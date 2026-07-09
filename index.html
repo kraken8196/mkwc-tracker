@@ -815,7 +815,11 @@ function formatScheduledLocal(iso){
   // language switcher. The timezone itself is still the visitor's own — that part
   // is automatic and untouched, since we never pass an explicit timeZone option.
   const d = new Date(iso);
-  return d.toLocaleString(localeForLang(), { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  let out = d.toLocaleString(localeForLang(), { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  // English's 12-hour clock famously confuses 12 AM/PM for midnight/noon — spell it out
+  // plainly instead. The other languages here already use an unambiguous 24h clock.
+  if(LANG==='en') out = out.replace('12:00 AM', 'Midnight').replace('12:00 PM', 'Noon');
+  return out;
 }
 function formatScheduledLocalDateOnly(iso){
   const d = new Date(iso);
