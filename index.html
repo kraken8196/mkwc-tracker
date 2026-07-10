@@ -37,6 +37,7 @@
       radial-gradient(circle at 100% 0%, rgba(255,255,255,0.10), transparent 35%),
       repeating-linear-gradient(115deg, rgba(0,0,0,0.05) 0 2px, transparent 2px 6px),
       linear-gradient(160deg, var(--orange-1) 0%, var(--orange-2) 45%, var(--orange-3) 100%);
+    background-attachment:fixed;
   }
   h1,h2,h3,.display{
     font-family:'Rajdhani',sans-serif;
@@ -55,7 +56,9 @@
   /* ---------- header ---------- */
   header{
     position:sticky; top:0; z-index:30;
-    background:rgba(20,10,3,0.97);
+    background:rgba(20,10,3,0.72);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line-strong);
   }
   .header-inner{
@@ -152,6 +155,20 @@
   .phase-countdown{
     font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--gold);font-weight:700;
     margin-top:8px;letter-spacing:0.03em;
+  }
+  .live-now-block{margin-top:18px;}
+  .live-now-title{
+    font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:0.08em;
+    font-family:'JetBrains Mono',monospace;margin-bottom:8px;display:flex;align-items:center;gap:7px;
+  }
+  .live-now-title::before{
+    content:'';width:8px;height:8px;border-radius:50%;background:var(--red);
+    box-shadow:0 0 0 0 rgba(229,72,77,0.6); animation:live-pulse 1.6s infinite;
+  }
+  @keyframes live-pulse{
+    0%{box-shadow:0 0 0 0 rgba(229,72,77,0.6);}
+    70%{box-shadow:0 0 0 7px rgba(229,72,77,0);}
+    100%{box-shadow:0 0 0 0 rgba(229,72,77,0);}
   }
 
   .format-card{
@@ -590,7 +607,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
     homeLinkStandings:'Voir les classements et le bracket', homeLinkCalendar:'Consulter le calendrier complet',
@@ -638,7 +655,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
     homeLinkStandings:'See standings and the bracket', homeLinkCalendar:'Check the full calendar',
@@ -686,7 +703,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
     homeLinkStandings:'Ver la clasificación y el cuadro', homeLinkCalendar:'Consultar el calendario completo',
@@ -734,7 +751,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
     homeLinkStandings:'順位表とトーナメント表を見る', homeLinkCalendar:'全カレンダーを見る',
@@ -1229,9 +1246,17 @@ function computeStandings(slots, scores){
 /* =========================================================
    RENDER: STANDINGS VIEW
 ========================================================= */
+function isGroupFullyPlayed(groupObj){
+  return pairsFor(groupObj.slots.length).every(([i,j])=>{
+    const h = groupObj.slots[i], a = groupObj.slots[j];
+    if(h==null || a==null) return false; // team not decided yet — group can't be complete
+    const sc = groupObj.scores[i+'-'+j];
+    return sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
+  });
+}
 function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
   const standings = computeStandings(groupObj.slots, groupObj.scores);
-  const anyPlayed = standings.some(r=>r.w>0||r.l>0);
+  const anyPlayed = isGroupFullyPlayed(groupObj);
   let rows = '';
   standings.forEach((r,i)=>{
     const isQ = anyPlayed && i < qualifyCount && r.tag!=null;
@@ -1455,7 +1480,7 @@ function getAllMatchItems(){
         items.push({
           stage:`${stageLabel} · Gr. ${id}`, date:itemDate, dayLabel:itemDayLabel, h,a, sc,
           anchor:`group-${anchorPrefix}-${id}`, matchRef:`g|${anchorPrefix}|${id}|${i}|${j}`,
-          dateKey:itemDateKey, dateOrder:itemDateOrder
+          dateKey:itemDateKey, dateOrder:itemDateOrder, rawIso: iso || null
         });
       });
     });
@@ -1496,6 +1521,9 @@ function matchCardHTML(it){
   </div>`;
 }
 
+function getLiveMatchesNow(){
+  return getAllMatchItems().filter(it => it.rawIso && new Date(it.rawIso).getTime() <= Date.now() && !isPlayed(it.sc));
+}
 function getPlayInStartMs(){
   return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
 }
@@ -1524,9 +1552,14 @@ function renderHomeView(){
   const totalMatches = getTotalMatchCount();
   const pct = totalMatches ? Math.round((matchesPlayed/totalMatches)*100) : 0;
   const status = getTournamentPhaseStatus();
+  const liveNow = status.phase!=='before' ? getLiveMatchesNow() : [];
 
   let html = `
     <div class="phase-banner phase-${status.phase}">${t(status.key)}${status.phase==='before' ? `<div id="playinCountdown" class="phase-countdown"></div>` : ''}</div>
+    ${liveNow.length ? `<div class="live-now-block">
+      <h3 class="live-now-title">${t('homeLiveNow')}</h3>
+      <div class="cal-list">${liveNow.map(matchCardHTML).join('')}</div>
+    </div>` : ''}
     <div class="stage-note" style="font-size:15px;margin:18px 0 24px;">${t('homeIntro')}</div>
 
     <div class="match-progress" style="margin-bottom:30px;">
@@ -1578,6 +1611,16 @@ function renderHomeView(){
     };
   });
   if(status.phase==='before') startCountdown(getPlayInStartMs()); else clearCountdownInterval();
+  ensureHomeLiveRefresh();
+}
+let homeLiveRefreshStarted = false;
+function ensureHomeLiveRefresh(){
+  if(homeLiveRefreshStarted) return;
+  homeLiveRefreshStarted = true;
+  setInterval(()=>{
+    const el = document.getElementById('view-home');
+    if(el && el.classList.contains('active')) renderHomeView();
+  }, 30000);
 }
 let countdownInterval = null;
 function clearCountdownInterval(){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval=null; } }
