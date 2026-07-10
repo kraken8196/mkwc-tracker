@@ -238,6 +238,7 @@
   .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
   .score-win{color:var(--gold);font-weight:700;}
+  .best-race-banner{margin-bottom:16px;font-size:14px;color:var(--cream);}
   .score-lose{color:var(--dim);}
   .cal-score.done{color:var(--cream);}
   .cal-date{font-size:12px;color:var(--dim);min-width:150px;flex-shrink:0;text-align:right;white-space:nowrap;}
@@ -271,6 +272,10 @@
   .match-detail-team .teamname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:19px;}
   .match-detail-team.winner .teamname{color:var(--green);}
   .match-detail-players-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
+  .race-chart-wrap{margin-top:28px;}
+  .race-chart-title{font-size:15px;color:var(--gold);margin-bottom:10px;}
+  .race-chart-legend{display:flex;gap:18px;margin-top:8px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+  .race-chart-legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
   .mdp-col{display:flex;flex-direction:column;gap:3px;}
   .match-detail-score{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--cream);white-space:nowrap;text-align:center;}
   .match-detail-score .md-vs{text-transform:uppercase;color:var(--dim);}
@@ -385,6 +390,16 @@
   .amr-player-row{display:flex;gap:6px;}
   .amr-player-row select{flex:1;min-width:0;}
   .amr-player-row .score-input{width:64px;flex-shrink:0;}
+  .amr-race-wrap{overflow-x:auto;margin-top:10px;}
+  .amr-race-table{border-collapse:collapse;font-size:12px;white-space:nowrap;}
+  .amr-race-table th,.amr-race-table td{padding:3px 4px;text-align:center;}
+  .amr-race-table thead th{color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;}
+  .amr-race-name{text-align:left !important;min-width:150px;}
+  .amr-race-table input.race-input{width:38px;padding:4px 2px;text-align:center;font-size:12px;}
+  .amr-race-table select{max-width:150px;font-size:12px;padding:4px 6px;}
+  .amr-race-total{color:var(--gold);font-weight:700;min-width:34px;}
+  .amr-track-table{margin-bottom:2px;}
+  .amr-track-select{width:110px;font-size:11px;padding:4px 3px;}
   select, .score-input{
     background:var(--panel-3);border:1px solid var(--line-strong);color:var(--cream);
     padding:7px 9px;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;
@@ -611,7 +626,11 @@ const I18N = {
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
     homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant',
-    thanksTitle:'Remerciements', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
+    thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
+    bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
+    tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
+    colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
+    colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
     homeLinkStandings:'Voir les classements et le bracket', homeLinkCalendar:'Consulter le calendrier complet',
@@ -660,7 +679,11 @@ const I18N = {
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
     homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now',
-    thanksTitle:'Thanks', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
+    thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
+    bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
+    tracksNote:'Average score on each track, across every player and match.',
+    colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
+    colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
     homeLinkStandings:'See standings and the bracket', homeLinkCalendar:'Check the full calendar',
@@ -709,7 +732,11 @@ const I18N = {
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
     homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora',
-    thanksTitle:'Agradecimientos', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
+    thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
+    bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
+    tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
+    colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
+    colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
     homeLinkStandings:'Ver la clasificación y el cuadro', homeLinkCalendar:'Consultar el calendario completo',
@@ -758,7 +785,11 @@ const I18N = {
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
     homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中',
-    thanksTitle:'謝辞', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
+    thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
+    bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
+    tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
+    colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
+    colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
     homeLinkStandings:'順位表とトーナメント表を見る', homeLinkCalendar:'全カレンダーを見る',
@@ -929,7 +960,45 @@ function defaultState(){
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
   return s;
 }
-function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', s:''})); }
+function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill('')})); }
+function playerTotal(p){ return (p.races||[]).reduce((sum,v)=> sum + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
+function playerRacesFilled(p){ return (p.races||[]).some(v=>v!=='' && v!=null); }
+
+const TRACKS = [
+  {id:'t1_mario_bros_circuit', fr:'Circuit Mario Bros.', en:'Mario Bros. Circuit', es:'Circuito Mario Bros.', ja:'マリオブラザーズサーキット'},
+  {id:'t2_crown_city', fr:'Trophéopolis', en:'Crown City', es:'Ciudad Corona', ja:'トロフィーシティ'},
+  {id:'t3_whistlestop_summit', fr:'Mont Tchou Tchou', en:'Whistlestop Summit', es:'Cañón Ferroviario', ja:'シュポポコースター'},
+  {id:'t4_dk_spaceport', fr:'Spatioport DK', en:'DK Spaceport', es:'Puerto Espacial DK', ja:'DKうちゅうセンター'},
+  {id:'t5_desert_hills', fr:'Désert du soleil', en:'Desert Hills', es:'Desierto Sol-Sol', ja:'サンサンさばく'},
+  {id:'t6_shy_guy_bazaar', fr:'Souk Maskass', en:'Shy Guy Bazaar', es:'Bazar Shy Guy', ja:'ヘイホーカーニバル'},
+  {id:'t7_wario_stadium', fr:'Stade Wario', en:'Wario Stadium', es:'Estadio Wario', ja:'ワリオスタジアム'},
+  {id:'t8_airship_fortress', fr:'Bateau volant', en:'Airship Fortress', es:'Fortaleza Aérea', ja:'キラーシップ'},
+  {id:'t9_dk_pass', fr:'Alpes DK', en:'DK Pass', es:'DK Alpino', ja:'DKスノーマウンテン'},
+  {id:'t10_starview_peak', fr:'Pic de l\'observatoire', en:'Starview Peak', es:'Mirador Estelar', ja:'ロゼッタてんもんだい'},
+  {id:'t11_sky_high_sundae', fr:'Cité Sorbet', en:'Sky-High Sundae', es:'Cielos Helados', ja:'アイスビルディング'},
+  {id:'t12_wario_s_galleon', fr:'Galion de Wario', en:'Wario\'s Galleon', es:'Galeón de Wario', ja:'ワリオシップ'},
+  {id:'t13_koopa_troopa_beach', fr:'Plage Koopa', en:'Koopa Troopa Beach', es:'Playa Koopa', ja:'ノコノコビーチ'},
+  {id:'t14_faraway_oasis', fr:'Savane sauvage', en:'Faraway Oasis', es:'Sabana Salpicante', ja:'リバーサイドサファリ'},
+  {id:'t15_peach_stadium', fr:'Stade Peach', en:'Peach Stadium', es:'Estadio Peach', ja:'ピーチスタジアム'},
+  {id:'t16_peach_beach', fr:'Plage Peach', en:'Peach Beach', es:'Playa Peach', ja:'ピーチビーチ'},
+  {id:'t17_salty_salty_speedway', fr:'Cité Fleur-de-sel', en:'Salty Salty Speedway', es:'Ciudad Salina', ja:'ソルティータウン'},
+  {id:'t18_dino_dino_jungle', fr:'Jungle Dino Dino', en:'Dino Dino Jungle', es:'Jungla Dino Dino', ja:'ディノディノジャングル'},
+  {id:'t19_great_block_ruins', fr:'Bloc ? antique', en:'Great ? Block Ruins', es:'Templo del Bloque ?', ja:'ハテナしんでん'},
+  {id:'t20_cheep_cheep_falls', fr:'Chutes Cheep Cheep', en:'Cheep Cheep Falls', es:'Cascadas Cheep Cheep', ja:'プクプクフォールズ'},
+  {id:'t21_dandelion_depths', fr:'Gouffre Pissenlit', en:'Dandelion Depths', es:'Gruta Diente de León', ja:'ショーニューロード'},
+  {id:'t22_boo_cinema', fr:'Cinéma Boo', en:'Boo Cinema', es:'Cine Boo', ja:'おばけシネマ'},
+  {id:'t23_dry_bones_burnout', fr:'Fournaise osseuse', en:'Dry Bones Burnout', es:'Caverna Ósea', ja:'ホネホネツイスター'},
+  {id:'t24_moo_moo_meadows', fr:'Prairie Meuh Meuh', en:'Moo Moo Meadows', es:'Pradera Mu-Mu', ja:'モーモーカントリー'},
+  {id:'t25_choco_mountain', fr:'Montagne Choco', en:'Choco Mountain', es:'Monte Chocolate', ja:'チョコマウンテン'},
+  {id:'t26_toad_s_factory', fr:'Usine Toad', en:'Toad\'s Factory', es:'Fábrica de Toad', ja:'キノピオファクトリー'},
+  {id:'t27_bowser_s_castle', fr:'Chateau de Bowser', en:'Bowser\'s Castle', es:'Castillo de Bowser', ja:'クッパキャッスル'},
+  {id:'t28_acorn_heights', fr:'Chemin du chêne', en:'Acorn Heights', es:'Aldea Arbórea', ja:'どんぐりツリーハウス'},
+  {id:'t29_mario_circuit', fr:'Circuit Mario', en:'Mario Circuit', es:'Circuito Mario', ja:'マリオサーキット'},
+  {id:'t30_rainbow_road', fr:'Route Arc-en-ciel', en:'Rainbow Road', es:'Senda Arco Iris', ja:'レインボーロード'},
+];
+
+function trackName(id){ if(!id) return ''; const tr = TRACKS.find(t=>t.id===id); return tr ? tr[LANG] : id; }
+function emptyMatchPlayers(){ return {h:emptyPlayerSlots(), a:emptyPlayerSlots(), tracks: Array(12).fill('')}; }
 
 /* =========================================================
    SUPABASE STORAGE (replaces the Claude.ai window.storage API
@@ -1322,7 +1391,7 @@ function parseMatchRef(ref){
     const h = g.slots[i], a = g.slots[j];
     const key = i+'-'+j;
     const sc = g.scores[key] || ['',''];
-    const pl = g.players[key] || {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+    const pl = g.players[key] || emptyMatchPlayers();
     const stageLabel = anchorPrefix==='quali' ? t('stageQuali') : t('stagePhaseGroupes');
     const iso = scheduledTimeFor(anchorPrefix, id, key);
     const dateStr = iso ? formatScheduledLocal(iso) : (anchorPrefix==='quali' ? t('dateQuali') : t('datePhase'));
@@ -1334,21 +1403,90 @@ function parseMatchRef(ref){
     if(!slots) return null;
     const h = slots[idx*2], a = slots[idx*2+1];
     const sc = roundScores[round][idx] || ['',''];
-    const pl = (STATE.bracket.players['r'+round]||{})[idx] || {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+    const pl = (STATE.bracket.players['r'+round]||{})[idx] || emptyMatchPlayers();
     return {h, a, sc, players:pl, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null};
   }
   return null;
 }
 
+function raceDetailTableHTML(playersH, playersA, teamH, teamA, tracks){
+  if(!tracks) return '';
+  const rows = [];
+  for(let r=0;r<12;r++){
+    const anyEntered = [...playersH,...playersA].some(p=> p.n && p.races && p.races[r]!=='' && p.races[r]!=null);
+    if(!anyEntered) continue;
+    const scH = playersH.reduce((s,p)=> s + (p.n && p.races[r]!=='' && p.races[r]!=null ? (Number(p.races[r])||0) : 0), 0);
+    const scA = playersA.reduce((s,p)=> s + (p.n && p.races[r]!=='' && p.races[r]!=null ? (Number(p.races[r])||0) : 0), 0);
+    rows.push({r, track:tracks[r], scH, scA});
+  }
+  if(!rows.length) return '';
+  return `<div class="stats-table-wrap" style="margin-top:20px;">
+    <table class="stats-table">
+      <thead><tr><th>${t('colRace')}</th><th>${t('colTrack')}</th><th class="num">${teamName(teamH)}</th><th class="num">${teamName(teamA)}</th></tr></thead>
+      <tbody>
+        ${rows.map(row=>`<tr>
+          <td class="lname">R${row.r+1}</td>
+          <td class="lteam">${row.track?trackName(row.track):'—'}</td>
+          <td class="num ${row.scH>row.scA?'score-win':''}">${row.scH}</td>
+          <td class="num ${row.scA>row.scH?'score-win':''}">${row.scA}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+function raceProgressChartHTML(playersH, playersA, teamH, teamA){
+  // Cumulative team score after each race, race by race — only up to the last race with any data entered.
+  let lastRace = -1;
+  for(let r=0;r<12;r++){
+    const anyEntered = [...playersH,...playersA].some(p=> p.n && p.races && p.races[r]!=='' && p.races[r]!=null);
+    if(anyEntered) lastRace = r;
+  }
+  if(lastRace < 0) return '';
+  const cumH = [], cumA = [];
+  let runH=0, runA=0;
+  for(let r=0;r<=lastRace;r++){
+    runH += playersH.reduce((s,p)=> s + (p.n && p.races[r]!=='' && p.races[r]!=null ? (Number(p.races[r])||0) : 0), 0);
+    runA += playersA.reduce((s,p)=> s + (p.n && p.races[r]!=='' && p.races[r]!=null ? (Number(p.races[r])||0) : 0), 0);
+    cumH.push(runH); cumA.push(runA);
+  }
+  const w=560, h=220, padL=40, padR=16, padT=16, padB=30;
+  const n = cumH.length;
+  const maxVal = Math.max(1, ...cumH, ...cumA);
+  const x = i => n>1 ? padL + (i/(n-1))*(w-padL-padR) : padL;
+  const y = v => padT + (1 - v/maxVal) * (h-padT-padB);
+  const pathFor = arr => arr.map((v,i)=> `${i===0?'M':'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const gridLines = [0,0.25,0.5,0.75,1].map(f=>{
+    const yy = padT + f*(h-padT-padB);
+    const val = Math.round(maxVal*(1-f));
+    return `<line x1="${padL}" y1="${yy}" x2="${w-padR}" y2="${yy}" stroke="rgba(255,235,210,0.12)" stroke-width="1"/>
+      <text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="#D9B996" font-family="JetBrains Mono, monospace">${val}</text>`;
+  }).join('');
+  const xLabels = cumH.map((_,i)=> `<text x="${x(i).toFixed(1)}" y="${h-padB+16}" text-anchor="middle" font-size="10" fill="#D9B996" font-family="JetBrains Mono, monospace">${i+1}</text>`).join('');
+  return `<div class="race-chart-wrap">
+    <h3 class="race-chart-title">${t('raceChartTitle')}</h3>
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:${w}px;display:block;">
+      ${gridLines}
+      ${xLabels}
+      <path d="${pathFor(cumH)}" fill="none" stroke="#FFCE54" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="${pathFor(cumA)}" fill="none" stroke="#8FA8D9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${cumH.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="#FFCE54"/>`).join('')}
+      ${cumA.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="#8FA8D9"/>`).join('')}
+    </svg>
+    <div class="race-chart-legend">
+      <span><span class="dot" style="background:#FFCE54;"></span>${teamName(teamH)}</span>
+      <span><span class="dot" style="background:#8FA8D9;"></span>${teamName(teamA)}</span>
+    </div>
+  </div>`;
+}
 function playerListHTML(entries, teamTag){
   const filled = entries.filter(p=>p.n);
   if(!filled.length) return '';
-  const sorted = [...filled].sort((a,b)=> (Number(b.s)||0)-(Number(a.s)||0));
+  const sorted = [...filled].sort((a,b)=> playerTotal(b)-playerTotal(a));
   return `<div class="stats-table-wrap">
     <table class="stats-table">
       <thead><tr><th colspan="2">${teamPlainHTML(teamTag)}</th></tr></thead>
       <tbody>
-        ${sorted.map(p=>`<tr><td class="lname">${p.n}</td><td class="num highlight">${p.s!==''?p.s:'—'}</td></tr>`).join('')}
+        ${sorted.map(p=>`<tr><td class="lname">${p.n}</td><td class="num highlight">${playerRacesFilled(p)?playerTotal(p):'—'}</td></tr>`).join('')}
       </tbody>
     </table>
   </div>`;
@@ -1383,7 +1521,9 @@ function renderMatchDetail(ref){
       ${(players.h.some(p=>p.n) || players.a.some(p=>p.n)) ? `<div class="match-detail-players-row">
         <div class="mdp-col">${playerListHTML(players.h, h)}</div>
         <div class="mdp-col">${playerListHTML(players.a, a)}</div>
-      </div>` : ''}
+      </div>
+      ${raceProgressChartHTML(players.h, players.a, h, a)}
+      ${raceDetailTableHTML(players.h, players.a, h, a, players.tracks)}` : ''}
     </div>
   `;
   wireMatchDetailEvents();
@@ -1723,6 +1863,155 @@ function getTeamStats(tag){
   return {w,l,d,pf,pa,played,diff:pf-pa,appearances};
 }
 
+function stdDev(arr){
+  if(arr.length<2) return null;
+  const mean = arr.reduce((s,v)=>s+v,0)/arr.length;
+  const variance = arr.reduce((s,v)=>s+(v-mean)*(v-mean),0)/arr.length;
+  return Math.sqrt(variance);
+}
+function getAdvancedStats(){
+  const playerAllRaces = {}; // "tag|name" -> [every individual race score across the tournament]
+  const playerMatchRaces = {}; // "tag|name" -> [ [12 race scores for one full match], ... ]
+  const teamMatchTotals = {}; // tag -> [ [6 player totals for one match], ... ]
+
+  function scanMatch(pl, tagH, tagA){
+    if(!pl) return;
+    [[pl.h, tagH], [pl.a, tagA]].forEach(([arr, tag])=>{
+      if(!tag || !arr) return;
+      const matchTotals = [];
+      arr.forEach(p=>{
+        if(!p.n) return;
+        const races = (p.races||[]).map(v=> v!=='' && v!=null ? Number(v) : null);
+        const filled = races.filter(v=>v!=null);
+        if(!filled.length) return;
+        const pkey = tag+'|'+p.n;
+        playerAllRaces[pkey] = (playerAllRaces[pkey]||[]).concat(filled);
+        matchTotals.push(filled.reduce((s,v)=>s+v,0));
+        if(filled.length===12){ // only fully-entered matches count toward the "finishing strong" read
+          playerMatchRaces[pkey] = playerMatchRaces[pkey] || [];
+          playerMatchRaces[pkey].push(races);
+        }
+      });
+      if(matchTotals.length===6){
+        teamMatchTotals[tag] = teamMatchTotals[tag] || [];
+        teamMatchTotals[tag].push(matchTotals);
+      }
+    });
+  }
+  function scanGroups(groupsObj){
+    for(const id in groupsObj){
+      const g = groupsObj[id];
+      for(const key in (g.players||{})){
+        const [i,j] = key.split('-').map(Number);
+        scanMatch(g.players[key], g.slots[i], g.slots[j]);
+      }
+    }
+  }
+  scanGroups(STATE.quali); scanGroups(STATE.top); scanGroups(STATE.mid);
+  const {rounds} = deriveBracketRounds();
+  for(let r=0;r<4;r++){
+    const slots = rounds[r];
+    const pls = STATE.bracket.players['r'+r] || {};
+    for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
+  }
+
+  // Consistency: gap between a player's best and worst individual race — smaller means steadier.
+  const consistency = {};
+  for(const pkey in playerAllRaces){
+    const races = playerAllRaces[pkey];
+    if(races.length<2) continue;
+    consistency[pkey] = Math.max(...races) - Math.min(...races);
+  }
+
+  // Clutch: average of the last 3 races minus average of the first 9, per match, then averaged —
+  // positive means a player tends to finish a match stronger than they started it.
+  const clutch = {};
+  for(const pkey in playerMatchRaces){
+    const diffs = playerMatchRaces[pkey].map(races=>{
+      const early = races.slice(0,9).reduce((s,v)=>s+v,0)/9;
+      const late = races.slice(9,12).reduce((s,v)=>s+v,0)/3;
+      return late-early;
+    });
+    if(diffs.length) clutch[pkey] = diffs.reduce((s,v)=>s+v,0)/diffs.length;
+  }
+
+  // Team balance: how spread out the 6 players' match totals are, averaged over the team's matches —
+  // smaller means the points are shared evenly rather than resting on one or two players.
+  const balance = {};
+  for(const tag in teamMatchTotals){
+    const perMatchSpread = teamMatchTotals[tag].map(totals=> stdDev(totals)).filter(v=>v!=null);
+    if(perMatchSpread.length) balance[tag] = perMatchSpread.reduce((s,v)=>s+v,0)/perMatchSpread.length;
+  }
+
+  return { consistency, clutch, balance };
+}
+function getRaceStats(){
+  const playerTrackStats = {}; // "tag|name" -> { trackId -> {count, total} }
+  const teamTrackStats = {}; // tag -> { trackId -> {count, total} }
+
+  function scanMatch(pl, tagH, tagA){
+    if(!pl || !pl.tracks) return;
+    [[pl.h, tagH], [pl.a, tagA]].forEach(([arr, tag])=>{
+      if(!tag) return;
+      (arr||[]).forEach(p=>{
+        if(!p.n) return;
+        (p.races||[]).forEach((val, r)=>{
+          if(val==='' || val==null) return;
+          const score = Number(val)||0;
+          const trackId = pl.tracks[r];
+          if(!trackId) return;
+          const pkey = tag+'|'+p.n;
+          playerTrackStats[pkey] = playerTrackStats[pkey] || {};
+          playerTrackStats[pkey][trackId] = playerTrackStats[pkey][trackId] || {count:0, total:0};
+          playerTrackStats[pkey][trackId].count++;
+          playerTrackStats[pkey][trackId].total += score;
+
+          teamTrackStats[tag] = teamTrackStats[tag] || {};
+          teamTrackStats[tag][trackId] = teamTrackStats[tag][trackId] || {count:0, total:0};
+          teamTrackStats[tag][trackId].count++;
+          teamTrackStats[tag][trackId].total += score;
+        });
+      });
+    });
+  }
+  function scanGroups(groupsObj){
+    for(const id in groupsObj){
+      const g = groupsObj[id];
+      for(const key in (g.players||{})){
+        const [i,j] = key.split('-').map(Number);
+        scanMatch(g.players[key], g.slots[i], g.slots[j]);
+      }
+    }
+  }
+  scanGroups(STATE.quali);
+  scanGroups(STATE.top);
+  scanGroups(STATE.mid);
+  const {rounds} = deriveBracketRounds();
+  for(let r=0;r<4;r++){
+    const slots = rounds[r];
+    const pls = STATE.bracket.players['r'+r] || {};
+    for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
+  }
+
+  function bestTrackFromStats(statsObj){
+    const result = {};
+    for(const key in statsObj){
+      let best=null, bestAvg=-1;
+      for(const tid in statsObj[key]){
+        const s = statsObj[key][tid];
+        const avg = s.total/s.count;
+        if(avg>bestAvg){ bestAvg=avg; best=tid; }
+      }
+      result[key] = best;
+    }
+    return result;
+  }
+
+  return {
+    bestTrackForPlayer: bestTrackFromStats(playerTrackStats),
+    bestTrackForTeam: bestTrackFromStats(teamTrackStats),
+  };
+}
 function getPlayerStats(){
   const stats = {}; // tag -> {name -> {count, total, w, l}}
   function add(tag, name, score, result){
@@ -1748,8 +2037,8 @@ function getPlayerStats(){
         const [i,j] = key.split('-').map(Number);
         const pl = g.players[key];
         const [hRes,aRes] = resultsFor(g.scores[key]);
-        (pl.h||[]).forEach(p=>{ if(p.n) add(g.slots[i], p.n, p.s, hRes); });
-        (pl.a||[]).forEach(p=>{ if(p.n) add(g.slots[j], p.n, p.s, aRes); });
+        (pl.h||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(g.slots[i], p.n, playerTotal(p), hRes); });
+        (pl.a||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(g.slots[j], p.n, playerTotal(p), aRes); });
       }
     }
   }
@@ -1762,8 +2051,8 @@ function getPlayerStats(){
       const pl = pls[m];
       const h = slots[m*2], a = slots[m*2+1];
       const [hRes,aRes] = resultsFor(roundScores[r][m]);
-      (pl.h||[]).forEach(p=>{ if(p.n) add(h, p.n, p.s, hRes); });
-      (pl.a||[]).forEach(p=>{ if(p.n) add(a, p.n, p.s, aRes); });
+      (pl.h||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(h, p.n, playerTotal(p), hRes); });
+      (pl.a||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(a, p.n, playerTotal(p), aRes); });
     }
   }
   // compute averages
@@ -1911,8 +2200,11 @@ function renderTeamDetail(tag){
   const upcoming = getUpcomingMatchesFor(tag);
   const recent = getRecentResultsFor(tag);
   const playerStats = getPlayerStats();
+  const raceStats = getRaceStats();
+  const advStats = getAdvancedStats();
   const myStats = playerStats[tag] || {};
   const winPct = stats.played ? Math.round((stats.w/stats.played)*100) : null;
+  const teamBestTrack = raceStats.bestTrackForTeam[tag];
   const playerRows = players
     .map(p=>({p, s:myStats[p.n]||null}))
     .sort((a,b)=> (b.s?b.s.avg:-1) - (a.s?a.s.avg:-1));
@@ -1931,6 +2223,8 @@ function renderTeamDetail(tag){
         <div class="s">${t('colWinPct')} <b>${winPct!=null?winPct+'%':'—'}</b></div>
         <div class="s">${t('statDiff')} <b>${stats.diff>0?'+':''}${stats.diff}</b></div>
         <div class="s">${t('statPlayers')} <b>${players.length}</b></div>
+        <div class="s">${t('colBestTrack')} <b>${teamBestTrack?trackName(teamBestTrack):'—'}</b></div>
+        <div class="s">${t('colBalance')} <b>${advStats.balance[tag]!=null?advStats.balance[tag].toFixed(1):'—'}</b></div>
       </div>
       ${stats.appearances.length? `<div class="helptext" style="margin:10px 0;">${stats.appearances.map(a=>a.anchor?`<span class="stage-link" data-anchor="${a.anchor}">${a.label}</span>`:a.label).join(' · ')}</div>` : ''}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
@@ -1953,15 +2247,24 @@ function renderTeamDetail(tag){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
       <div class="stats-table-wrap">
         <table class="stats-table">
-          <thead><tr><th></th><th>${t('colPlayer')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+          <thead><tr><th></th><th>${t('colPlayer')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colConsistency')}</th><th class="num">${t('colClutch')}</th></tr></thead>
           <tbody>
-            ${playerRows.map(({p,s})=>`<tr>
+            ${playerRows.map(({p,s})=>{
+              const bestTid = raceStats.bestTrackForPlayer[tag+'|'+p.n];
+              const pkey = tag+'|'+p.n;
+              const cons = advStats.consistency[pkey];
+              const clu = advStats.clutch[pkey];
+              return `<tr>
               <td style="text-align:center;"><span class="nat-badge" data-tooltip="${natName(p.nat)}">${p.nat}</span></td>
               <td class="lname">${p.n}</td>
               <td class="num">${s?s.count:'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
               <td class="num ${s?'highlight':''}">${s?s.avg.toFixed(1):'—'}</td>
-            </tr>`).join('')}
+              <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
+              <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
+              <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
+            </tr>`;
+            }).join('')}
           </tbody>
         </table>
       </div>
@@ -1979,6 +2282,8 @@ function wireTeamDetailEvents(){
 let statsMode = 'players';
 function renderPlayersView(){
   const el = document.getElementById('view-players');
+  const raceStats = getRaceStats();
+  const advStats = getAdvancedStats();
   let html = `<div class="admin-select-row" style="margin-bottom:16px;">
     <button class="chip ${statsMode==='players'?'active':''}" data-statsmode="players">${t('tabPlayers')}</button>
     <button class="chip ${statsMode==='teams'?'active':''}" data-statsmode="teams">${t('tabTeamsStats')}</button>
@@ -1998,9 +2303,13 @@ function renderPlayersView(){
     html += `<div class="stage-note">${t('playersNote')} ${all.length===0?t('playersEmpty'):''}</div>`;
     if(all.length){
       html += `<div class="stats-table-wrap"><table class="stats-table" id="leaderList">
-        <thead><tr><th></th><th>${t('colPlayer')}</th><th>${t('colTeam')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+        <thead><tr><th></th><th>${t('colPlayer')}</th><th>${t('colTeam')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colConsistency')}</th><th class="num">${t('colClutch')}</th></tr></thead>
         <tbody>`;
       all.forEach((p,i)=>{
+        const bestTid = raceStats.bestTrackForPlayer[p.tag+'|'+p.name];
+        const pkey = p.tag+'|'+p.name;
+        const cons = advStats.consistency[pkey];
+        const clu = advStats.clutch[pkey];
         html += `<tr class="leader-row" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}">
           <td class="lp ${i===0?'top1':''}">${i+1}</td>
           <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname">${p.name}</span></span></td>
@@ -2008,6 +2317,9 @@ function renderPlayersView(){
           <td class="num">${p.count}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
           <td class="num highlight">${p.avg.toFixed(1)}</td>
+          <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
+          <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
+          <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
         </tr>`;
       });
       html += `</tbody></table></div>`;
@@ -2033,9 +2345,11 @@ function renderPlayersView(){
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
     html += `<div class="stats-table-wrap"><table class="stats-table" id="teamStatsList">
-      <thead><tr><th></th><th>${t('colTeam')}</th><th class="num">${t('statMatches')}</th><th class="num">${t('statW')}</th><th class="num">${t('colD')}</th><th class="num">${t('statL')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('statDiff')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+      <thead><tr><th></th><th>${t('colTeam')}</th><th class="num">${t('statMatches')}</th><th class="num">${t('statW')}</th><th class="num">${t('colD')}</th><th class="num">${t('statL')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('statDiff')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colBalance')}</th></tr></thead>
       <tbody>`;
     teams.forEach((tm,i)=>{
+      const bestTid = raceStats.bestTrackForTeam[tm.tag];
+      const bal = advStats.balance[tm.tag];
       html += `<tr class="leader-row" data-team="${teamName(tm.tag).toLowerCase()}">
         <td class="lp ${i===0?'top1':''}">${i+1}</td>
         <td><span class="teamcell">${teamLinkHTML(tm.tag)}</span></td>
@@ -2046,6 +2360,8 @@ function renderPlayersView(){
         <td class="num">${tm.played? Math.round(tm.winPct*100)+'%' : '—'}</td>
         <td class="num">${tm.diff>0?'+':''}${tm.diff}</td>
         <td class="num highlight">${tm.played? tm.avg.toFixed(1) : '—'}</td>
+        <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
+        <td class="num">${bal!=null?bal.toFixed(1):'—'}</td>
       </tr>`;
     });
     html += `</tbody></table></div>`;
@@ -2473,6 +2789,42 @@ let adminUnlocked = false;
 let adminSection = 'quali';
 let adminGroup = 'W';
 
+function trackOptions(selected){
+  return `<option value="">—</option>` + TRACKS.map(tr=>`<option value="${tr.id}" ${selected===tr.id?'selected':''}>${tr[LANG]}</option>`).join('');
+}
+function trackSelectorRowHTML(key, tracks, disabled, dataAttr){
+  dataAttr = dataAttr || 'pmatch';
+  const cols = Array.from({length:12}, (_,r)=>r);
+  return `<div class="amr-race-wrap">
+    <table class="amr-race-table amr-track-table">
+      <tbody><tr>
+        <td class="amr-race-name" style="color:var(--dim);font-size:11px;">${t('adminTrackLabel')}</td>
+        ${cols.map(r=>`<td><select class="amr-track-select" data-${dataAttr}-track="${key}" data-race="${r}" ${disabled}>${trackOptions(tracks?tracks[r]:'')}</select></td>`).join('')}
+        <td></td>
+      </tr></tbody>
+    </table>
+  </div>`;
+}
+function raceTableHTML(key, side, players, teamTag, disabled, dataAttr){
+  dataAttr = dataAttr || 'pmatch';
+  const cols = Array.from({length:12}, (_,r)=>r);
+  return `<div class="amr-race-wrap">
+    <table class="amr-race-table">
+      <thead><tr>
+        <th class="amr-race-name">${teamTag?teamName(teamTag):'—'}</th>
+        ${cols.map(r=>`<th>R${r+1}</th>`).join('')}
+        <th>Σ</th>
+      </tr></thead>
+      <tbody>
+        ${players.map((p,pi)=>`<tr>
+          <td class="amr-race-name"><select data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-field="name" ${disabled}>${playerOptions(teamTag, p.n)}</select></td>
+          ${cols.map(r=>`<td><input type="number" class="race-input" data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-race="${r}" value="${p.races?p.races[r]:''}" ${disabled}></td>`).join('')}
+          <td class="num amr-race-total">${playerTotal(p)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
 function playerOptions(tag, selected){
   if(!tag) return `<option value="">—</option>`;
   const players = roster(tag);
@@ -2560,14 +2912,14 @@ function renderAdminView(){
       });
     }
 
-    html += `<div class="helptext">Pour chaque match : sélectionne les 6 joueurs de chaque équipe et leur score individuel. Le score total de l'équipe se calcule tout seul en additionnant les 6 scores.</div>`;
+    html += `<div class="helptext">Pour chaque match : sélectionne les 6 joueurs de chaque équipe, puis leur score à chacune des 12 courses. Le total par joueur et le score d'équipe se calculent tout seuls.</div>`;
     pairsFor(stateGroup.slots.length).forEach(([i,j])=>{
       const h = stateGroup.slots[i], a = stateGroup.slots[j];
       const key = i+'-'+j;
-      const pl = stateGroup.players[key] || {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+      const pl = stateGroup.players[key] || emptyMatchPlayers();
       const disabled = (h==null || a==null) ? 'disabled' : '';
-      const totalH = pl.h.reduce((sum,p)=> sum + (Number(p.s)||0), 0);
-      const totalA = pl.a.reduce((sum,p)=> sum + (Number(p.s)||0), 0);
+      const totalH = pl.h.reduce((sum,p)=> sum + playerTotal(p), 0);
+      const totalA = pl.a.reduce((sum,p)=> sum + playerTotal(p), 0);
       html += `<div class="admin-match-full">
         <div class="amr-header">
           <span class="team-select">${h?teamName(h):'—'}</span>
@@ -2576,20 +2928,9 @@ function renderAdminView(){
           <span class="amr-total" id="total-${key}-1">${totalA}</span>
           <span class="team-select" style="text-align:right;">${a?teamName(a):'—'}</span>
         </div>
-        <div class="amr-players">
-          <div class="amr-side">
-            ${pl.h.map((p,pi)=>`<div class="amr-player-row">
-              <select data-pmatch="${key}" data-pside="0" data-pidx="${pi}" ${disabled}>${playerOptions(h, p.n)}</select>
-              <input type="number" class="score-input" data-pmatch="${key}" data-pside="0" data-pidx="${pi}" value="${p.s}" ${disabled}>
-            </div>`).join('')}
-          </div>
-          <div class="amr-side">
-            ${pl.a.map((p,pi)=>`<div class="amr-player-row">
-              <select data-pmatch="${key}" data-pside="1" data-pidx="${pi}" ${disabled}>${playerOptions(a, p.n)}</select>
-              <input type="number" class="score-input" data-pmatch="${key}" data-pside="1" data-pidx="${pi}" value="${p.s}" ${disabled}>
-            </div>`).join('')}
-          </div>
-        </div>
+        ${trackSelectorRowHTML(key, pl.tracks, disabled)}
+        ${raceTableHTML(key, 0, pl.h, h, disabled)}
+        ${raceTableHTML(key, 1, pl.a, a, disabled)}
       </div>`;
     });
   }
@@ -2612,11 +2953,11 @@ function renderAdminView(){
       const slots = rounds[r];
       for(let m=0;m<slots.length/2;m++){
         const h=slots[m*2], a=slots[m*2+1];
-        const pl = (STATE.bracket.players['r'+r]||{})[m] || {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+        const pl = (STATE.bracket.players['r'+r]||{})[m] || emptyMatchPlayers();
         const disabled = (h==null||a==null)?'disabled':'';
         const bkey = `${r}-${m}`;
-        const totalH = pl.h.reduce((sum,p)=> sum + (Number(p.s)||0), 0);
-        const totalA = pl.a.reduce((sum,p)=> sum + (Number(p.s)||0), 0);
+        const totalH = pl.h.reduce((sum,p)=> sum + playerTotal(p), 0);
+        const totalA = pl.a.reduce((sum,p)=> sum + playerTotal(p), 0);
         html += `<div class="admin-match-full">
           <div class="amr-header">
             <span class="team-select">${h?teamName(h):'—'}</span>
@@ -2625,20 +2966,9 @@ function renderAdminView(){
             <span class="amr-total" id="btotal-${bkey}-1">${totalA}</span>
             <span class="team-select" style="text-align:right;">${a?teamName(a):'—'}</span>
           </div>
-          <div class="amr-players">
-            <div class="amr-side">
-              ${pl.h.map((p,pi)=>`<div class="amr-player-row">
-                <select data-bpmatch="${bkey}" data-pside="0" data-pidx="${pi}" ${disabled}>${playerOptions(h, p.n)}</select>
-                <input type="number" class="score-input" data-bpmatch="${bkey}" data-pside="0" data-pidx="${pi}" value="${p.s}" ${disabled}>
-              </div>`).join('')}
-            </div>
-            <div class="amr-side">
-              ${pl.a.map((p,pi)=>`<div class="amr-player-row">
-                <select data-bpmatch="${bkey}" data-pside="1" data-pidx="${pi}" ${disabled}>${playerOptions(a, p.n)}</select>
-                <input type="number" class="score-input" data-bpmatch="${bkey}" data-pside="1" data-pidx="${pi}" value="${p.s}" ${disabled}>
-              </div>`).join('')}
-            </div>
-          </div>
+          ${trackSelectorRowHTML(bkey, pl.tracks, disabled, 'bpmatch')}
+          ${raceTableHTML(bkey, 0, pl.h, h, disabled, 'bpmatch')}
+          ${raceTableHTML(bkey, 1, pl.a, a, disabled, 'bpmatch')}
         </div>`;
       }
     }
@@ -2723,17 +3053,23 @@ function renderAdminView(){
       const stateGroup = adminSection==='quali'?STATE.quali[adminGroup]:(adminSection==='top'?STATE.top[adminGroup]:STATE.mid[adminGroup]);
       el.querySelectorAll('[data-pmatch]').forEach(field=>{
         const key = field.dataset.pmatch, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
-        if(!stateGroup.players[key]) stateGroup.players[key] = {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+        if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
         const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
-        else slot[pidx].s = field.value;
+        else slot[pidx].races[Number(field.dataset.race)] = field.value;
+      });
+      el.querySelectorAll('[data-pmatch-track]').forEach(field=>{
+        const key = field.dataset.pmatchTrack;
+        if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
+        if(!stateGroup.players[key].tracks) stateGroup.players[key].tracks = Array(12).fill('');
+        stateGroup.players[key].tracks[Number(field.dataset.race)] = field.value;
       });
       // team totals are derived from the 12 individual scores, never typed directly
       Object.keys(stateGroup.players).forEach(key=>{
         const pl = stateGroup.players[key];
-        const totalH = pl.h.reduce((sum,p)=> sum + (p.n && p.s!=='' ? (Number(p.s)||0) : 0), 0);
-        const totalA = pl.a.reduce((sum,p)=> sum + (p.n && p.s!=='' ? (Number(p.s)||0) : 0), 0);
-        const anyFilled = pl.h.some(p=>p.n && p.s!=='') || pl.a.some(p=>p.n && p.s!=='');
+        const totalH = pl.h.reduce((sum,p)=> sum + (p.n ? playerTotal(p) : 0), 0);
+        const totalA = pl.a.reduce((sum,p)=> sum + (p.n ? playerTotal(p) : 0), 0);
+        const anyFilled = pl.h.some(p=>p.n && playerRacesFilled(p)) || pl.a.some(p=>p.n && playerRacesFilled(p));
         stateGroup.scores[key] = anyFilled ? [String(totalH), String(totalA)] : ['',''];
       });
     }
@@ -2741,17 +3077,24 @@ function renderAdminView(){
       el.querySelectorAll('[data-bpmatch]').forEach(field=>{
         const [r,m] = field.dataset.bpmatch.split('-');
         const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = {h:emptyPlayerSlots(), a:emptyPlayerSlots()};
+        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
         const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
-        else slot[pidx].s = field.value;
+        else slot[pidx].races[Number(field.dataset.race)] = field.value;
+      });
+      el.querySelectorAll('[data-bpmatch-track]').forEach(field=>{
+        const [r,m] = field.dataset.bpmatchTrack.split('-');
+        const rk = 'r'+r;
+        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
+        if(!STATE.bracket.players[rk][m].tracks) STATE.bracket.players[rk][m].tracks = Array(12).fill('');
+        STATE.bracket.players[rk][m].tracks[Number(field.dataset.race)] = field.value;
       });
       for(const rk of ['r0','r1','r2','r3']){
         Object.keys(STATE.bracket.players[rk]||{}).forEach(m=>{
           const pl = STATE.bracket.players[rk][m];
-          const totalH = pl.h.reduce((sum,p)=> sum + (p.n && p.s!=='' ? (Number(p.s)||0) : 0), 0);
-          const totalA = pl.a.reduce((sum,p)=> sum + (p.n && p.s!=='' ? (Number(p.s)||0) : 0), 0);
-          const anyFilled = pl.h.some(p=>p.n && p.s!=='') || pl.a.some(p=>p.n && p.s!=='');
+          const totalH = pl.h.reduce((sum,p)=> sum + (p.n ? playerTotal(p) : 0), 0);
+          const totalA = pl.a.reduce((sum,p)=> sum + (p.n ? playerTotal(p) : 0), 0);
+          const anyFilled = pl.h.some(p=>p.n && playerRacesFilled(p)) || pl.a.some(p=>p.n && playerRacesFilled(p));
           STATE.bracket.scores[rk][m] = anyFilled ? [String(totalH), String(totalA)] : ['',''];
         });
       }
