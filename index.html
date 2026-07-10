@@ -149,6 +149,10 @@
     background:rgba(229,72,77,0.12);border-color:var(--red);color:var(--cream);
   }
   .phase-banner.phase-after{background:rgba(255,206,84,0.12);border-color:var(--gold);}
+  .phase-countdown{
+    font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--gold);font-weight:700;
+    margin-top:8px;letter-spacing:0.03em;
+  }
 
   .format-card{
     background:linear-gradient(160deg, #4a2a12, #5c3618);
@@ -1492,14 +1496,17 @@ function matchCardHTML(it){
   </div>`;
 }
 
+function getPlayInStartMs(){
+  return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
+}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
   const today = dOnly(now.getFullYear(), now.getMonth()+1, now.getDate());
-  const playInStart=dOnly(2026,7,10), playInEnd=dOnly(2026,7,13);
+  const playInEnd=dOnly(2026,7,13);
   const groupStart=dOnly(2026,7,17), groupEnd=dOnly(2026,7,20);
   const bracketStart=dOnly(2026,7,24), bracketEnd=dOnly(2026,8,3);
-  if(today < playInStart) return {phase:'before', key:'homeStatusBefore'};
+  if(now.getTime() < getPlayInStartMs()) return {phase:'before', key:'homeStatusBefore'};
   if(today < playInEnd) return {phase:'playin', key:'homeStatusPlayin'};
   if(today < groupStart) return {phase:'between1', key:'homeStatusBetween1'};
   if(today < groupEnd) return {phase:'group', key:'homeStatusGroup'};
@@ -1519,7 +1526,7 @@ function renderHomeView(){
   const status = getTournamentPhaseStatus();
 
   let html = `
-    <div class="phase-banner phase-${status.phase}">${t(status.key)}</div>
+    <div class="phase-banner phase-${status.phase}">${t(status.key)}${status.phase==='before' ? `<div id="playinCountdown" class="phase-countdown"></div>` : ''}</div>
     <div class="stage-note" style="font-size:15px;margin:18px 0 24px;">${t('homeIntro')}</div>
 
     <div class="match-progress" style="margin-bottom:30px;">
@@ -1570,6 +1577,28 @@ function renderHomeView(){
       window.scrollTo({top:0,behavior:'smooth'});
     };
   });
+  if(status.phase==='before') startCountdown(getPlayInStartMs()); else clearCountdownInterval();
+}
+let countdownInterval = null;
+function clearCountdownInterval(){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval=null; } }
+function startCountdown(targetMs){
+  clearCountdownInterval();
+  function tick(){
+    const el = document.getElementById('playinCountdown');
+    if(!el){ clearCountdownInterval(); return; } // navigated away from home — stop updating a detached element
+    const diff = targetMs - Date.now();
+    if(diff <= 0){
+      clearCountdownInterval();
+      renderHomeView(); // flips the banner over to "happening now" as soon as it hits zero
+      return;
+    }
+    const s = Math.floor(diff/1000);
+    const days = Math.floor(s/86400), hours = Math.floor((s%86400)/3600), minutes = Math.floor((s%3600)/60), seconds = s%60;
+    const pad = n=>String(n).padStart(2,'0');
+    el.textContent = (days>0 ? `${days}d ` : '') + `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
 }
 
 function renderCalendarView(){
