@@ -239,6 +239,13 @@
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
   .score-win{color:var(--gold);font-weight:700;}
   .best-race-banner{margin-bottom:16px;font-size:14px;color:var(--cream);}
+  .twitch-live-banner{
+    display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:12px 16px;
+    background:rgba(145,70,255,0.14);border:1px solid #9146FF;border-radius:10px;
+    color:var(--cream);font-weight:700;text-decoration:none;font-size:14px;
+    transition:background .15s;
+  }
+  .twitch-live-banner:hover{background:rgba(145,70,255,0.24);}
   .score-lose{color:var(--dim);}
   .cal-score.done{color:var(--cream);}
   .cal-date{font-size:12px;color:var(--dim);min-width:150px;flex-shrink:0;text-align:right;white-space:nowrap;}
@@ -334,6 +341,8 @@
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}
   .stats-table .lteam{font-size:12.5px;color:var(--dim);}
+  .player-row-link{cursor:pointer;}
+  .player-row-link:hover{background:rgba(255,206,84,0.06);}
   .stats-table .teamcell{display:flex;align-items:center;gap:8px;}
 
   /* admin */
@@ -530,6 +539,7 @@
 <section id="view-calendar"></section>
 <section id="view-teams"></section>
 <section id="view-match"></section>
+<section id="view-player"></section>
 <section id="view-players"></section>
 <section id="view-flageditor"></section>
 <section id="view-admin"></section>
@@ -630,7 +640,8 @@ const I18N = {
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
     colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
-    colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
+    colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre',
+    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
     homeLinkStandings:'Voir les classements et le bracket', homeLinkCalendar:'Consulter le calendrier complet',
@@ -683,7 +694,8 @@ const I18N = {
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
     colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
-    colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
+    colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance',
+    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
     homeLinkStandings:'See standings and the bracket', homeLinkCalendar:'Check the full calendar',
@@ -736,7 +748,8 @@ const I18N = {
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
     colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
-    colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
+    colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio',
+    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
     homeLinkStandings:'Ver la clasificación y el cuadro', homeLinkCalendar:'Consultar el calendario completo',
@@ -789,7 +802,8 @@ const I18N = {
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
     colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
-    colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
+    colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス',
+    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
     homeLinkStandings:'順位表とトーナメント表を見る', homeLinkCalendar:'全カレンダーを見る',
@@ -1395,7 +1409,7 @@ function parseMatchRef(ref){
     const stageLabel = anchorPrefix==='quali' ? t('stageQuali') : t('stagePhaseGroupes');
     const iso = scheduledTimeFor(anchorPrefix, id, key);
     const dateStr = iso ? formatScheduledLocal(iso) : (anchorPrefix==='quali' ? t('dateQuali') : t('datePhase'));
-    return {h, a, sc, players:pl, stage:`${stageLabel} · Gr. ${id}`, date:dateStr, anchor:`group-${anchorPrefix}-${id}`};
+    return {h, a, sc, players:pl, stage:`${stageLabel} · Gr. ${id}`, date:dateStr, anchor:`group-${anchorPrefix}-${id}`, rawIso: iso||null};
   } else if(parts[0]==='b'){
     const round = Number(parts[1]), idx = Number(parts[2]);
     const {rounds, roundScores} = deriveBracketRounds();
@@ -1404,7 +1418,7 @@ function parseMatchRef(ref){
     const h = slots[idx*2], a = slots[idx*2+1];
     const sc = roundScores[round][idx] || ['',''];
     const pl = (STATE.bracket.players['r'+round]||{})[idx] || emptyMatchPlayers();
-    return {h, a, sc, players:pl, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null};
+    return {h, a, sc, players:pl, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null, rawIso:null};
   }
   return null;
 }
@@ -1499,13 +1513,15 @@ function renderMatchDetail(ref){
     wireMatchDetailEvents();
     return;
   }
-  const {h, a, sc, players, stage, date, anchor} = md;
+  const {h, a, sc, players, stage, date, anchor, rawIso} = md;
   const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
   const hWin = played && Number(sc[0])>Number(sc[1]);
   const aWin = played && Number(sc[1])>Number(sc[0]);
+  const isLiveNow = !played && rawIso && new Date(rawIso).getTime() <= Date.now();
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
     <div class="team-detail-page">
+      ${isLiveNow ? `<a href="https://www.twitch.tv/mariokartcentral" target="_blank" rel="noopener noreferrer" class="twitch-live-banner">🔴 ${t('watchLiveTwitch')}</a>` : ''}
       <div class="helptext" style="margin-bottom:18px;">
         <span class="${anchor?'stage-link':''}"${anchor?` data-anchor="${anchor}"`:''}>${stage}</span> · ${date}
       </div>
@@ -2010,7 +2026,14 @@ function getRaceStats(){
   return {
     bestTrackForPlayer: bestTrackFromStats(playerTrackStats),
     bestTrackForTeam: bestTrackFromStats(teamTrackStats),
+    playerTrackStats, teamTrackStats,
   };
+}
+function trackBreakdownList(statsForKey){
+  if(!statsForKey) return [];
+  return Object.keys(statsForKey).map(tid=>({
+    trackId: tid, count: statsForKey[tid].count, avg: statsForKey[tid].total/statsForKey[tid].count
+  })).sort((a,b)=> b.avg-a.avg);
 }
 function getPlayerStats(){
   const stats = {}; // tag -> {name -> {count, total, w, l}}
@@ -2254,7 +2277,7 @@ function renderTeamDetail(tag){
               const pkey = tag+'|'+p.n;
               const cons = advStats.consistency[pkey];
               const clu = advStats.clutch[pkey];
-              return `<tr>
+              return `<tr class="player-row-link" data-player-tag="${tag}" data-player-name="${p.n}">
               <td style="text-align:center;"><span class="nat-badge" data-tooltip="${natName(p.nat)}">${p.nat}</span></td>
               <td class="lname">${p.n}</td>
               <td class="num">${s?s.count:'—'}</td>
@@ -2268,12 +2291,80 @@ function renderTeamDetail(tag){
           </tbody>
         </table>
       </div>
+
+      <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('teamTracksTitle')}</h3>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>${t('colTrack')}</th><th class="num">${t('colRacesPlayed')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+          <tbody>
+            ${(()=>{ const teamBreakdown = trackBreakdownList(raceStats.teamTrackStats[tag]);
+              return teamBreakdown.length ? teamBreakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td><td class="num highlight">${b.avg.toFixed(1)}</td></tr>`).join('')
+                : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`;
+            })()}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }
 function wireTeamDetailEvents(){
   const btn = document.getElementById('backToTeamsBtn');
   if(btn) btn.onclick = goBack;
+  document.querySelectorAll('.player-row-link').forEach(row=>{
+    row.onclick = ()=>{
+      pushNavHistory();
+      selectedPlayer = {tag: row.dataset.playerTag, name: row.dataset.playerName};
+      setView('player');
+      renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  });
+}
+function renderPlayerDetail(tag, name){
+  const el = document.getElementById('view-player');
+  const playerStats = getPlayerStats();
+  const raceStats = getRaceStats();
+  const advStats = getAdvancedStats();
+  const pkey = tag+'|'+name;
+  const s = (playerStats[tag]||{})[name] || null;
+  const bestTid = raceStats.bestTrackForPlayer[pkey];
+  const cons = advStats.consistency[pkey];
+  const clu = advStats.clutch[pkey];
+  const breakdown = trackBreakdownList(raceStats.playerTrackStats[pkey]);
+  const natEntry = roster(tag).find(p=>p.n===name);
+
+  el.innerHTML = `
+    <button class="back-btn" id="backToPlayerBtn">${backLabel()}</button>
+    <div class="team-detail-page">
+      <div class="tdp-header">
+        <span class="team-link" data-team="${tag}">${flagEl(tag,'lg')}</span>
+        <div>
+          <h2 class="outline" style="margin-bottom:2px;">${name}</h2>
+          <span class="team-link" data-team="${tag}" style="font-size:14px;color:var(--dim);cursor:pointer;">${teamName(tag)}</span>
+          ${natEntry? `<span class="nat-badge" data-tooltip="${natName(natEntry.nat)}" style="margin-left:8px;">${natEntry.nat}</span>` : ''}
+        </div>
+      </div>
+      <div class="stat-strip">
+        <div class="s">${t('colWarsPlayed')} <b>${s?s.count:'—'}</b></div>
+        <div class="s">${t('colWinPct')} <b>${s?Math.round(s.winPct*100)+'%':'—'}</b></div>
+        <div class="s">${t('colAvg')} <b>${s?s.avg.toFixed(1):'—'}</b></div>
+        <div class="s">${t('colBestTrack')} <b>${bestTid?trackName(bestTid):'—'}</b></div>
+        <div class="s">${t('colConsistency')} <b>${cons!=null?cons.toFixed(1):'—'}</b></div>
+        <div class="s">${t('colClutch')} <b>${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</b></div>
+      </div>
+      <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('colTrack')}</h3>
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead><tr><th>${t('colTrack')}</th><th class="num">${t('colRacesPlayed')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+          <tbody>
+            ${breakdown.length? breakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td><td class="num highlight">${b.avg.toFixed(1)}</td></tr>`).join('')
+              : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  document.getElementById('backToPlayerBtn').onclick = goBack;
 }
 
 /* =========================================================
@@ -2310,7 +2401,7 @@ function renderPlayersView(){
         const pkey = p.tag+'|'+p.name;
         const cons = advStats.consistency[pkey];
         const clu = advStats.clutch[pkey];
-        html += `<tr class="leader-row" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}">
+        html += `<tr class="leader-row player-row-link" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}" data-player-tag="${p.tag}" data-player-name="${p.name}">
           <td class="lp ${i===0?'top1':''}">${i+1}</td>
           <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname">${p.name}</span></span></td>
           <td class="lteam">${teamName(p.tag)}</td>
@@ -2369,6 +2460,15 @@ function renderPlayersView(){
 
   el.innerHTML = html;
   el.querySelectorAll('[data-statsmode]').forEach(b=> b.onclick = ()=>{ statsMode = b.dataset.statsmode; renderPlayersView(); });
+  el.querySelectorAll('.player-row-link').forEach(row=>{
+    row.onclick = ()=>{
+      pushNavHistory();
+      selectedPlayer = {tag: row.dataset.playerTag, name: row.dataset.playerName};
+      setView('player');
+      renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  });
 }
 
 /* =========================================================
@@ -3125,6 +3225,7 @@ function HERO_INFO_F(){ return {
   admin: {title:t('heroTitleAdmin'), sub:t('heroSubAdmin')},
 };}
 let selectedMatch = null;
+let selectedPlayer = null; // {tag, name}
 function updateHero(view){
   const HERO_INFO = HERO_INFO_F();
   let info = HERO_INFO[view] || HERO_INFO.home;
@@ -3165,10 +3266,11 @@ function renderAll(){
 let restoringFromHistory = false;
 function pushBrowserHistory(){
   if(restoringFromHistory) return; // don't re-push while we're the ones restoring a state
-  const state = {view: currentView, selectedTeam, selectedMatch};
+  const state = {view: currentView, selectedTeam, selectedMatch, selectedPlayer};
   let hash = '#'+currentView;
   if(currentView==='teams' && selectedTeam) hash += '/'+selectedTeam;
   if(currentView==='match' && selectedMatch) hash += '/'+encodeURIComponent(selectedMatch);
+  if(currentView==='player' && selectedPlayer) hash += '/'+selectedPlayer.tag+'/'+encodeURIComponent(selectedPlayer.name);
   try{ history.pushState(state, '', hash); }
   catch(e){ /* some embedded/sandboxed environments (e.g. a preview iframe) disallow this — harmless to skip there */ }
 }
@@ -3176,7 +3278,7 @@ function setView(view){
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', players:'view-players', flageditor:'view-flageditor', admin:'view-admin'};
+  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', flageditor:'view-flageditor', admin:'view-admin'};
   document.getElementById(map[view]).classList.add('active');
   const adminToggle = document.getElementById('adminToggle');
   if(adminToggle) adminToggle.classList.toggle('on', view==='admin');
@@ -3187,12 +3289,14 @@ function setView(view){
 }
 window.addEventListener('popstate', (e)=>{
   restoringFromHistory = true;
-  const state = e.state || {view:'home', selectedTeam:null, selectedMatch:null};
+  const state = e.state || {view:'home', selectedTeam:null, selectedMatch:null, selectedPlayer:null};
   selectedTeam = state.selectedTeam || null;
   selectedMatch = state.selectedMatch || null;
+  selectedPlayer = state.selectedPlayer || null;
   setView(state.view || 'home');
   if(state.view==='teams') renderTeamsView();
   if(state.view==='match') renderMatchDetail(selectedMatch);
+  if(state.view==='player' && selectedPlayer) renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
   restoringFromHistory = false;
 });
 document.getElementById('brandLogo').onclick = ()=>{
