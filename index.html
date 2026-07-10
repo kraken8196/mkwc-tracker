@@ -1517,7 +1517,7 @@ function renderMatchDetail(ref){
   const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
   const hWin = played && Number(sc[0])>Number(sc[1]);
   const aWin = played && Number(sc[1])>Number(sc[0]);
-  const isLiveNow = !played && rawIso && new Date(rawIso).getTime() <= Date.now();
+  const isLiveNow = isCurrentlyLive(rawIso, sc);
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
     <div class="team-detail-page">
@@ -1684,8 +1684,15 @@ function matchCardHTML(it){
   </div>`;
 }
 
+const MATCH_DURATION_MS = 60 * 60 * 1000; // a war/set is assumed to last about an hour
+function isCurrentlyLive(rawIso, sc){
+  if(!rawIso || isPlayed(sc)) return false;
+  const start = new Date(rawIso).getTime();
+  const now = Date.now();
+  return start <= now && (now - start) < MATCH_DURATION_MS;
+}
 function getLiveMatchesNow(){
-  return getAllMatchItems().filter(it => it.rawIso && new Date(it.rawIso).getTime() <= Date.now() && !isPlayed(it.sc));
+  return getAllMatchItems().filter(it => isCurrentlyLive(it.rawIso, it.sc));
 }
 function getPlayInStartMs(){
   return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
@@ -1968,8 +1975,9 @@ function getRaceStats(){
   function scanMatch(pl, tagH, tagA){
     if(!pl || !pl.tracks) return;
     [[pl.h, tagH], [pl.a, tagA]].forEach(([arr, tag])=>{
-      if(!tag) return;
-      (arr||[]).forEach(p=>{
+      if(!tag || !arr) return;
+      // player-level: one entry per player, per race they actually played
+      arr.forEach(p=>{
         if(!p.n) return;
         (p.races||[]).forEach((val, r)=>{
           if(val==='' || val==null) return;
@@ -1981,13 +1989,22 @@ function getRaceStats(){
           playerTrackStats[pkey][trackId] = playerTrackStats[pkey][trackId] || {count:0, total:0};
           playerTrackStats[pkey][trackId].count++;
           playerTrackStats[pkey][trackId].total += score;
-
-          teamTrackStats[tag] = teamTrackStats[tag] || {};
-          teamTrackStats[tag][trackId] = teamTrackStats[tag][trackId] || {count:0, total:0};
-          teamTrackStats[tag][trackId].count++;
-          teamTrackStats[tag][trackId].total += score;
         });
       });
+      // team-level: one entry per race the team actually played (not one per player),
+      // using the team's combined score for that race — so 6 players playing the same
+      // race counts as the team playing that track once, not six times.
+      for(let r=0;r<12;r++){
+        const trackId = pl.tracks[r];
+        if(!trackId) continue;
+        const scoresThisRace = arr.filter(p=>p.n && p.races && p.races[r]!=='' && p.races[r]!=null).map(p=>Number(p.races[r])||0);
+        if(!scoresThisRace.length) continue;
+        const teamRaceTotal = scoresThisRace.reduce((s,v)=>s+v,0);
+        teamTrackStats[tag] = teamTrackStats[tag] || {};
+        teamTrackStats[tag][trackId] = teamTrackStats[tag][trackId] || {count:0, total:0};
+        teamTrackStats[tag][trackId].count++;
+        teamTrackStats[tag][trackId].total += teamRaceTotal;
+      }
     });
   }
   function scanGroups(groupsObj){
