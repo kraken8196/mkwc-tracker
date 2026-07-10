@@ -1027,6 +1027,7 @@ const SB_HEADERS = {
   'Content-Type': 'application/json',
 };
 let authToken = null; // set only after a successful admin login; never persisted anywhere written to disk by us
+let refreshToken = null;
 function authHeaders(){
   return authToken ? { ...SB_HEADERS, 'Authorization': `Bearer ${authToken}` } : SB_HEADERS;
 }
@@ -1039,7 +1040,23 @@ async function loginAdmin(email, password){
   if(!res.ok) throw new Error('Invalid credentials');
   const data = await res.json();
   authToken = data.access_token;
+  refreshToken = data.refresh_token;
   return true;
+}
+async function refreshAdminSession(){
+  if(!refreshToken) return false;
+  try{
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: SB_HEADERS,
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    if(!res.ok) return false;
+    const data = await res.json();
+    authToken = data.access_token;
+    refreshToken = data.refresh_token;
+    return true;
+  }catch(e){ return false; }
 }
 const SB_STORAGE = {
   async get(key){
@@ -1050,16 +1067,26 @@ const SB_STORAGE = {
     return { key, value: rows[0].value };
   },
   async set(key, value){
-    const res = await fetch(SB_TABLE, {
+    let res = await fetch(SB_TABLE, {
       method: 'POST',
       headers: { ...authHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
     });
+    if((res.status===401 || res.status===403) && await refreshAdminSession()){
+      res = await fetch(SB_TABLE, {
+        method: 'POST',
+        headers: { ...authHeaders(), 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
+      });
+    }
     if(!res.ok) throw new Error('Supabase set failed: '+res.status);
     return { key, value };
   },
   async delete(key){
-    const res = await fetch(`${SB_TABLE}?key=eq.${encodeURIComponent(key)}`, { method:'DELETE', headers: authHeaders() });
+    let res = await fetch(`${SB_TABLE}?key=eq.${encodeURIComponent(key)}`, { method:'DELETE', headers: authHeaders() });
+    if((res.status===401 || res.status===403) && await refreshAdminSession()){
+      res = await fetch(`${SB_TABLE}?key=eq.${encodeURIComponent(key)}`, { method:'DELETE', headers: authHeaders() });
+    }
     if(!res.ok) throw new Error('Supabase delete failed: '+res.status);
     return { key, deleted:true };
   },
@@ -1090,8 +1117,7 @@ async function loadState(){
   }catch(e){ STATE = defaultState(); }
 }
 async function saveState(){
-  try{ await SB_STORAGE.set('mkwc_state', JSON.stringify(STATE)); }
-  catch(e){ console.error('Erreur de sauvegarde', e); }
+  await SB_STORAGE.set('mkwc_state', JSON.stringify(STATE)); // let errors propagate — callers decide how to surface them
 }
 
 /* =========================================================
@@ -3151,7 +3177,7 @@ function renderAdminView(){
   };
   el.querySelectorAll('[data-grp]').forEach(b=> b.onclick = ()=>{ adminGroup=b.dataset.grp; renderAdminView(); });
   const lockBtn = document.getElementById('lockBtn');
-  if(lockBtn) lockBtn.onclick = ()=>{ adminUnlocked=false; authToken=null; renderAdminView(); };
+  if(lockBtn) lockBtn.onclick = ()=>{ adminUnlocked=false; authToken=null; refreshToken=null; renderAdminView(); };
   const saveBtn = document.getElementById('saveBtn');
   if(saveBtn) saveBtn.onclick = async ()=>{
     if(adminSection==='mid'){
@@ -3224,7 +3250,7 @@ function renderAdminView(){
     // Save to Supabase in the background; only bother the user if it actually fails.
     saveState().catch(()=>{
       const err = document.getElementById('adminSaveError');
-      if(err) err.textContent = "⚠️ Sauvegarde en ligne échouée — vérifie ta connexion, tes changements restent visibles ici mais ne sont pas encore synchronisés.";
+      if(err) err.textContent = "⚠️ Sauvegarde en ligne échouée. Si ta session a expiré, verrouille l'admin (bouton ci-dessous) puis reconnecte-toi, et enregistre à nouveau — tes changements restent visibles ici en attendant.";
     });
   };
 }
