@@ -178,6 +178,8 @@
   .format-card .stage-note{color:var(--cream);opacity:0.92;}
   .explore-card{cursor:pointer;transition:border-color .15s, transform .15s;}
   .explore-card:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .helptext a{color:var(--gold);text-decoration:underline;text-underline-offset:2px;}
+  .helptext a:hover{color:var(--cream);}
   .explore-card h3{margin-bottom:0;justify-content:flex-start;gap:8px;}
 
   table.standings{width:100%;border-collapse:collapse;font-size:13px;}
@@ -392,6 +394,7 @@
   .save-note{font-size:12px;color:var(--green);margin-left:8px;opacity:0;transition:opacity 0.3s;}
   .save-note.show{opacity:1;}
   .helptext{font-size:12px;color:var(--dim);margin-bottom:10px;}
+  .thanks-text{font-size:15px;font-weight:600;color:var(--cream);margin-top:32px;line-height:1.5;}
   footer{text-align:center;color:var(--dim);font-size:12px;padding:40px 20px;}
 
   /* flag editor */
@@ -608,6 +611,7 @@ const I18N = {
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
     homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant',
+    thanksTitle:'Remerciements', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
     homeLinkStandings:'Voir les classements et le bracket', homeLinkCalendar:'Consulter le calendrier complet',
@@ -656,6 +660,7 @@ const I18N = {
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
     homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now',
+    thanksTitle:'Thanks', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
     homeLinkStandings:'See standings and the bracket', homeLinkCalendar:'Check the full calendar',
@@ -704,6 +709,7 @@ const I18N = {
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
     homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora',
+    thanksTitle:'Agradecimientos', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
     homeLinkStandings:'Ver la clasificación y el cuadro', homeLinkCalendar:'Consultar el calendario completo',
@@ -752,6 +758,7 @@ const I18N = {
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
     homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中',
+    thanksTitle:'謝辞', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
     homeLinkStandings:'順位表とトーナメント表を見る', homeLinkCalendar:'全カレンダーを見る',
@@ -1599,6 +1606,8 @@ function renderHomeView(){
       <div class="group-card explore-card" data-navto="teams"><h3>${t('homeLinkTeams')}</h3></div>
       <div class="group-card explore-card" data-navto="players"><h3>${t('homeLinkStats')}</h3></div>
     </div>
+
+    <div class="thanks-text">${t('thanksText')}</div>
   `;
   el.innerHTML = html;
   el.querySelectorAll('.explore-card').forEach(card=>{
