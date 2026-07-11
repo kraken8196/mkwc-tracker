@@ -246,6 +246,7 @@
     transition:background .15s;
   }
   .twitch-live-banner:hover{background:rgba(145,70,255,0.24);}
+  .sub-tag{color:var(--dim);font-size:11px;font-weight:400;}
   .score-lose{color:var(--dim);}
   .cal-score.done{color:var(--cream);}
   .cal-date{font-size:12px;color:var(--dim);min-width:150px;flex-shrink:0;text-align:right;white-space:nowrap;}
@@ -641,7 +642,8 @@ const I18N = {
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
     colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
     colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre',
-    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
+    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant',
+    adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
     homeLinkStandings:'Voir les classements et le bracket', homeLinkCalendar:'Consulter le calendrier complet',
@@ -695,7 +697,8 @@ const I18N = {
     tracksNote:'Average score on each track, across every player and match.',
     colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
     colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance',
-    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
+    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now',
+    adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
     homeLinkStandings:'See standings and the bracket', homeLinkCalendar:'Check the full calendar',
@@ -749,7 +752,8 @@ const I18N = {
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
     colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
     colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio',
-    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
+    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora',
+    adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
     homeLinkStandings:'Ver la clasificación y el cuadro', homeLinkCalendar:'Consultar el calendario completo',
@@ -803,7 +807,8 @@ const I18N = {
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
     colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
     colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス',
-    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
+    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る',
+    adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
     homeLinkStandings:'順位表とトーナメント表を見る', homeLinkCalendar:'全カレンダーを見る',
@@ -977,6 +982,29 @@ function defaultState(){
 function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill('')})); }
 function playerTotal(p){ return (p.races||[]).reduce((sum,v)=> sum + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
 function playerRacesFilled(p){ return (p.races||[]).some(v=>v!=='' && v!=null); }
+// A player can be substituted mid-match (e.g. connection issue). subFromRace is 1-indexed:
+// races before it belong to the original player (p.n), races from it onward belong to p.subName.
+function raceOwnerName(p, raceIdx){
+  if(p.subName && p.subFromRace && (raceIdx+1) >= Number(p.subFromRace)) return p.subName;
+  return p.n;
+}
+// Splits a slot into one or two "segments" (original player, and substitute if any), each with
+// their own name and the subset of the 12 races that belongs to them. Used everywhere stats need
+// to credit the right person instead of assuming one name covers the whole match.
+function playerSegments(p){
+  if(!p || !p.n) return [];
+  const races = p.races || Array(12).fill('');
+  if(!p.subName || !p.subFromRace){
+    return [{ name: p.n, races, raceIndices: races.map((_,i)=>i) }];
+  }
+  const cut = Math.max(1, Math.min(12, Number(p.subFromRace))) - 1; // 0-indexed cutoff
+  const beforeIdx = [], afterIdx = [];
+  races.forEach((_,i)=> (i<cut ? beforeIdx : afterIdx).push(i));
+  const segs = [];
+  if(beforeIdx.length) segs.push({ name: p.n, races: beforeIdx.map(i=>races[i]), raceIndices: beforeIdx });
+  if(afterIdx.length) segs.push({ name: p.subName, races: afterIdx.map(i=>races[i]), raceIndices: afterIdx });
+  return segs;
+}
 
 const TRACKS = [
   {id:'t1_mario_bros_circuit', fr:'Circuit Mario Bros.', en:'Mario Bros. Circuit', es:'Circuito Mario Bros.', ja:'マリオブラザーズサーキット'},
@@ -1552,12 +1580,20 @@ function raceProgressChartHTML(playersH, playersA, teamH, teamA){
 function playerListHTML(entries, teamTag){
   const filled = entries.filter(p=>p.n);
   if(!filled.length) return '';
-  const sorted = [...filled].sort((a,b)=> playerTotal(b)-playerTotal(a));
+  const rows = [];
+  filled.forEach(p=>{
+    playerSegments(p).forEach((seg, idx)=>{
+      const segScore = seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0);
+      const hasData = seg.races.some(v=>v!=='' && v!=null);
+      rows.push({ name: seg.name, score: segScore, hasData, isSub: idx>0 });
+    });
+  });
+  rows.sort((a,b)=> b.score-a.score);
   return `<div class="stats-table-wrap">
     <table class="stats-table">
       <thead><tr><th colspan="2">${teamPlainHTML(teamTag)}</th></tr></thead>
       <tbody>
-        ${sorted.map(p=>`<tr><td class="lname">${p.n}</td><td class="num highlight">${playerRacesFilled(p)?playerTotal(p):'—'}</td></tr>`).join('')}
+        ${rows.map(r=>`<tr><td class="lname">${r.name}${r.isSub?` <span class="sub-tag">(${t('subTag')})</span>`:''}</td><td class="num highlight">${r.hasData?r.score:'—'}</td></tr>`).join('')}
       </tbody>
     </table>
   </div>`;
@@ -1961,16 +1997,22 @@ function getAdvancedStats(){
       const matchTotals = [];
       arr.forEach(p=>{
         if(!p.n) return;
-        const races = (p.races||[]).map(v=> v!=='' && v!=null ? Number(v) : null);
-        const filled = races.filter(v=>v!=null);
-        if(!filled.length) return;
-        const pkey = tag+'|'+p.n;
-        playerAllRaces[pkey] = (playerAllRaces[pkey]||[]).concat(filled);
-        matchTotals.push(filled.reduce((s,v)=>s+v,0));
-        if(filled.length===12){ // only fully-entered matches count toward the "finishing strong" read
-          playerMatchRaces[pkey] = playerMatchRaces[pkey] || [];
-          playerMatchRaces[pkey].push(races);
-        }
+        const slotFilled = (p.races||[]).some(v=>v!=='' && v!=null);
+        if(!slotFilled) return;
+        // Team balance cares about how many points this slot contributed, regardless of who played it.
+        matchTotals.push((p.races||[]).reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0));
+        // Individual stats (consistency, clutch) need to credit the right person per race.
+        playerSegments(p).forEach(seg=>{
+          const races = seg.races.map(v=> v!=='' && v!=null ? Number(v) : null);
+          const filled = races.filter(v=>v!=null);
+          if(!filled.length) return;
+          const pkey = tag+'|'+seg.name;
+          playerAllRaces[pkey] = (playerAllRaces[pkey]||[]).concat(filled);
+          if(filled.length===12){ // only a full, un-substituted match counts toward "finishing strong"
+            playerMatchRaces[pkey] = playerMatchRaces[pkey] || [];
+            playerMatchRaces[pkey].push(races);
+          }
+        });
       });
       if(matchTotals.length===6){
         teamMatchTotals[tag] = teamMatchTotals[tag] || [];
@@ -2041,7 +2083,8 @@ function getRaceStats(){
           const score = Number(val)||0;
           const trackId = pl.tracks[r];
           if(!trackId) return;
-          const pkey = tag+'|'+p.n;
+          const owner = raceOwnerName(p, r);
+          const pkey = tag+'|'+owner;
           playerTrackStats[pkey] = playerTrackStats[pkey] || {};
           playerTrackStats[pkey][trackId] = playerTrackStats[pkey][trackId] || {count:0, total:0};
           playerTrackStats[pkey][trackId].count++;
@@ -2127,6 +2170,8 @@ function getPlayerStats(){
     if(aa>hh) return ['l','w'];
     return [null,null];
   }
+  function segTotal(seg){ return seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
+  function segFilled(seg){ return seg.races.some(v=>v!=='' && v!=null); }
   function scan(groupsObj){
     for(const id in groupsObj){
       const g = groupsObj[id];
@@ -2134,8 +2179,8 @@ function getPlayerStats(){
         const [i,j] = key.split('-').map(Number);
         const pl = g.players[key];
         const [hRes,aRes] = resultsFor(g.scores[key]);
-        (pl.h||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(g.slots[i], p.n, playerTotal(p), hRes); });
-        (pl.a||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(g.slots[j], p.n, playerTotal(p), aRes); });
+        (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[i], seg.name, segTotal(seg), hRes); }));
+        (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[j], seg.name, segTotal(seg), aRes); }));
       }
     }
   }
@@ -2148,8 +2193,8 @@ function getPlayerStats(){
       const pl = pls[m];
       const h = slots[m*2], a = slots[m*2+1];
       const [hRes,aRes] = resultsFor(roundScores[r][m]);
-      (pl.h||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(h, p.n, playerTotal(p), hRes); });
-      (pl.a||[]).forEach(p=>{ if(p.n && playerRacesFilled(p)) add(a, p.n, playerTotal(p), aRes); });
+      (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(h, seg.name, segTotal(seg), hRes); }));
+      (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(a, seg.name, segTotal(seg), aRes); }));
     }
   }
   // compute averages
@@ -2988,12 +3033,16 @@ function raceTableHTML(key, side, players, teamTag, disabled, dataAttr){
         <th class="amr-race-name">${teamTag?teamName(teamTag):'—'}</th>
         ${cols.map(r=>`<th>R${r+1}</th>`).join('')}
         <th>Σ</th>
+        <th class="amr-race-name">${t('adminSubLabel')}</th>
+        <th>${t('adminSubFromLabel')}</th>
       </tr></thead>
       <tbody>
         ${players.map((p,pi)=>`<tr>
           <td class="amr-race-name"><select data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-field="name" ${disabled}>${playerOptions(teamTag, p.n)}</select></td>
           ${cols.map(r=>`<td><input type="number" class="race-input" data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-race="${r}" value="${p.races?p.races[r]:''}" ${disabled}></td>`).join('')}
           <td class="num amr-race-total">${playerTotal(p)}</td>
+          <td class="amr-race-name"><select data-${dataAttr}-sub="${key}" data-pside="${side}" data-pidx="${pi}" ${disabled}>${playerOptions(teamTag, p.subName, true)}</select></td>
+          <td><input type="number" min="1" max="12" class="sub-from-input" data-${dataAttr}-subfrom="${key}" data-pside="${side}" data-pidx="${pi}" value="${p.subFromRace||''}" placeholder="—" ${disabled}></td>
         </tr>`).join('')}
       </tbody>
     </table>
@@ -3233,6 +3282,18 @@ function renderAdminView(){
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
         else slot[pidx].races[Number(field.dataset.race)] = field.value;
       });
+      el.querySelectorAll('[data-pmatch-sub]').forEach(field=>{
+        const key = field.dataset.pmatchSub, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
+        const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
+        slot[pidx].subName = field.value;
+      });
+      el.querySelectorAll('[data-pmatch-subfrom]').forEach(field=>{
+        const key = field.dataset.pmatchSubfrom, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
+        const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
+        slot[pidx].subFromRace = field.value;
+      });
       el.querySelectorAll('[data-pmatch-track]').forEach(field=>{
         const key = field.dataset.pmatchTrack;
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
@@ -3257,6 +3318,20 @@ function renderAdminView(){
         if(!Array.isArray(slot[pidx].races)) migratePlayerSlot(slot[pidx]); // safety net for any old-shaped data we haven't seen yet
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
         else slot[pidx].races[Number(field.dataset.race)] = field.value;
+      });
+      el.querySelectorAll('[data-bpmatch-sub]').forEach(field=>{
+        const [r,m] = field.dataset.bpmatchSub.split('-');
+        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
+        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
+        slot[pidx].subName = field.value;
+      });
+      el.querySelectorAll('[data-bpmatch-subfrom]').forEach(field=>{
+        const [r,m] = field.dataset.bpmatchSubfrom.split('-');
+        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
+        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
+        slot[pidx].subFromRace = field.value;
       });
       el.querySelectorAll('[data-bpmatch-track]').forEach(field=>{
         const [r,m] = field.dataset.bpmatchTrack.split('-');
