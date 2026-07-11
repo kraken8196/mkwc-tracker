@@ -310,9 +310,12 @@
   }
   .nat-badge:hover::after{opacity:1;}
   .col-help{position:relative;display:inline-block;cursor:help;border-bottom:1px dotted var(--dim);}
+  /* Tooltip opens DOWNWARD (into the table body) on purpose: the scrollable
+     .stats-table-wrap clips anything above the header row, so an upward bubble
+     would be cut off. */
   .col-help::after{
     content:attr(data-tooltip);
-    position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+    position:absolute; top:calc(100% + 8px); left:50%; transform:translateX(-50%);
     width:max-content; max-width:230px; white-space:normal; text-align:left;
     background:#1a1005; color:var(--cream); border:1px solid var(--line-strong);
     padding:7px 10px; border-radius:8px; font-size:11px; line-height:1.35;
