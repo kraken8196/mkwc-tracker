@@ -324,6 +324,12 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.45); z-index:40;
   }
   .col-help:hover::after{opacity:1;}
+  /* Edge columns: anchor the bubble to the cell's right edge so it can't spill
+     off the right side of the (horizontally-clipping) table wrapper. */
+  .stats-table thead th:last-child .col-help::after,
+  .stats-table thead th:nth-last-child(2) .col-help::after{
+    left:auto; right:0; transform:none;
+  }
 
   /* players view */
   .player-search{
