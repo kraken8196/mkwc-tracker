@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MKWC 2026 — Suivi en direct</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"></noscript>
 <style>
   :root{
     --orange-1:#F0942F;
@@ -3564,6 +3566,7 @@ async function loadLangPref(){
   const startedOnAdmin = location.hash.startsWith('#admin');
   try{ history.replaceState({view:'home', selectedTeam:null, selectedMatch:null}, '', startedOnAdmin ? location.hash : '#home'); }catch(e){}
   const flagCache = loadFlagCacheFromStorage();
+  let needsRasterizing = false;
   if(flagCache){
     // Reuse everything from last time — skips both the Supabase round-trip and the
     // (comparatively expensive) client-side flag rasterization entirely.
@@ -3576,8 +3579,11 @@ async function loadLangPref(){
     await Promise.all([loadState(), loadFlagOverrides()]);
     migrateAllPlayerData();
     refreshFlagSymbols();
-    await rasterizeAllFlags();
-    saveFlagCacheToStorage();
+    // Flags display fine straight away as inline SVG via <use href="#flagsym-…">
+    // (see flagEl()), so we DON'T block first paint on rasterization. The PNG
+    // rasters are purely a cache-warming optimisation for later renders/visits;
+    // we build them in the background once the page is already interactive.
+    needsRasterizing = true;
   }
   await loadLangPref();
   applyStaticI18n();
@@ -3591,8 +3597,14 @@ async function loadLangPref(){
     loadScreen.style.opacity = '0';
     setTimeout(()=> loadScreen.remove(), 300);
   }
+  if(needsRasterizing){
+    // Warm the raster cache after the page is shown, off the critical path.
+    const warmRasterCache = ()=>{ rasterizeAllFlags().then(()=>{ try{ saveFlagCacheToStorage(); }catch(e){} }); };
+    if('requestIdleCallback' in window){ requestIdleCallback(warmRasterCache, {timeout:2000}); }
+    else { setTimeout(warmRasterCache, 200); }
+  }
 })();
 </script>
-<script src="https://cdn.counter.dev/script.js" data-id="45966b52-f9be-4362-a3f1-a034ae52e05d" data-utcoffset="2"></script>
+<script defer src="https://cdn.counter.dev/script.js" data-id="45966b52-f9be-4362-a3f1-a034ae52e05d" data-utcoffset="2"></script>
 </body>
 </html>
