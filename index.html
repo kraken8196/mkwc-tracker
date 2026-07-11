@@ -1013,6 +1013,37 @@ const TRACKS = [
 
 function trackName(id){ if(!id) return ''; const tr = TRACKS.find(t=>t.id===id); return tr ? tr[LANG] : id; }
 function emptyMatchPlayers(){ return {h:emptyPlayerSlots(), a:emptyPlayerSlots(), tracks: Array(12).fill('')}; }
+function migratePlayerSlot(slot){
+  // Older matches encoded before the 12-race system only stored a single total score
+  // ({n, s}) per player. Give any such slot a proper races array so the admin form can
+  // safely write into it — the old total is kept as race 1 rather than being discarded.
+  if(!slot || Array.isArray(slot.races)) return slot;
+  const legacyScore = slot.s;
+  slot.races = Array(12).fill('');
+  if(legacyScore !== undefined && legacyScore !== '' && legacyScore != null) slot.races[0] = legacyScore;
+  delete slot.s;
+  return slot;
+}
+function migrateMatchPlayers(pl){
+  if(!pl) return pl;
+  if(pl.h) pl.h.forEach(migratePlayerSlot);
+  if(pl.a) pl.a.forEach(migratePlayerSlot);
+  if(!Array.isArray(pl.tracks)) pl.tracks = Array(12).fill('');
+  return pl;
+}
+function migrateAllPlayerData(){
+  function migrateGroup(groupsObj){
+    for(const id in groupsObj){
+      const g = groupsObj[id];
+      if(g.players) for(const key in g.players) migrateMatchPlayers(g.players[key]);
+    }
+  }
+  migrateGroup(STATE.quali); migrateGroup(STATE.top); migrateGroup(STATE.mid);
+  for(const rk of ['r0','r1','r2','r3']){
+    const pls = STATE.bracket.players && STATE.bracket.players[rk];
+    if(pls) for(const m in pls) migrateMatchPlayers(pls[m]);
+  }
+}
 
 /* =========================================================
    SUPABASE STORAGE (replaces the Claude.ai window.storage API
@@ -3198,6 +3229,7 @@ function renderAdminView(){
         const key = field.dataset.pmatch, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
         const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
+        if(!Array.isArray(slot[pidx].races)) migratePlayerSlot(slot[pidx]); // safety net for any old-shaped data we haven't seen yet
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
         else slot[pidx].races[Number(field.dataset.race)] = field.value;
       });
@@ -3222,6 +3254,7 @@ function renderAdminView(){
         const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
         if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
         const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
+        if(!Array.isArray(slot[pidx].races)) migratePlayerSlot(slot[pidx]); // safety net for any old-shaped data we haven't seen yet
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
         else slot[pidx].races[Number(field.dataset.race)] = field.value;
       });
@@ -3424,6 +3457,7 @@ async function loadLangPref(){
   const startedOnAdmin = location.hash.startsWith('#admin');
   try{ history.replaceState({view:'home', selectedTeam:null, selectedMatch:null}, '', startedOnAdmin ? location.hash : '#home'); }catch(e){}
   await Promise.all([loadState(), loadFlagOverrides()]);
+  migrateAllPlayerData();
   refreshFlagSymbols();
   await rasterizeAllFlags();
   await loadLangPref();
