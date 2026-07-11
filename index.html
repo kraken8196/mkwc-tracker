@@ -1192,7 +1192,31 @@ function refreshFlagSymbols(){
   const defs = document.getElementById('flagSymbolDefs');
   if(defs) defs.innerHTML = buildFlagSymbolDefs();
 }
-const FLAG_RASTER_CACHE = {};
+const FLAG_RASTER_CACHE = {};   // tag -> PNG data URL (persisted to localStorage)
+const FLAG_RASTER_URL = {};     // tag -> short blob: URL used for on-screen <img> (NOT persisted).
+// We display flags by referencing this short blob URL instead of inlining the full
+// base64 data URL into every cell. Inlining made lists of many flags (e.g. the players
+// table) build a multi-megabyte HTML string, which is what stalled tab switches.
+function dataURLToBlob(dataURL){
+  const comma = dataURL.indexOf(',');
+  const meta = dataURL.slice(5, comma);            // e.g. "image/png;base64"
+  const isB64 = /;base64$/i.test(meta);
+  const mime = meta.replace(/;base64$/i,'') || 'image/png';
+  const dataPart = dataURL.slice(comma+1);
+  const bin = isB64 ? atob(dataPart) : decodeURIComponent(dataPart);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
+}
+function hydrateRasterURL(tag){
+  try{
+    const data = FLAG_RASTER_CACHE[tag];
+    if(!data) return;
+    if(FLAG_RASTER_URL[tag]){ try{ URL.revokeObjectURL(FLAG_RASTER_URL[tag]); }catch(e){} }
+    FLAG_RASTER_URL[tag] = URL.createObjectURL(dataURLToBlob(data));
+  }catch(e){ /* leave unset — the flag falls back to the lightweight inline SVG */ }
+}
+function hydrateAllRasterURLs(){ Object.keys(FLAG_RASTER_CACHE).forEach(hydrateRasterURL); }
 function rasterizeFlag(tag){
   return new Promise((resolve)=>{
     try{
@@ -1206,6 +1230,7 @@ function rasterizeFlag(tag){
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, 480, 320);
           FLAG_RASTER_CACHE[tag] = canvas.toDataURL('image/png');
+          hydrateRasterURL(tag);
         }catch(e){ /* leave uncached, SVG fallback will be used */ }
         resolve();
       };
@@ -1409,7 +1434,7 @@ async function deleteFlagOverride(tag){
 }
 function flagInnerFor(tag){ return (FLAG_OVERRIDES[tag]!==undefined) ? FLAG_OVERRIDES[tag] : buildFlagInner(tag); }
 function flagEl(tag, cls){
-  const raster = FLAG_RASTER_CACHE[tag];
+  const raster = FLAG_RASTER_URL[tag];
   const inner = raster
     ? `<img src="${raster}" alt="" style="width:100%;height:100%;display:block;">`
     : `<svg viewBox="0 0 30 20"><use href="#flagsym-${tag}"></use></svg>`;
@@ -2318,7 +2343,7 @@ function renderTeamsView(){
   html += `<div class="flag-grid">`;
   tags.forEach(tag=>{
     html += `<div class="flag-grid-item" data-team="${tag}" title="${teamName(tag)}">
-      <div class="fgi-flag">${FLAG_RASTER_CACHE[tag] ? `<img src="${FLAG_RASTER_CACHE[tag]}" alt="" style="width:100%;height:100%;display:block;">` : `<svg viewBox="0 0 30 20"><use href="#flagsym-${tag}"></use></svg>`}</div>
+      <div class="fgi-flag">${FLAG_RASTER_URL[tag] ? `<img src="${FLAG_RASTER_URL[tag]}" alt="" style="width:100%;height:100%;display:block;">` : `<svg viewBox="0 0 30 20"><use href="#flagsym-${tag}"></use></svg>`}</div>
       <div class="fgi-overlay"><span>${teamName(tag)}</span></div>
     </div>`;
   });
@@ -3578,6 +3603,7 @@ async function loadLangPref(){
     // (comparatively expensive) client-side flag rasterization entirely.
     FLAG_OVERRIDES = flagCache.overrides || {};
     Object.assign(FLAG_RASTER_CACHE, flagCache.rasters || {});
+    hydrateAllRasterURLs();
     await loadState();
     migrateAllPlayerData();
     refreshFlagSymbols();
