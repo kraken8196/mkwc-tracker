@@ -1,6 +1,8 @@
 /* MKWC 2026 tracker — static build.
-   Split from the original single-page app; Supabase/admin/flag-editor code
-   removed, flags rendered as static PNGs, tournament data loaded from data.json. */
+   Split from the original single-page app; admin/flag-editor UI removed and
+   flags rendered as static PNGs. Tournament stats (scores/results) are read
+   live from the same Supabase table the admin app writes to — see STATS
+   DATA LOADING below — while flags stay fully static, untouched by Supabase. */
 /* =========================================================
    DIAGNOSTIC TEMPORAIRE — à retirer une fois le problème trouvé
 ========================================================= */
@@ -537,15 +539,33 @@ function migrateAllPlayerData(){
 }
 
 /* =========================================================
-   STATIC DATA LOADING
-   The live site used to fetch this from a Supabase table; the tournament
-   data barely changes, so it now just ships as static data (assets/data.js,
-   mirrored in data.json for readability), loaded via <script> — not fetch()
-   — so the site also works when opened directly via file:// without a server.
+   STATS DATA LOADING (Supabase, read-only)
+   Scores/results are fetched live from the same Supabase "site_data" table
+   the admin app (index.html) writes to, using its public anon key (read-only
+   here — this page never writes). assets/data.js (window.MKWC_DATA) is kept
+   only as a fallback snapshot: used if the Supabase fetch fails, or when the
+   site is opened directly via file:// (fetch can't hit Supabase from there).
+   Flags are NOT part of this — they stay static PNGs, see FLAG RENDER below.
 ========================================================= */
+const SUPABASE_URL = 'https://iegkufvmpnwpwabbljte.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_0b95MOYv1hzwUi8uiUdLyA_OJempZOf';
+const SB_TABLE = `${SUPABASE_URL}/rest/v1/site_data`;
+const SB_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  'Content-Type': 'application/json',
+};
+async function fetchRemoteState(){
+  const res = await fetch(`${SB_TABLE}?key=eq.mkwc_state&select=value`, { headers: SB_HEADERS });
+  if(!res.ok) throw new Error('Supabase get failed: '+res.status);
+  const rows = await res.json();
+  return rows.length ? JSON.parse(rows[0].value) : null;
+}
 async function loadState(){
+  let parsed = null;
+  try{ parsed = await fetchRemoteState(); }catch(e){ parsed = null; }
+  if(!parsed) parsed = window.MKWC_DATA || null;
   try{
-    const parsed = window.MKWC_DATA;
     if(parsed){
       const d = defaultState();
       STATE = Object.assign(d, parsed);
