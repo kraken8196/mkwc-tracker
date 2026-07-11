@@ -107,6 +107,16 @@ const I18N = {
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
     colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
     colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre',
+    tipMatches:'Nombre de matchs (war) joués par l\'équipe.', tipWarsPlayed:'Nombre de matchs (war) auxquels le joueur a participé.',
+    tipW:'Nombre de matchs gagnés.', tipD:'Nombre de matchs nuls.', tipL:'Nombre de matchs perdus.',
+    tipWinPct:'Pourcentage de matchs gagnés sur le total de matchs joués.',
+    tipDiff:'Différence entre les points marqués et les points encaissés, tous matchs confondus.',
+    tipAvg:'Score moyen du joueur par course.', tipTeamAvg:'Score moyen de l\'équipe par match.',
+    tipBestTrack:'Circuit sur lequel le meilleur score moyen a été obtenu.',
+    tipConsistency:'Écart entre la meilleure et la pire course du joueur. Plus c\'est bas, plus il est régulier.',
+    tipClutch:'Moyenne des 3 dernières courses moins celle des 9 premières. Positif = finit plus fort qu\'il n\'a commencé.',
+    tipBalance:'Répartition des points entre les 6 joueurs, en moyenne par match. Plus c\'est bas, plus les points sont partagés équitablement.',
+    tipRacesPlayed:'Nombre de courses jouées sur ce circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
     clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible',
     adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
@@ -162,6 +172,16 @@ const I18N = {
     tracksNote:'Average score on each track, across every player and match.',
     colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
     colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance',
+    tipMatches:'Number of matches (wars) the team has played.', tipWarsPlayed:'Number of matches (wars) the player took part in.',
+    tipW:'Number of matches won.', tipD:'Number of drawn matches.', tipL:'Number of matches lost.',
+    tipWinPct:'Share of matches won out of all matches played.',
+    tipDiff:'Points scored minus points conceded, across all matches.',
+    tipAvg:'Player\'s average score per race.', tipTeamAvg:'Team\'s average score per match.',
+    tipBestTrack:'Track with the best average score.',
+    tipConsistency:'Gap between the player\'s best and worst race. Lower means steadier.',
+    tipClutch:'Average of the last 3 races minus the first 9. Positive = finishes stronger than they started.',
+    tipBalance:'How evenly the 6 players share the points, averaged per match. Lower means more evenly shared.',
+    tipRacesPlayed:'Number of races played on this track.', tipGB:'Points scored by the team in the group.',
     clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available',
     adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
@@ -217,6 +237,16 @@ const I18N = {
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
     colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
     colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio',
+    tipMatches:'Número de partidos (wars) jugados por el equipo.', tipWarsPlayed:'Número de partidos (wars) en los que participó el jugador.',
+    tipW:'Número de partidos ganados.', tipD:'Número de partidos empatados.', tipL:'Número de partidos perdidos.',
+    tipWinPct:'Porcentaje de partidos ganados sobre el total jugado.',
+    tipDiff:'Puntos anotados menos puntos recibidos, en todos los partidos.',
+    tipAvg:'Puntuación media del jugador por carrera.', tipTeamAvg:'Puntuación media del equipo por partido.',
+    tipBestTrack:'Circuito con la mejor puntuación media.',
+    tipConsistency:'Diferencia entre la mejor y la peor carrera del jugador. Cuanto más bajo, más regular.',
+    tipClutch:'Media de las 3 últimas carreras menos las 9 primeras. Positivo = termina más fuerte de lo que empezó.',
+    tipBalance:'Cómo reparten los puntos los 6 jugadores, en promedio por partido. Cuanto más bajo, más equilibrado.',
+    tipRacesPlayed:'Número de carreras jugadas en este circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
     clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible',
     adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
@@ -272,6 +302,16 @@ const I18N = {
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
     colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
     colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス',
+    tipMatches:'チームが行った試合（war）数。', tipWarsPlayed:'選手が参加した試合（war）数。',
+    tipW:'勝った試合数。', tipD:'引き分けた試合数。', tipL:'負けた試合数。',
+    tipWinPct:'全試合数に対する勝利の割合。',
+    tipDiff:'全試合を通じた、獲得ポイントから失点を引いた差。',
+    tipAvg:'選手の1レースあたりの平均スコア。', tipTeamAvg:'チームの1試合あたりの平均スコア。',
+    tipBestTrack:'平均スコアが最も高かったコース。',
+    tipConsistency:'選手のベストとワーストのレース差。小さいほど安定。',
+    tipClutch:'最後の3レースの平均から最初の9レースの平均を引いた値。プラスなら尻上がり。',
+    tipBalance:'6人の選手のポイント配分の均等さ（1試合平均）。小さいほど均等。',
+    tipRacesPlayed:'このコースで走ったレース数。', tipGB:'グループでチームが獲得したポイント。',
     clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません',
     adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
@@ -593,6 +633,14 @@ function flagEl(tag, cls){
 function tbdEl(){ return `<span class="tbd"></span>`; }
 function teamLinkHTML(tag, cls){ return `<span class="team-link" data-team="${tag}">${flagEl(tag,cls)}<span class="teamname">${teamName(tag)}</span></span>`; }
 function teamPlainHTML(tag, cls){ return `<span class="team-plain">${flagEl(tag,cls)}<span class="teamname">${teamName(tag)}</span></span>`; }
+// Stats-table header cell with an optional hover tooltip explaining the column.
+// labelKey/tipKey are i18n keys; extraClass adds e.g. 'num' for right-aligned columns.
+function th(labelKey, tipKey, extraClass){
+  const cls = extraClass ? ` class="${extraClass}"` : '';
+  if(!tipKey) return `<th${cls}>${t(labelKey)}</th>`;
+  const tip = t(tipKey).replace(/"/g,'&quot;');
+  return `<th${cls}><span class="col-help" data-tooltip="${tip}">${t(labelKey)}</span></th>`;
+}
 /* =========================================================
    STANDINGS CALC
 ========================================================= */
@@ -650,7 +698,7 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
     <div style="overflow-x:auto;">
     <table class="standings">
-      <thead><tr><th></th><th>${t('colTeam')}</th><th class="num">${t('colW')}</th><th class="num">${t('colD')}</th><th class="num">${t('colL')}</th><th class="num">${t('colGB')}</th><th class="num">${t('colDiff')}</th></tr></thead>
+      <thead><tr><th></th>${th('colTeam')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colGB','tipGB','num')}${th('colDiff','tipDiff','num')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>
@@ -1622,7 +1670,7 @@ function renderTeamDetail(tag){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
       <div class="stats-table-wrap">
         <table class="stats-table">
-          <thead><tr><th></th><th>${t('colPlayer')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colConsistency')}</th><th class="num">${t('colClutch')}</th></tr></thead>
+          <thead><tr><th></th>${th('colPlayer')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
           <tbody>
             ${playerRows.map(({p,s})=>{
               const bestTid = raceStats.bestTrackForPlayer[tag+'|'+p.n];
@@ -1647,7 +1695,7 @@ function renderTeamDetail(tag){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('teamTracksTitle')}</h3>
       <div class="stats-table-wrap">
         <table class="stats-table">
-          <thead><tr><th>${t('colTrack')}</th><th class="num">${t('colRacesPlayed')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+          <thead><tr>${th('colTrack')}${th('colRacesPlayed','tipRacesPlayed','num')}${th('colAvg','tipAvg','num')}</tr></thead>
           <tbody>
             ${(()=>{ const teamBreakdown = trackBreakdownList(raceStats.teamTrackStats[tag]);
               return teamBreakdown.length ? teamBreakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td><td class="num highlight">${b.avg.toFixed(1)}</td></tr>`).join('')
@@ -1707,7 +1755,7 @@ function renderPlayerDetail(tag, name){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('colTrack')}</h3>
       <div class="stats-table-wrap">
         <table class="stats-table">
-          <thead><tr><th>${t('colTrack')}</th><th class="num">${t('colRacesPlayed')}</th><th class="num">${t('colAvg')}</th></tr></thead>
+          <thead><tr>${th('colTrack')}${th('colRacesPlayed','tipRacesPlayed','num')}${th('colAvg','tipAvg','num')}</tr></thead>
           <tbody>
             ${breakdown.length? breakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td><td class="num highlight">${b.avg.toFixed(1)}</td></tr>`).join('')
               : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`}
@@ -1746,7 +1794,7 @@ function renderPlayersView(){
     html += `<div class="stage-note">${t('playersNote')} ${all.length===0?t('playersEmpty'):''}</div>`;
     if(all.length){
       html += `<div class="stats-table-wrap"><table class="stats-table" id="leaderList">
-        <thead><tr><th></th><th>${t('colPlayer')}</th><th>${t('colTeam')}</th><th class="num">${t('colWarsPlayed')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colConsistency')}</th><th class="num">${t('colClutch')}</th></tr></thead>
+        <thead><tr><th></th>${th('colPlayer')}${th('colTeam')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
         <tbody>`;
       all.forEach((p,i)=>{
         const bestTid = raceStats.bestTrackForPlayer[p.tag+'|'+p.name];
@@ -1789,7 +1837,7 @@ function renderPlayersView(){
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
     html += `<div class="stats-table-wrap"><table class="stats-table" id="teamStatsList">
-      <thead><tr><th></th><th>${t('colTeam')}</th><th class="num">${t('statMatches')}</th><th class="num">${t('statW')}</th><th class="num">${t('colD')}</th><th class="num">${t('statL')}</th><th class="num">${t('colWinPct')}</th><th class="num">${t('statDiff')}</th><th class="num">${t('colAvg')}</th><th>${t('colBestTrack')}</th><th class="num">${t('colBalance')}</th></tr></thead>
+      <thead><tr><th></th>${th('colTeam')}${th('statMatches','tipMatches','num')}${th('statW','tipW','num')}${th('colD','tipD','num')}${th('statL','tipL','num')}${th('colWinPct','tipWinPct','num')}${th('statDiff','tipDiff','num')}${th('colAvg','tipTeamAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colBalance','tipBalance','num')}</tr></thead>
       <tbody>`;
     teams.forEach((tm,i)=>{
       const bestTid = raceStats.bestTrackForTeam[tm.tag];
@@ -1964,6 +2012,7 @@ function renderLangSwitch(){
     updateHero(currentView);
     renderAll();
     if(currentView==='match') renderMatchDetail(selectedMatch);
+    if(currentView==='player' && selectedPlayer) renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
   });
 }
 async function loadLangPref(){
