@@ -58,17 +58,17 @@
     overflow-x:auto; scrollbar-width:none;
   }
   .header-inner::-webkit-scrollbar{display:none;}
-  .brand{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .brand{display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; color:var(--cream);}
   .brand-mark{
     width:104px;height:auto;flex-shrink:0;
   }
   .brand-text{line-height:1.05;}
-  .brand-text .t1{font-size:20px;}
+  .brand-text .t1{font-size:20px;color:var(--cream);}
   .brand-text .t1 span{color:var(--gold);}
   .brand-text .t2{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.12em;}
   nav{display:flex;gap:6px;margin-left:auto;flex-wrap:nowrap;flex-shrink:0;}
   .navbtn{
-    background:transparent;border:1px solid transparent;color:var(--dim);
+    background:transparent;border:1px solid transparent;color:var(--dim);text-decoration:none;
     padding:8px 14px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;
     font-size:15px;letter-spacing:0.03em;cursor:pointer;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
   }
