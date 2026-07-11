@@ -107,7 +107,7 @@ const I18N = {
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
     colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
     colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre',
-    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant',
+    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible',
     adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
@@ -162,7 +162,7 @@ const I18N = {
     tracksNote:'Average score on each track, across every player and match.',
     colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
     colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance',
-    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now',
+    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available',
     adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
@@ -217,7 +217,7 @@ const I18N = {
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
     colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
     colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio',
-    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora',
+    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible',
     adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
@@ -272,7 +272,7 @@ const I18N = {
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
     colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
     colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス',
-    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る',
+    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません',
     adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
@@ -438,7 +438,7 @@ let STATE = {
 };
 
 function defaultState(){
-  const s = {quali:{},mid:{},top:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
+  const s = {quali:{},mid:{},top:{},streams:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
   for(const g in QUALI_GROUPS) s.quali[g] = {slots:[...QUALI_GROUPS[g].teams], scores:{}, players:{}};
   for(const g in MID_GROUPS) s.mid[g] = {slots:[...MID_GROUPS[g].fixed, null, null], scores:{}, players:{}};
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
@@ -577,6 +577,7 @@ async function loadState(){
       }
       if(!STATE.bracket) STATE.bracket = d.bracket;
       if(!STATE.bracket.players) STATE.bracket.players = {r0:{},r1:{},r2:{},r3:{}};
+      if(!STATE.streams || typeof STATE.streams !== 'object') STATE.streams = {};
     } else { STATE = defaultState(); }
   }catch(e){ STATE = defaultState(); }
 }
@@ -813,7 +814,9 @@ function renderMatchDetail(ref){
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
     <div class="team-detail-page">
-      ${isLiveNow ? `<a href="https://www.twitch.tv/mariokartcentral" target="_blank" rel="noopener noreferrer" class="twitch-live-banner">🔴 ${t('watchLiveTwitch')}</a>` : ''}
+      ${isLiveNow ? (streamLinkFor(ref)
+        ? `<a href="${streamLinkFor(ref)}" target="_blank" rel="noopener noreferrer" class="twitch-live-banner">🔴 ${t('watchLive')}</a>`
+        : `<div class="twitch-live-banner twitch-live-banner--nolink">🔴 ${t('liveNoStream')}</div>`) : ''}
       <div class="helptext" style="margin-bottom:18px;">
         <span class="${anchor?'stage-link':''}"${anchor?` data-anchor="${anchor}"`:''}>${stage}</span> · ${date}
       </div>
@@ -974,6 +977,23 @@ function matchCardHTML(it){
     <span class="cal-score ${played?'done':''}">${scoreHTML}</span>
     <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
   </div>`;
+}
+
+/* =========================================================
+   STREAM LINKS (per-match)
+   ---------------------------------------------------------
+   MKCentral won't stream every match, so each match's live banner uses a per-match
+   link set from the admin app and stored in STATE.streams, keyed by the match's
+   matchRef (the same id used in data-matchref):
+   Group match:   'g|<quali|top|mid>|<groupId>|<i>|<j>'   e.g. 'g|quali|A|0|1'
+   Bracket match: 'b|<round>|<index>'                     e.g. 'b|2|0'
+
+   A match with no link (unset, or empty) shows the banner with no clickable link.
+========================================================= */
+// Returns null when no clickable link should be shown, otherwise the URL string.
+function streamLinkFor(ref){
+  const url = STATE.streams && STATE.streams[ref];
+  return (typeof url === 'string' && url.trim() !== '') ? url.trim() : null;
 }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a war/set is assumed to last about an hour

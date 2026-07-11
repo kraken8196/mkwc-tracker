@@ -237,6 +237,10 @@
     transition:background .15s;
   }
   .twitch-live-banner:hover{background:rgba(145,70,255,0.24);}
+  .twitch-live-banner--nolink{
+    background:rgba(229,72,77,0.12);border-color:var(--red);cursor:default;
+  }
+  .twitch-live-banner--nolink:hover{background:rgba(229,72,77,0.12);}
   .sub-tag{color:var(--dim);font-size:11px;font-weight:400;}
   .score-lose{color:var(--dim);}
   .cal-score.done{color:var(--cream);}
