@@ -553,6 +553,18 @@
 
 <script>
 /* =========================================================
+   DIAGNOSTIC TEMPORAIRE — à retirer une fois le problème trouvé
+========================================================= */
+const __T0 = performance.now();
+function __trace(label){ console.log(`[perf] ${label} — ${(performance.now()-__T0).toFixed(0)} ms depuis le début du script`); }
+try{
+  new PerformanceObserver((list)=>{
+    list.getEntries().forEach(e=>{
+      console.log(`[longtask] ${e.duration.toFixed(0)} ms, démarré à ${(e.startTime-__T0).toFixed(0)} ms`);
+    });
+  }).observe({type:'longtask', buffered:true});
+}catch(e){ console.log('[perf] longtask observer non supporté:', e.message); }
+/* =========================================================
    DATA — TEAMS
 ========================================================= */
 const TEAMS = {
@@ -3488,7 +3500,9 @@ let dirtyViews = new Set(Object.keys(VIEW_RENDERERS));
 function markAllDirty(){ dirtyViews = new Set(Object.keys(VIEW_RENDERERS)); }
 function ensureViewRendered(view){
   if(VIEW_RENDERERS[view] && dirtyViews.has(view)){
+    const __t0 = performance.now();
     VIEW_RENDERERS[view]();
+    console.log(`[perf] rendu de la vue "${view}" : ${(performance.now()-__t0).toFixed(1)} ms`);
     dirtyViews.delete(view);
   }
 }
@@ -3512,6 +3526,8 @@ function pushBrowserHistory(){
   catch(e){ /* some embedded/sandboxed environments (e.g. a preview iframe) disallow this — harmless to skip there */ }
 }
 function setView(view){
+  const __setViewT0 = performance.now();
+  __trace(`setView('${view}') appelé (clic reçu)`);
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
@@ -3523,6 +3539,7 @@ function setView(view){
   ensureViewRendered(view);
   window.scrollTo(0, 0); // each view starts fresh at the top, never inheriting another view's scroll position
   pushBrowserHistory();
+  console.log(`[perf] setView('${view}') total (jusqu'à la fin de la fonction) : ${(performance.now()-__setViewT0).toFixed(1)} ms`);
 }
 window.addEventListener('popstate', (e)=>{
   restoringFromHistory = true;
@@ -3615,6 +3632,7 @@ async function loadLangPref(){
 }
 
 (async function init(){
+  __trace('init() démarre');
   const startedOnAdmin = location.hash.startsWith('#admin');
   try{ history.replaceState({view:'home', selectedTeam:null, selectedMatch:null}, '', startedOnAdmin ? location.hash : '#home'); }catch(e){}
   const flagCache = loadFlagCacheFromStorage();
@@ -3625,7 +3643,9 @@ async function loadLangPref(){
     FLAG_OVERRIDES = flagCache.overrides || {};
     Object.assign(FLAG_RASTER_CACHE, flagCache.rasters || {});
     hydrateAllRasterURLs();
+    __trace('avant loadState (avec flagCache)');
     await loadState();
+    __trace('après loadState (avec flagCache)');
     migrateAllPlayerData();
     refreshFlagSymbols();
   } else {
@@ -3634,7 +3654,9 @@ async function loadLangPref(){
     // an in-code generated version (buildFlagInner), so we render immediately from
     // those and pull the published overrides in the BACKGROUND — no blocking round-trip.
     FLAG_OVERRIDES = FLAG_OVERRIDES_BAKED ? {...FLAG_OVERRIDES_BAKED} : {};
+    __trace('avant loadState (cold start)');
     await loadState();
+    __trace('après loadState (cold start)');
     migrateAllPlayerData();
     refreshFlagSymbols();
     coldStart = true;
@@ -3643,7 +3665,9 @@ async function loadLangPref(){
   applyStaticI18n();
   renderLangSwitch();
   updateHero(currentView);
+  __trace('avant renderAll (premier rendu)');
   renderAll();
+  __trace('après renderAll (premier rendu)');
   if(startedOnAdmin) checkForSecretAdminAccess();
   const loadScreen = document.getElementById('loadScreen');
   if(loadScreen){
@@ -3651,6 +3675,7 @@ async function loadLangPref(){
     loadScreen.style.opacity = '0';
     setTimeout(()=> loadScreen.remove(), 300);
   }
+  __trace('init() terminé, écran de chargement retiré');
   if(coldStart){
     // Off the critical path, once the page is already shown & interactive: fetch
     // any published flag overrides and swap them in live (updating the <symbol>
@@ -3659,9 +3684,12 @@ async function loadLangPref(){
     // visually identical (same source shapes/colors) and free of CPU cost, so the
     // PNG step was pure overhead that stole the main thread right after load.
     const warmFlags = async ()=>{
+      __trace('warmFlags() démarre (arrière-plan)');
       try{
         await loadFlagOverridesStatic();  // static flags.json (non-blocking, cacheable, no Supabase dependency)
+        __trace('flags.json chargé');
         refreshFlagSymbols();        // live-updates all on-screen flags, no DOM rebuild
+        __trace('refreshFlagSymbols terminé');
       }catch(e){ /* keep the baked/generated flags */ }
     };
     if('requestIdleCallback' in window){ requestIdleCallback(()=>warmFlags(), {timeout:2000}); }
