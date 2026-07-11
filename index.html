@@ -3652,16 +3652,17 @@ async function loadLangPref(){
     setTimeout(()=> loadScreen.remove(), 300);
   }
   if(coldStart){
-    // Off the critical path, once the page is already shown & interactive:
-    //  1. fetch any admin flag overrides from Supabase and swap them in live
-    //     (updating the <symbol> defs re-skins every <use> flag with no re-render),
-    //  2. rasterize to PNG and warm the localStorage cache for next time.
+    // Off the critical path, once the page is already shown & interactive: fetch
+    // any published flag overrides and swap them in live (updating the <symbol>
+    // defs re-skins every <use> flag with no DOM rebuild). We no longer rasterize
+    // flags to PNG here — the inline SVG rendered via <use href="#flagsym-…"> is
+    // visually identical (same source shapes/colors) and free of CPU cost, so the
+    // PNG step was pure overhead that stole the main thread right after load.
     const warmFlags = async ()=>{
       try{
         await loadFlagOverridesStatic();  // static flags.json (non-blocking, cacheable, no Supabase dependency)
         refreshFlagSymbols();        // live-updates all on-screen flags, no DOM rebuild
       }catch(e){ /* keep the baked/generated flags */ }
-      try{ await rasterizeAllFlags(); saveFlagCacheToStorage(); }catch(e){}
     };
     if('requestIdleCallback' in window){ requestIdleCallback(()=>warmFlags(), {timeout:2000}); }
     else { setTimeout(warmFlags, 200); }
