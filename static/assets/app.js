@@ -1759,9 +1759,9 @@ function renderPlayersView(){
         if(tierDiff !== 0) return tierDiff;
         return aPlayed ? -1 : 1;
       }
-      // both have played: prefer the team with more matches played (a more reliable sample)
-      // before comparing performance, so a single lucky win doesn't outrank a proven record
-      return (b.played-a.played) || b.winPct-a.winPct || b.diff-a.diff || projectedRank(a.tag)-projectedRank(b.tag);
+      // both have played: rank purely on average score per match, regardless of how many
+      // matches each has played. Win%, point diff and projection only break exact ties.
+      return (b.avg-a.avg) || b.winPct-a.winPct || b.diff-a.diff || projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
