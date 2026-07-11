@@ -1602,18 +1602,21 @@ function renderTeamDetail(tag){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
       ${recent.length? `<div class="cal-list" style="margin-bottom:8px;">${recent.map(u=>{
           const won = Number(u.sc[0])>Number(u.sc[1]);
+          const lost = Number(u.sc[0])<Number(u.sc[1]);
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}</span>
-          <span class="cal-teams">${teamPlainHTML(u.opp)}</span>
-          <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${!won?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+          <span class="cal-teams"><span class="cal-team-side ${won?'is-winner':''}">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side ${lost?'is-winner':''}">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date">${u.date}</span>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('upcomingMatches')}</h3>
       ${upcoming.length? `<div class="cal-list" style="margin-bottom:8px;">${upcoming.map(u=>`<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}</span>
-          <span class="cal-teams">${teamPlainHTML(u.opp)}</span>
-          <span class="cal-score"></span>
+          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-score"><span class="vs">${t('vs')}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date emphasize">${u.date}</span>
         </div>`).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('noUpcoming')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>

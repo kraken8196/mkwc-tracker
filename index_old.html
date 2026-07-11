@@ -237,7 +237,10 @@
   .match-card{cursor:pointer;transition:border-color .15s, box-shadow .15s;}
   .match-card:hover{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
   .cal-stage{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;min-width:160px;white-space:nowrap;}
-  .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;}
+  .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;justify-content:flex-end;}
+  .cal-teams-opp{justify-content:flex-start;}
+  .cal-team-side{display:flex;align-items:center;gap:10px;}
+  .cal-team-side.is-winner .teamname{color:var(--gold);}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
   .score-win{color:var(--gold);font-weight:700;}
   .best-race-banner{margin-bottom:16px;font-size:14px;color:var(--cream);}
@@ -284,7 +287,7 @@
   .match-detail-team{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:160px;text-align:center;}
   .match-detail-team .team-link{flex-direction:column;gap:10px;}
   .match-detail-team .teamname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:19px;}
-  .match-detail-team.winner .teamname{color:var(--green);}
+  .match-detail-team.winner .teamname{color:var(--gold);}
   .match-detail-players-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
   .race-chart-wrap{margin-top:28px;}
   .race-chart-title{font-size:15px;color:var(--gold);margin-bottom:10px;}
@@ -459,11 +462,11 @@
     .flag-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
 
     .cal-item{padding:10px 12px;gap:8px 12px;}
-    .cal-stage{min-width:0;font-size:10px;}
-    .cal-teams{font-size:14px;flex-basis:100%;order:1;}
-    .cal-stage{order:0;}
-    .cal-score{order:2;width:auto;}
-    .cal-date{order:3;min-width:0;text-align:left;}
+    .cal-stage{min-width:0;font-size:10px;order:0;flex-basis:100%;}
+    .cal-teams{font-size:14px;order:1;flex:1;justify-content:flex-end;}
+    .cal-score{order:2;width:auto;flex-shrink:0;}
+    .cal-teams-opp{order:3;justify-content:flex-start;}
+    .cal-date{order:4;min-width:0;text-align:left;flex-basis:100%;}
 
     .match-detail-row{flex-direction:column;gap:10px;padding:10px 0;}
     .match-detail-team{min-width:0;width:100%;}
@@ -2497,18 +2500,21 @@ function renderTeamDetail(tag){
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
       ${recent.length? `<div class="cal-list" style="margin-bottom:8px;">${recent.map(u=>{
           const won = Number(u.sc[0])>Number(u.sc[1]);
+          const lost = Number(u.sc[0])<Number(u.sc[1]);
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}</span>
-          <span class="cal-teams">${teamPlainHTML(u.opp)}</span>
-          <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${!won?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+          <span class="cal-teams"><span class="cal-team-side ${won?'is-winner':''}">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side ${lost?'is-winner':''}">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date">${u.date}</span>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('upcomingMatches')}</h3>
       ${upcoming.length? `<div class="cal-list" style="margin-bottom:8px;">${upcoming.map(u=>`<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}</span>
-          <span class="cal-teams">${teamPlainHTML(u.opp)}</span>
-          <span class="cal-score"></span>
+          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-score"><span class="vs">${t('vs')}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date emphasize">${u.date}</span>
         </div>`).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('noUpcoming')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
