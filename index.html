@@ -1349,6 +1349,12 @@ function buildFlagInner(tag){
   }
 }
 let FLAG_OVERRIDES = {};
+/* Baked-in copy of the admin's custom flags, so the page can show them instantly
+   on a cold start WITHOUT waiting for a Supabase round-trip. Fill this object with
+   the export from your live site (see instructions) — keys are team tags, values
+   are the flag's inner SVG string. Leave as null to fall back to generated flags
+   plus a background fetch. */
+const FLAG_OVERRIDES_BAKED = null;
 const FLAG_CACHE_KEY = 'mkwc_flag_cache_v1';
 const FLAG_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes — long enough to skip re-fetching on every refresh
                                             // during a live tournament, short enough that an admin's flag
@@ -3566,24 +3572,25 @@ async function loadLangPref(){
   const startedOnAdmin = location.hash.startsWith('#admin');
   try{ history.replaceState({view:'home', selectedTeam:null, selectedMatch:null}, '', startedOnAdmin ? location.hash : '#home'); }catch(e){}
   const flagCache = loadFlagCacheFromStorage();
-  let needsRasterizing = false;
+  let coldStart = false;
   if(flagCache){
     // Reuse everything from last time — skips both the Supabase round-trip and the
     // (comparatively expensive) client-side flag rasterization entirely.
     FLAG_OVERRIDES = flagCache.overrides || {};
     Object.assign(FLAG_RASTER_CACHE, flagCache.rasters || {});
-    await Promise.all([loadState()]);
+    await loadState();
     migrateAllPlayerData();
     refreshFlagSymbols();
   } else {
-    await Promise.all([loadState(), loadFlagOverrides()]);
+    // COLD START. Only the live tournament data (loadState) must gate first paint.
+    // The custom flags live in Supabase, but every flag also has an in-code
+    // generated version (buildFlagInner), so we render immediately from those and
+    // pull the Supabase overrides in the BACKGROUND — no blocking flag round-trip.
+    FLAG_OVERRIDES = FLAG_OVERRIDES_BAKED ? {...FLAG_OVERRIDES_BAKED} : {};
+    await loadState();
     migrateAllPlayerData();
     refreshFlagSymbols();
-    // Flags display fine straight away as inline SVG via <use href="#flagsym-…">
-    // (see flagEl()), so we DON'T block first paint on rasterization. The PNG
-    // rasters are purely a cache-warming optimisation for later renders/visits;
-    // we build them in the background once the page is already interactive.
-    needsRasterizing = true;
+    coldStart = true;
   }
   await loadLangPref();
   applyStaticI18n();
@@ -3597,11 +3604,20 @@ async function loadLangPref(){
     loadScreen.style.opacity = '0';
     setTimeout(()=> loadScreen.remove(), 300);
   }
-  if(needsRasterizing){
-    // Warm the raster cache after the page is shown, off the critical path.
-    const warmRasterCache = ()=>{ rasterizeAllFlags().then(()=>{ try{ saveFlagCacheToStorage(); }catch(e){} }); };
-    if('requestIdleCallback' in window){ requestIdleCallback(warmRasterCache, {timeout:2000}); }
-    else { setTimeout(warmRasterCache, 200); }
+  if(coldStart){
+    // Off the critical path, once the page is already shown & interactive:
+    //  1. fetch any admin flag overrides from Supabase and swap them in live
+    //     (updating the <symbol> defs re-skins every <use> flag with no re-render),
+    //  2. rasterize to PNG and warm the localStorage cache for next time.
+    const warmFlags = async ()=>{
+      try{
+        await loadFlagOverrides();   // Supabase: custom flags (non-blocking now)
+        refreshFlagSymbols();        // live-updates all on-screen flags, no DOM rebuild
+      }catch(e){ /* keep the baked/generated flags */ }
+      try{ await rasterizeAllFlags(); saveFlagCacheToStorage(); }catch(e){}
+    };
+    if('requestIdleCallback' in window){ requestIdleCallback(()=>warmFlags(), {timeout:2000}); }
+    else { setTimeout(warmFlags, 200); }
   }
 })();
 </script>
