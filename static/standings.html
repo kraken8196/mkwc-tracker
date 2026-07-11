@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKWC 2026 — Classements &amp; Bracket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap"></noscript>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="img/logo.png">
+</head>
+<body>
+<div id="loadScreen" style="position:fixed;inset:0;z-index:999999;background:
+  radial-gradient(circle at 12% -10%, rgba(255,206,84,0.25), transparent 45%),
+  radial-gradient(circle at 100% 0%, rgba(255,255,255,0.10), transparent 35%),
+  repeating-linear-gradient(115deg, rgba(0,0,0,0.05) 0 2px, transparent 2px 6px),
+  linear-gradient(160deg, #F0942F 0%, #C1591C 45%, #8A3812 100%);
+"></div>
+<script>setTimeout(()=>{ const ls = document.getElementById('loadScreen'); if(ls) ls.remove(); }, 6000);</script>
+
+<header>
+  <div class="header-inner">
+    <a class="brand" id="brandLogo" href="home.html" style="text-decoration:none;">
+      <img class="brand-mark" src="img/logo.png" alt="MKWC">
+      <div class="brand-text">
+        <div class="t1 display">MKWC <span>2026</span></div>
+        <div class="t2" data-i18n="liveTracking">Suivi en direct</div>
+      </div>
+    </a>
+    <nav>
+      <a class="navbtn" data-view="home" data-i18n="navHome" href="home.html">Accueil</a>
+      <a class="navbtn active" data-view="standings" data-i18n="navStandings" href="standings.html">Classements &amp; Bracket</a>
+      <a class="navbtn" data-view="calendar" data-i18n="navCalendar" href="calendar.html">Calendrier</a>
+      <a class="navbtn" data-view="teams" data-i18n="navTeams" href="teams.html">Équipes</a>
+      <a class="navbtn" data-view="players" data-i18n="navPlayers" href="stats.html">Joueurs</a>
+    </nav>
+    <div class="lang-switch" id="langSwitch"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-titles">
+    <h1 class="outline" id="heroTitle">Coupe du Monde Mario Kart World</h1>
+    <div class="sub" id="heroSub">31 équipes nationales · Qualification → Phase de groupes → Bracket final</div>
+  </div>
+  <div class="dates" data-i18n="heroDates">10 JUIL → 2 AOÛT 2026</div>
+</div>
+
+<main>
+
+<section id="view-home"></section>
+<section id="view-standings" class="active"></section>
+<section id="view-calendar"></section>
+<section id="view-teams"></section>
+<section id="view-match"></section>
+<section id="view-player"></section>
+<section id="view-players"></section>
+
+</main>
+
+<footer data-i18n="footer">Projet de suivi communautaire, non affilié à Nintendo. Les données sont saisies manuellement et visibles par toute personne ayant ce lien.</footer>
+
+<script>window.MKWC_INITIAL_VIEW = 'standings';</script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
