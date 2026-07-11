@@ -1347,6 +1347,23 @@ function buildFlagInner(tag){
   }
 }
 let FLAG_OVERRIDES = {};
+const FLAG_CACHE_KEY = 'mkwc_flag_cache_v1';
+const FLAG_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes — long enough to skip re-fetching on every refresh
+                                            // during a live tournament, short enough that an admin's flag
+                                            // change still reaches everyone else within a reasonable time.
+function loadFlagCacheFromStorage(){
+  try{
+    const raw = localStorage.getItem(FLAG_CACHE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !parsed.timestamp || (Date.now()-parsed.timestamp) > FLAG_CACHE_TTL_MS) return null;
+    return parsed;
+  }catch(e){ return null; } // storage unavailable/corrupt — just skip the cache, no harm done
+}
+function saveFlagCacheToStorage(){
+  try{ localStorage.setItem(FLAG_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), overrides: FLAG_OVERRIDES, rasters: FLAG_RASTER_CACHE })); }
+  catch(e){ /* storage full or unavailable — harmless to skip caching */ }
+}
 let PENDING_SYNC = new Set(); // tags applied locally but not yet confirmed saved on the server
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 async function loadFlagOverrides(){
@@ -1380,6 +1397,7 @@ async function deleteFlagOverride(tag){
   delete FLAG_OVERRIDES[tag];
   refreshFlagSymbols();
   await rasterizeFlag(tag);
+  saveFlagCacheToStorage();
 }
 function flagInnerFor(tag){ return (FLAG_OVERRIDES[tag]!==undefined) ? FLAG_OVERRIDES[tag] : buildFlagInner(tag); }
 function flagEl(tag, cls){
@@ -2129,11 +2147,13 @@ function getRaceStats(){
   function bestTrackFromStats(statsObj){
     const result = {};
     for(const key in statsObj){
-      let best=null, bestAvg=-1;
+      let best=null, bestCount=-1, bestAvg=-1;
       for(const tid in statsObj[key]){
         const s = statsObj[key][tid];
         const avg = s.total/s.count;
-        if(avg>bestAvg){ bestAvg=avg; best=tid; }
+        // Prefer the track played the most — a single lucky race shouldn't outrank a track
+        // actually mastered over several attempts. Average only breaks ties within the same count.
+        if(s.count>bestCount || (s.count===bestCount && avg>bestAvg)){ bestCount=s.count; bestAvg=avg; best=tid; }
       }
       result[key] = best;
     }
@@ -2150,18 +2170,23 @@ function trackBreakdownList(statsForKey){
   if(!statsForKey) return [];
   return Object.keys(statsForKey).map(tid=>({
     trackId: tid, count: statsForKey[tid].count, avg: statsForKey[tid].total/statsForKey[tid].count
-  })).sort((a,b)=> b.avg-a.avg);
+  })).sort((a,b)=> b.count-a.count || b.avg-a.avg);
+}
+function formatMatchCount(n){
+  if(n==null) return '—';
+  const rounded = Math.round(n*10)/10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 function getPlayerStats(){
   const stats = {}; // tag -> {name -> {count, total, w, l}}
-  function add(tag, name, score, result){
+  function add(tag, name, score, result, weight){
     if(!tag || !name) return;
     stats[tag] = stats[tag] || {};
     if(!stats[tag][name]) stats[tag][name] = {count:0, total:0, w:0, l:0};
     const s = stats[tag][name];
-    s.count += 1;
+    s.count += weight;
     s.total += (isFinite(score) ? Number(score) : 0);
-    if(result==='w') s.w += 1; else if(result==='l') s.l += 1;
+    if(result==='w') s.w += weight; else if(result==='l') s.l += weight;
   }
   function resultsFor(sc){
     if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) return [null,null];
@@ -2170,8 +2195,12 @@ function getPlayerStats(){
     if(aa>hh) return ['l','w'];
     return [null,null];
   }
-  function segTotal(seg){ return seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
   function segFilled(seg){ return seg.races.some(v=>v!=='' && v!=null); }
+  // A player who only raced part of a match (substitute, or a match still being encoded live)
+  // is credited proportionally: e.g. 5 of 12 races counts as 0.4 of a match, with their real,
+  // unprojected points — so their average per match stays fair without inventing scores.
+  function segWeight(seg){ return seg.races.filter(v=>v!=='' && v!=null).length / 12; }
+  function segTotal(seg){ return seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
   function scan(groupsObj){
     for(const id in groupsObj){
       const g = groupsObj[id];
@@ -2179,8 +2208,8 @@ function getPlayerStats(){
         const [i,j] = key.split('-').map(Number);
         const pl = g.players[key];
         const [hRes,aRes] = resultsFor(g.scores[key]);
-        (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[i], seg.name, segTotal(seg), hRes); }));
-        (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[j], seg.name, segTotal(seg), aRes); }));
+        (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[i], seg.name, segTotal(seg), hRes, segWeight(seg)); }));
+        (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[j], seg.name, segTotal(seg), aRes, segWeight(seg)); }));
       }
     }
   }
@@ -2193,8 +2222,8 @@ function getPlayerStats(){
       const pl = pls[m];
       const h = slots[m*2], a = slots[m*2+1];
       const [hRes,aRes] = resultsFor(roundScores[r][m]);
-      (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(h, seg.name, segTotal(seg), hRes); }));
-      (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(a, seg.name, segTotal(seg), aRes); }));
+      (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(h, seg.name, segTotal(seg), hRes, segWeight(seg)); }));
+      (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(a, seg.name, segTotal(seg), aRes, segWeight(seg)); }));
     }
   }
   // compute averages
@@ -2349,7 +2378,7 @@ function renderTeamDetail(tag){
   const teamBestTrack = raceStats.bestTrackForTeam[tag];
   const playerRows = players
     .map(p=>({p, s:myStats[p.n]||null}))
-    .sort((a,b)=> (b.s?b.s.avg:-1) - (a.s?a.s.avg:-1));
+    .sort((a,b)=> (b.s?b.s.count:-1) - (a.s?a.s.count:-1) || (b.s?b.s.avg:-1) - (a.s?a.s.avg:-1));
   return `
     <button class="back-btn" id="backToTeamsBtn">${backLabel()}</button>
     <div class="team-detail-page">
@@ -2399,7 +2428,7 @@ function renderTeamDetail(tag){
               return `<tr class="player-row-link" data-player-tag="${tag}" data-player-name="${p.n}">
               <td style="text-align:center;"><span class="nat-badge" data-tooltip="${natName(p.nat)}">${p.nat}</span></td>
               <td class="lname">${p.n}</td>
-              <td class="num">${s?s.count:'—'}</td>
+              <td class="num">${s?formatMatchCount(s.count):'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
               <td class="num ${s?'highlight':''}">${s?s.avg.toFixed(1):'—'}</td>
               <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
@@ -2464,7 +2493,7 @@ function renderPlayerDetail(tag, name){
         </div>
       </div>
       <div class="stat-strip">
-        <div class="s">${t('colWarsPlayed')} <b>${s?s.count:'—'}</b></div>
+        <div class="s">${t('colWarsPlayed')} <b>${s?formatMatchCount(s.count):'—'}</b></div>
         <div class="s">${t('colWinPct')} <b>${s?Math.round(s.winPct*100)+'%':'—'}</b></div>
         <div class="s">${t('colAvg')} <b>${s?s.avg.toFixed(1):'—'}</b></div>
         <div class="s">${t('colBestTrack')} <b>${bestTid?trackName(bestTid):'—'}</b></div>
@@ -2508,7 +2537,7 @@ function renderPlayersView(){
         all.push({tag, name, avg:s.avg, count:s.count, w:s.w, l:s.l, winPct:s.winPct});
       }
     }
-    all.sort((a,b)=> b.avg-a.avg || b.count-a.count);
+    all.sort((a,b)=> b.count-a.count || b.avg-a.avg);
 
     html += `<div class="stage-note">${t('playersNote')} ${all.length===0?t('playersEmpty'):''}</div>`;
     if(all.length){
@@ -2524,7 +2553,7 @@ function renderPlayersView(){
           <td class="lp ${i===0?'top1':''}">${i+1}</td>
           <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname">${p.name}</span></span></td>
           <td class="lteam">${teamName(p.tag)}</td>
-          <td class="num">${p.count}</td>
+          <td class="num">${formatMatchCount(p.count)}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
           <td class="num highlight">${p.avg.toFixed(1)}</td>
           <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
@@ -2549,8 +2578,9 @@ function renderPlayersView(){
         if(tierDiff !== 0) return tierDiff;
         return aPlayed ? -1 : 1;
       }
-      // both have played: let real performance decide, projected rank only as final tiebreak
-      return b.winPct-a.winPct || b.diff-a.diff || projectedRank(a.tag)-projectedRank(b.tag);
+      // both have played: prefer the team with more matches played (a more reliable sample)
+      // before comparing performance, so a single lucky win doesn't outrank a proven record
+      return (b.played-a.played) || b.winPct-a.winPct || b.diff-a.diff || projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
@@ -2721,6 +2751,7 @@ function renderFlagEditorView(){
       tags.forEach(t=>{ FLAG_OVERRIDES[t] = data[t]; });
       refreshFlagSymbols();
       await Promise.all(tags.map(rasterizeFlag));
+      saveFlagCacheToStorage();
       renderAll();
       renderFlagEditorView();
     }catch(err){
@@ -2979,6 +3010,7 @@ function renderFlagEditorView(){
     FLAG_OVERRIDES[editorTag] = content;
     refreshFlagSymbols();
     await rasterizeFlag(editorTag);
+    saveFlagCacheToStorage();
     renderAll();
     const badge = document.querySelector('.editor-badge');
     if(badge){ badge.textContent = '✓ version personnalisée'; badge.className='editor-badge custom'; }
@@ -3531,10 +3563,22 @@ async function loadLangPref(){
 (async function init(){
   const startedOnAdmin = location.hash.startsWith('#admin');
   try{ history.replaceState({view:'home', selectedTeam:null, selectedMatch:null}, '', startedOnAdmin ? location.hash : '#home'); }catch(e){}
-  await Promise.all([loadState(), loadFlagOverrides()]);
-  migrateAllPlayerData();
-  refreshFlagSymbols();
-  await rasterizeAllFlags();
+  const flagCache = loadFlagCacheFromStorage();
+  if(flagCache){
+    // Reuse everything from last time — skips both the Supabase round-trip and the
+    // (comparatively expensive) client-side flag rasterization entirely.
+    FLAG_OVERRIDES = flagCache.overrides || {};
+    Object.assign(FLAG_RASTER_CACHE, flagCache.rasters || {});
+    await Promise.all([loadState()]);
+    migrateAllPlayerData();
+    refreshFlagSymbols();
+  } else {
+    await Promise.all([loadState(), loadFlagOverrides()]);
+    migrateAllPlayerData();
+    refreshFlagSymbols();
+    await rasterizeAllFlags();
+    saveFlagCacheToStorage();
+  }
   await loadLangPref();
   applyStaticI18n();
   renderLangSwitch();
