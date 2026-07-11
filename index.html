@@ -1409,6 +1409,21 @@ async function loadFlagOverrides(){
     }
   }catch(e){ /* no overrides yet */ }
 }
+// Static, cacheable published overrides for regular visitors — no Supabase round-trip.
+// This file lives next to index.html and is only re-fetched by browsers when its own
+// content actually changes, so editing index.html for anything else no longer forces
+// everyone to re-download the flags. Publish new custom flags by using the existing
+// "Copier ma sauvegarde" button in the flag editor, then saving that text over
+// flags.json and pushing it — a separate, independent deploy from index.html itself.
+async function loadFlagOverridesStatic(){
+  try{
+    const res = await fetch('flags.json', { cache: 'no-cache' }); // revalidate cheaply via ETag/Last-Modified, no full re-download unless changed
+    if(res.ok){
+      const parsed = await res.json();
+      if(parsed && typeof parsed === 'object') FLAG_OVERRIDES = parsed;
+    }
+  }catch(e){ /* offline, or file not deployed yet — keep the generated flags */ }
+}
 async function saveFlagOverride(tag, content){
   const delays = [0, 2000, 5000, 10000]; // give the platform's rate limiter real time to reset
   let lastErr;
@@ -3269,7 +3284,13 @@ function renderAdminView(){
 
   el.querySelectorAll('[data-sec]').forEach(b=> b.onclick = ()=>{ adminSection=b.dataset.sec; renderAdminView(); });
   const flagsBtn = document.getElementById('adminFlagsBtn');
-  if(flagsBtn) flagsBtn.onclick = ()=>{ setView('flageditor'); renderFlagEditorView(); };
+  if(flagsBtn) flagsBtn.onclick = ()=>{
+    setView('flageditor');
+    renderFlagEditorView();
+    // The editor is the admin's working tool: pull the live Supabase drafts (which
+    // may be ahead of the last published flags.json) so edits in progress aren't lost from view.
+    loadFlagOverrides().then(()=>{ refreshFlagSymbols(); renderFlagEditorView(); }).catch(()=>{});
+  };
 
   function stateBackupText(){ return JSON.stringify(STATE, null, 0); }
   document.getElementById('stateExportBtn').onclick = async ()=>{
@@ -3609,9 +3630,9 @@ async function loadLangPref(){
     refreshFlagSymbols();
   } else {
     // COLD START. Only the live tournament data (loadState) must gate first paint.
-    // The custom flags live in Supabase, but every flag also has an in-code
-    // generated version (buildFlagInner), so we render immediately from those and
-    // pull the Supabase overrides in the BACKGROUND — no blocking flag round-trip.
+    // Custom flags are published to a static flags.json file, but every flag also has
+    // an in-code generated version (buildFlagInner), so we render immediately from
+    // those and pull the published overrides in the BACKGROUND — no blocking round-trip.
     FLAG_OVERRIDES = FLAG_OVERRIDES_BAKED ? {...FLAG_OVERRIDES_BAKED} : {};
     await loadState();
     migrateAllPlayerData();
@@ -3637,7 +3658,7 @@ async function loadLangPref(){
     //  2. rasterize to PNG and warm the localStorage cache for next time.
     const warmFlags = async ()=>{
       try{
-        await loadFlagOverrides();   // Supabase: custom flags (non-blocking now)
+        await loadFlagOverridesStatic();  // static flags.json (non-blocking, cacheable, no Supabase dependency)
         refreshFlagSymbols();        // live-updates all on-screen flags, no DOM rebuild
       }catch(e){ /* keep the baked/generated flags */ }
       try{ await rasterizeAllFlags(); saveFlagCacheToStorage(); }catch(e){}
