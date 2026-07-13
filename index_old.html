@@ -194,6 +194,39 @@
     margin-top:10px;letter-spacing:0.04em;
   }
 
+  /* Play-In recap teaser on the home page */
+  .nutshell-teaser{
+    display:flex;flex-direction:column;gap:4px;margin-top:18px;padding:16px 20px;border-radius:12px;
+    cursor:pointer;text-decoration:none;
+    background:linear-gradient(160deg, var(--panel-3), var(--panel-2));
+    border:1px solid var(--line-strong);transition:transform .15s, box-shadow .15s, border-color .15s;
+  }
+  .nutshell-teaser:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,0.3);border-color:var(--gold);}
+  .nutshell-teaser .nt-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.12em;}
+  .nutshell-teaser .nt-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:24px;color:var(--cream);line-height:1.05;}
+  .nutshell-teaser .nt-cta{font-size:13px;color:var(--dim);margin-top:2px;}
+
+  /* Play-In recap article */
+  .np-article{max-width:660px;margin:0 auto;}
+  .np-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:0.14em;margin:14px 0 12px;}
+  .np-title{font-size:clamp(34px,6vw,50px);line-height:1.04;text-wrap:balance;}
+  .np-standfirst{font-size:17px;line-height:1.6;color:var(--cream);opacity:0.92;margin:18px 0 0;}
+  .np-byline{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);margin-top:14px;}
+  .np-rule{height:1px;background:var(--line-strong);border:0;margin:26px 0 2px;}
+  .np-body{font-size:16.5px;line-height:1.75;color:var(--cream);}
+  .np-body p{margin:18px 0;}
+  .np-body strong{color:#fff;font-weight:600;}
+  .np-fig{color:var(--gold);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  .np-h2{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:23px;color:var(--gold);text-transform:uppercase;letter-spacing:0.03em;margin:36px 0 2px;}
+  .np-score{
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+    margin:8px 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    font-family:'Rajdhani',sans-serif;font-weight:700;
+  }
+  .np-score .t{font-size:20px;color:var(--cream);}
+  .np-score .n{font-family:'JetBrains Mono',monospace;font-size:30px;color:var(--gold);}
+  .np-score .d{color:var(--dim);}
+
   .format-card{
     background:linear-gradient(160deg, #4a2a12, #5c3618);
     border:1px solid rgba(255,206,84,0.35);
@@ -681,6 +714,7 @@
 <section id="view-match"></section>
 <section id="view-player"></section>
 <section id="view-players"></section>
+<section id="view-nutshell"></section>
 <section id="view-flageditor"></section>
 <section id="view-admin"></section>
 
@@ -787,7 +821,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit', adminTotalLabel:'Total',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -853,7 +887,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track', adminTotalLabel:'Total',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -919,7 +953,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito', adminTotalLabel:'Total',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -985,7 +1019,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース', adminTotalLabel:'合計',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -2190,6 +2224,140 @@ function allGroupMatchesPlayed(groupsObj){
   }
   return true;
 }
+// Computes every stat shown in the Play-In recap article, straight from STATE.quali,
+// so the page is always in sync with the latest results. Returns null-ish fields when
+// there isn't enough data yet; the article only renders once the phase is complete.
+function getPlayInRecap(){
+  const q = STATE.quali || {};
+  const matches = []; // {H,A,scH,scA,tracks,players}
+  for(const id in q){
+    const g = q[id];
+    if(!g) continue;
+    pairsFor(g.slots.length).forEach(([i,j])=>{
+      const key = i+'-'+j, sc = g.scores[key];
+      if(!isPlayed(sc) || g.slots[i]==null || g.slots[j]==null) return;
+      matches.push({ H:g.slots[i], A:g.slots[j], scH:Number(sc[0]), scA:Number(sc[1]),
+        tracks:(g.players[key]||{}).tracks||[], pl:g.players[key]||{h:[],a:[]} });
+    });
+  }
+
+  // per-player race scores; per-track (player,score); team records & points
+  const praces = {}; // name -> [race scores]
+  const pmatchTotal = {}; // name -> best single-match total
+  const p15 = {}; // name -> count of 15s
+  const trackScores = {}; // trackId -> [{n,v}]
+  const trackUses = {}; // trackId -> selections
+  const teamPts = {}, teamGames = {}, teamRec = {}; // tag -> pts / games / [w,d,l]
+  const distinctTracks = new Set();
+  let racesPlayed = 0, totalPoints = 0;
+
+  function bump(obj,k,by){ obj[k]=(obj[k]||0)+by; }
+
+  matches.forEach(m=>{
+    // team record + points
+    bump(teamPts,m.H,m.scH); bump(teamPts,m.A,m.scA);
+    bump(teamGames,m.H,1); bump(teamGames,m.A,1);
+    teamRec[m.H]=teamRec[m.H]||[0,0,0]; teamRec[m.A]=teamRec[m.A]||[0,0,0];
+    if(m.scH>m.scA){ teamRec[m.H][0]++; teamRec[m.A][2]++; }
+    else if(m.scA>m.scH){ teamRec[m.A][0]++; teamRec[m.H][2]++; }
+    else { teamRec[m.H][1]++; teamRec[m.A][1]++; }
+    // tracks selected
+    (m.tracks||[]).forEach(tid=>{ if(tid){ bump(trackUses,tid,1); distinctTracks.add(tid); } });
+    // per race: credit the right player (handles substitutes) and per-track scoring
+    const raceIdxSeen = new Set();
+    [['h',m.H],['a',m.A]].forEach(([side])=>{
+      (m.pl[side]||[]).forEach(p=>{
+        if(!p||!p.n) return;
+        const races = p.races||[];
+        races.forEach((v,i)=>{
+          if(v==='' || v==null) return;
+          const val = Number(v)||0;
+          const owner = raceOwnerName(p,i);
+          praces[owner]=praces[owner]||[]; praces[owner].push(val);
+          if(val===15) bump(p15,owner,1);
+          const tid = m.tracks[i];
+          if(tid){ trackScores[tid]=trackScores[tid]||[]; trackScores[tid].push({n:owner,v:val}); }
+          raceIdxSeen.add(i);
+          totalPoints += val;
+        });
+      });
+    });
+    racesPlayed += raceIdxSeen.size;
+    // best single-match total per player (segments credit substitutes correctly)
+    [['h'],['a']].forEach(([side])=>{
+      (m.pl[side]||[]).forEach(p=>{
+        playerSegments(p).forEach(seg=>{
+          const tot = seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0);
+          const any = seg.races.some(v=>v!=='' && v!=null);
+          if(any) pmatchTotal[seg.name] = Math.max(pmatchTotal[seg.name]||0, tot);
+        });
+      });
+    });
+  });
+
+  const playersPlayed = Object.keys(praces).length;
+
+  // --- Match highlights ---
+  const draw = matches.find(m=>m.scH===m.scA) || null;
+  // biggest comeback: eventual winner's largest running deficit
+  function cum(m){
+    const h=Array(12).fill(0), a=Array(12).fill(0);
+    (m.pl.h||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null) h[i]+=Number(v); }));
+    (m.pl.a||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null) a[i]+=Number(v); }));
+    let sh=0,sa=0; const ch=[],ca=[];
+    for(let i=0;i<12;i++){ sh+=h[i]; sa+=a[i]; ch.push(sh); ca.push(sa); }
+    return [ch,ca];
+  }
+  let comeback=null;
+  matches.forEach(m=>{
+    if(m.scH===m.scA) return;
+    if(!(m.pl.h||[]).some(p=>p.n)) return;
+    const [ch,ca]=cum(m);
+    const winH=m.scH>m.scA;
+    let worst=Infinity;
+    for(let i=0;i<12;i++){ const d = winH ? (ch[i]-ca[i]) : (ca[i]-ch[i]); if(d<worst) worst=d; }
+    if(worst<0 && (comeback===null || worst<comeback.deficit)){
+      comeback={ deficit:worst, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA) };
+    }
+  });
+
+  // --- Individual bests ---
+  const bestMatch = Object.entries(pmatchTotal).sort((a,b)=>b[1]-a[1])[0] || null;
+  const mostPerfect = Object.entries(p15).sort((a,b)=>b[1]-a[1])[0] || null;
+  // most consistent: lowest stddev, min 12 races
+  const consList = Object.entries(praces).filter(([,rs])=>rs.length>=12)
+    .map(([n,rs])=>[n, stdDev(rs)]).filter(([,sd])=>sd!=null).sort((a,b)=>a[1]-b[1]);
+  const mostConsistent = consList[0] || null;
+
+  // --- Teams ---
+  const undefeated = Object.keys(teamRec).filter(t=>teamRec[t][2]===0);
+  const teamAvg = Object.keys(teamPts).map(t=>[t, teamPts[t]/teamGames[t]]).sort((a,b)=>b[1]-a[1]);
+  const bestOffense = teamAvg[0] || null;
+
+  // --- Tracks ---
+  const mostPlayedTrack = Object.entries(trackUses).sort((a,b)=>b[1]-a[1])[0] || null;
+  // good players = top 25% by overall mean race (min 12 races)
+  const meanByPlayer = Object.entries(praces).filter(([,rs])=>rs.length>=12)
+    .map(([n,rs])=>[n, rs.reduce((s,v)=>s+v,0)/rs.length]).sort((a,b)=>b[1]-a[1]);
+  const nGood = Math.max(10, Math.round(meanByPlayer.length*0.25));
+  const good = new Set(meanByPlayer.slice(0,nGood).map(([n])=>n));
+  // track avg among good players, reliable sample only (>=30 good-player races)
+  const trackGoodAvg = [];
+  for(const tid in trackScores){
+    const gs = trackScores[tid].filter(x=>good.has(x.n)).map(x=>x.v);
+    if(gs.length>=30) trackGoodAvg.push([tid, gs.reduce((s,v)=>s+v,0)/gs.length, gs.length]);
+  }
+  trackGoodAvg.sort((a,b)=>b[1]-a[1]);
+  const skillTrack = trackGoodAvg[0] || null;      // highest good-player avg
+  const levellerTrack = trackGoodAvg[trackGoodAvg.length-1] || null; // lowest
+
+  return {
+    matchesCount: matches.length, racesPlayed, totalPoints, playersPlayed,
+    distinctTracks: distinctTracks.size,
+    draw, comeback, bestMatch, mostPerfect, mostConsistent,
+    undefeated, bestOffense, mostPlayedTrack, skillTrack, levellerTrack
+  };
+}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
@@ -2228,6 +2396,11 @@ function renderHomeView(){
       <div class="cal-list">${liveNow.map(matchCardHTML).join('')}</div>
     </div>` : ''}
     ${nextMatch ? nextMatchBlockHTML(nextMatch) : ''}
+    ${allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
+      <span class="nt-eyebrow">${nt('eyebrow')}</span>
+      <span class="nt-title">${nt('title')}</span>
+      <span class="nt-cta">${t('nutshellRead')} →</span>
+    </a>` : ''}
     <div class="stage-note" style="font-size:15px;margin:18px 0 24px;">${t('homeIntro')}</div>
 
     <div class="match-progress" style="margin-bottom:30px;">
@@ -2271,7 +2444,7 @@ function renderHomeView(){
     <div class="thanks-text">${t('thanksText')}</div>
   `;
   el.innerHTML = html;
-  el.querySelectorAll('.explore-card').forEach(card=>{
+  el.querySelectorAll('.explore-card, .nutshell-teaser').forEach(card=>{
     card.onclick = ()=>{
       navHistory = [];
       const view = card.dataset.navto;
@@ -3969,6 +4142,174 @@ function renderAdminView(){
 }
 
 /* =========================================================
+   RENDER: PLAY-IN RECAP ARTICLE ("Le Play-In en bref")
+   Shown only once every Play-In match is played; all figures come from
+   getPlayInRecap() so the article stays in sync with the results.
+========================================================= */
+// Article strings per language. {placeholders} are filled from the computed recap.
+// <b> marks bold; <fig> marks a highlighted number.
+const NUTSHELL_I18N = {
+  fr:{
+    eyebrow:'Récap · Phase de Play-In',
+    title:'Le Play-In en bref',
+    standfirst:'La première phase du MKWC 2026 est close. Quinze équipes s’y sont affrontées pour décrocher leur place en phase de groupes. Le temps d’un tour d’horizon des chiffres qui la résument : les matchs marquants, les exploits individuels, les circuits et quelques détails qui échappent au tableau des scores.',
+    byline:'Groupes W · X · Y · Z',
+    hMatches:'Les matchs marquants',
+    hIndiv:'Les performances individuelles',
+    hTeams:'Du côté des équipes',
+    hTracks:'Les circuits',
+    hDyk:'Le saviez-vous ?',
+    draw:'Sur l’ensemble de la phase, un seul match n’a pas trouvé de vainqueur. Le <b>{h}</b> et le <b>{a}</b> se sont quittés dos à dos, incapables de se départager au terme des douze courses.',
+    comeback:'Le <b>{winner}</b> signe aussi la plus belle remontée de la phase. Mené de <fig>{deficit}</fig> points face au {loser}, il a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé du Play-In.',
+    indiv:'Un nom revient plus que les autres : <b>{player}</b>. Il détient le meilleur total individuel de la phase avec <fig>{best}</fig> points sur un seul match, et a franchi la ligne en tête à <fig>{perfect}</fig> reprises — le plus grand nombre de courses gagnées par un joueur sur le Play-In.',
+    consistent:'Côté régularité, <b>{player}</b> se distingue comme le joueur le plus constant du plateau : ses scores restent au plus près de sa moyenne d’une course à l’autre.',
+    undefeated:'{count} nations terminent le Play-In sans la moindre défaite : {list}.',
+    offense:'C’est le/la <b>{team}</b> qui affiche la meilleure moyenne offensive, avec <fig>{avg}</fig> points marqués par match.',
+    trackMost:'Parmi les trente circuits du jeu, un seul a été choisi plus souvent que les autres : le <b>{track}</b>, sélectionné à <fig>{n}</fig> reprises par les équipes.',
+    trackSkill:'Mais tous les tracés ne se valent pas pour l’élite. En regardant le score moyen des meilleurs joueurs de la phase, circuit par circuit, deux profils se détachent nettement. C’est sur le <b>{skill}</b> que le niveau s’exprime le plus : les joueurs du haut du classement y marquent en moyenne <fig>{skillAvg}</fig> points par course, bien au-dessus de leur moyenne générale. À l’inverse, le <b>{leveller}</b> est celui où ils peinent le plus à se détacher, avec <fig>{levAvg}</fig> de moyenne : un tracé qui a tendance à rebattre les cartes.',
+    dyk1:'En tout, la phase de Play-In aura réuni <fig>{players}</fig> joueurs sur la piste, pour <fig>{matches}</fig> matchs et <fig>{races}</fig> courses disputées. Mises bout à bout, ces courses représentent <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
+    dyk2:'Les équipes n’ont pas boudé la variété : les <fig>{tracks}</fig> circuits du jeu ont tous été sélectionnés au moins une fois au cours de la phase.'
+  },
+  en:{
+    eyebrow:'Recap · Play-In Stage',
+    title:'The Play-In in a nutshell',
+    standfirst:'The first stage of MKWC 2026 is over. Fifteen teams battled for a spot in the Group Stage. Time for a look at the numbers behind it: the standout matches, the individual feats, the tracks and a few details the scoreboard doesn’t show.',
+    byline:'Groups W · X · Y · Z',
+    hMatches:'Standout matches',
+    hIndiv:'Individual performances',
+    hTeams:'Around the teams',
+    hTracks:'The tracks',
+    hDyk:'Did you know?',
+    draw:'Across the whole stage, only one match ended without a winner. <b>{h}</b> and <b>{a}</b> finished dead level, unable to separate after twelve races.',
+    comeback:'<b>{winner}</b> also pulled off the biggest comeback of the stage. Down by <fig>{deficit}</fig> points against {loser}, they turned it around to win <b>{scW}–{scL}</b> — the largest deficit overturned in the Play-In.',
+    indiv:'One name stands out: <b>{player}</b>. They hold the best individual match total of the stage with <fig>{best}</fig> points in a single match, and crossed the line first <fig>{perfect}</fig> times — the most race wins by any player in the Play-In.',
+    consistent:'For consistency, <b>{player}</b> was the steadiest player on the roster: their scores stayed closest to their average from one race to the next.',
+    undefeated:'{count} nations finish the Play-In without a single loss: {list}.',
+    offense:'<b>{team}</b> boasts the best scoring average, with <fig>{avg}</fig> points per match.',
+    trackMost:'Of the game’s thirty tracks, one was picked more than any other: <b>{track}</b>, selected <fig>{n}</fig> times by the teams.',
+    trackSkill:'But not all tracks reward the elite equally. Looking at the average score of the stage’s best players, track by track, two profiles stand out clearly. It’s on <b>{skill}</b> that skill shows the most: top-ranked players average <fig>{skillAvg}</fig> points per race there, well above their overall average. Conversely, <b>{leveller}</b> is where they struggle most to pull away, at <fig>{levAvg}</fig> on average: a track that tends to reshuffle the deck.',
+    dyk1:'All told, the Play-In brought <fig>{players}</fig> players to the track, across <fig>{matches}</fig> matches and <fig>{races}</fig> races. End to end, those races add up to <fig>{points}</fig> points scored by all racers combined.',
+    dyk2:'Teams embraced the variety: all <fig>{tracks}</fig> of the game’s tracks were picked at least once during the stage.'
+  },
+  es:{
+    eyebrow:'Resumen · Fase de Play-In',
+    title:'El Play-In en resumen',
+    standfirst:'La primera fase del MKWC 2026 ha terminado. Quince equipos se enfrentaron por un puesto en la fase de grupos. Es momento de repasar las cifras que la resumen: los partidos destacados, las hazañas individuales, los circuitos y algunos detalles que no muestra el marcador.',
+    byline:'Grupos W · X · Y · Z',
+    hMatches:'Los partidos destacados',
+    hIndiv:'Las actuaciones individuales',
+    hTeams:'Entre los equipos',
+    hTracks:'Los circuitos',
+    hDyk:'¿Sabías que...?',
+    draw:'En toda la fase, solo un partido terminó sin ganador. <b>{h}</b> y <b>{a}</b> acabaron igualados, incapaces de separarse tras doce carreras.',
+    comeback:'<b>{winner}</b> firma también la mejor remontada de la fase. Con <fig>{deficit}</fig> puntos de desventaja ante {loser}, le dio la vuelta para ganar <b>{scW}–{scL}</b>: la mayor desventaja remontada del Play-In.',
+    indiv:'Un nombre destaca sobre los demás: <b>{player}</b>. Posee el mejor total individual de la fase con <fig>{best}</fig> puntos en un solo partido, y cruzó la meta en primer lugar <fig>{perfect}</fig> veces: el mayor número de carreras ganadas por un jugador en el Play-In.',
+    consistent:'En regularidad, <b>{player}</b> fue el jugador más constante del plantel: sus puntuaciones se mantuvieron lo más cerca de su media de una carrera a otra.',
+    undefeated:'{count} naciones terminan el Play-In sin una sola derrota: {list}.',
+    offense:'<b>{team}</b> presenta la mejor media ofensiva, con <fig>{avg}</fig> puntos por partido.',
+    trackMost:'De los treinta circuitos del juego, uno fue elegido más que ningún otro: <b>{track}</b>, seleccionado <fig>{n}</fig> veces por los equipos.',
+    trackSkill:'Pero no todos los trazados recompensan igual a la élite. Mirando la puntuación media de los mejores jugadores de la fase, circuito por circuito, se distinguen dos perfiles. Es en <b>{skill}</b> donde el nivel se expresa más: los jugadores del top promedian <fig>{skillAvg}</fig> puntos por carrera, muy por encima de su media general. En cambio, <b>{leveller}</b> es donde más les cuesta despegar, con <fig>{levAvg}</fig> de media: un trazado que tiende a barajar de nuevo las cartas.',
+    dyk1:'En total, el Play-In reunió a <fig>{players}</fig> jugadores en la pista, en <fig>{matches}</fig> partidos y <fig>{races}</fig> carreras. Sumadas, esas carreras representan <fig>{points}</fig> puntos anotados por el conjunto de pilotos.',
+    dyk2:'Los equipos apostaron por la variedad: los <fig>{tracks}</fig> circuitos del juego fueron elegidos al menos una vez durante la fase.'
+  },
+  ja:{
+    eyebrow:'まとめ · プレイインステージ',
+    title:'プレイインを振り返る',
+    standfirst:'MKWC 2026の第1ステージが終了しました。15チームがグループステージ進出をかけて競い合いました。ここで、その数字を振り返ります。印象的な試合、個人の活躍、コース、そしてスコアボードには表れない細かな事実を見ていきましょう。',
+    byline:'グループ W · X · Y · Z',
+    hMatches:'印象的な試合',
+    hIndiv:'個人の活躍',
+    hTeams:'チームをめぐって',
+    hTracks:'コース',
+    hDyk:'豆知識',
+    draw:'ステージ全体で、勝者が決まらなかった試合はただ一つ。<b>{h}</b>と<b>{a}</b>は12レースを終えても決着がつかず、互角のまま引き分けました。',
+    comeback:'<b>{winner}</b>はこのステージ最大の逆転劇も演じました。{loser}に<fig>{deficit}</fig>点差をつけられながら、試合をひっくり返して<b>{scW}–{scL}</b>で勝利——プレイイン最大の逆転差です。',
+    indiv:'ひときわ目立つ名前が<b>{player}</b>。1試合<fig>{best}</fig>点というステージ最高の個人得点を記録し、<fig>{perfect}</fig>回もトップでゴール——プレイインで最多のレース勝利数です。',
+    consistent:'安定性では、<b>{player}</b>がロスター随一の安定感を見せました。レースごとのスコアが平均から最もぶれない選手です。',
+    undefeated:'{count}チームが一度も負けずにプレイインを終えました：{list}。',
+    offense:'<b>{team}</b>が最高の平均得点を記録、1試合あたり<fig>{avg}</fig>点です。',
+    trackMost:'ゲームの30コースのうち、他を上回って選ばれたのが<b>{track}</b>。チームによって<fig>{n}</fig>回選択されました。',
+    trackSkill:'しかし、すべてのコースが実力を等しく反映するわけではありません。ステージ上位選手の平均スコアをコースごとに見ると、2つの傾向がはっきり表れます。実力が最も出るのが<b>{skill}</b>。上位選手はここで1レースあたり平均<fig>{skillAvg}</fig>点を記録し、全体平均を大きく上回ります。逆に<b>{leveller}</b>では差をつけにくく、平均<fig>{levAvg}</fig>点——展開が読みにくいコースです。',
+    dyk1:'プレイイン全体で<fig>{players}</fig>人の選手がコースに立ち、<fig>{matches}</fig>試合・<fig>{races}</fig>レースが行われました。これらを合わせると、全選手で<fig>{points}</fig>点が記録されました。',
+    dyk2:'チームは多彩さを見せ、ゲームの<fig>{tracks}</fig>コースすべてがステージ中に少なくとも一度は選ばれました。'
+  }
+};
+function nt(key, vars){
+  const dict = NUTSHELL_I18N[LANG] || NUTSHELL_I18N.en;
+  let s = dict[key] || NUTSHELL_I18N.en[key] || key;
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  // turn our lightweight markup into styled spans
+  s = s.replace(/<b>/g,'<strong>').replace(/<\/b>/g,'</strong>')
+       .replace(/<fig>/g,'<span class="np-fig">').replace(/<\/fig>/g,'</span>');
+  return s;
+}
+function renderNutshellView(){
+  const el = document.getElementById('view-nutshell');
+  if(!el) return;
+  // Guard: only meaningful once the whole Play-In is done.
+  if(!allGroupMatchesPlayed(STATE.quali)){
+    el.innerHTML = `<div class="stage-note">${t('calNoMatch')}</div>`;
+    return;
+  }
+  const r = getPlayInRecap();
+  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
+  const paras = [];
+
+  paras.push(`<h2 class="np-h2">${nt('hMatches')}</h2>`);
+  if(r.draw){
+    paras.push(`<p>${nt('draw',{h:teamName(r.draw.H), a:teamName(r.draw.A)})}</p>`);
+    paras.push(`<div class="np-score"><span class="t">${teamName(r.draw.H)}</span><span class="n">${r.draw.scH}</span><span class="d">–</span><span class="n">${r.draw.scA}</span><span class="t">${teamName(r.draw.A)}</span></div>`);
+  }
+  if(r.comeback){
+    paras.push(`<p>${nt('comeback',{winner:teamName(r.comeback.winner), loser:teamName(r.comeback.loser), deficit:Math.abs(r.comeback.deficit), scW:r.comeback.scW, scL:r.comeback.scL})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${nt('hIndiv')}</h2>`);
+  if(r.bestMatch && r.mostPerfect){
+    paras.push(`<p>${nt('indiv',{player:r.bestMatch[0], best:r.bestMatch[1], perfect:r.mostPerfect[1]})}</p>`);
+  }
+  if(r.mostConsistent){
+    paras.push(`<p>${nt('consistent',{player:r.mostConsistent[0]})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${nt('hTeams')}</h2>`);
+  if(r.undefeated && r.undefeated.length){
+    const list = r.undefeated.map(teamName);
+    const joined = list.length>1 ? list.slice(0,-1).join(', ')+' '+ (LANG==='en'?'and':LANG==='es'?'y':LANG==='ja'?'、':'et') +' '+list[list.length-1] : list[0];
+    paras.push(`<p>${nt('undefeated',{count:list.length, list:joined})}</p>`);
+  }
+  if(r.bestOffense){
+    paras.push(`<p>${nt('offense',{team:teamName(r.bestOffense[0]), avg:Math.round(r.bestOffense[1])})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${nt('hTracks')}</h2>`);
+  if(r.mostPlayedTrack){
+    paras.push(`<p>${nt('trackMost',{track:trackName(r.mostPlayedTrack[0]), n:r.mostPlayedTrack[1]})}</p>`);
+  }
+  if(r.skillTrack && r.levellerTrack && r.skillTrack[0]!==r.levellerTrack[0]){
+    paras.push(`<p>${nt('trackSkill',{skill:trackName(r.skillTrack[0]), skillAvg:r.skillTrack[1].toFixed(1).replace('.',decimalSep()), leveller:trackName(r.levellerTrack[0]), levAvg:r.levellerTrack[1].toFixed(1).replace('.',decimalSep())})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${nt('hDyk')}</h2>`);
+  paras.push(`<p>${nt('dyk1',{players:nf(r.playersPlayed), matches:nf(r.matchesCount), races:nf(r.racesPlayed), points:nf(r.totalPoints)})}</p>`);
+  paras.push(`<p>${nt('dyk2',{tracks:nf(r.distinctTracks)})}</p>`);
+
+  el.innerHTML = `
+    <button class="back-btn" id="backFromNutshell">← ${t('navHome')}</button>
+    <article class="np-article">
+      <div class="np-eyebrow">${nt('eyebrow')}</div>
+      <h1 class="np-title outline">${nt('title')}</h1>
+      <p class="np-standfirst">${nt('standfirst')}</p>
+      <div class="np-byline">${nt('byline')}</div>
+      <hr class="np-rule">
+      <div class="np-body">${paras.join('')}</div>
+    </article>`;
+  const back = document.getElementById('backFromNutshell');
+  if(back) back.onclick = ()=>{ setView('home'); };
+}
+function decimalSep(){ return LANG==='en' ? '.' : ','; }
+
+/* =========================================================
    NAV
 ========================================================= */
 function HERO_INFO_F(){ return {
@@ -3977,6 +4318,7 @@ function HERO_INFO_F(){ return {
   calendar: {title:t('heroTitleCalendar'), sub:t('heroSubCalendar')},
   teams: {title:t('heroTitleTeams'), sub:t('heroSubTeams')},
   players: {title:t('heroTitlePlayers'), sub:t('heroSubPlayers')},
+  nutshell: {title:t('heroTitleNutshell'), sub:t('heroSubNutshell')},
   flageditor: {title:t('heroTitleFlags'), sub:t('heroSubFlags')},
   admin: {title:t('heroTitleAdmin'), sub:t('heroSubAdmin')},
 };}
@@ -4002,6 +4344,7 @@ const VIEW_RENDERERS = {
   calendar: renderCalendarView,
   teams: renderTeamsView,
   players: renderPlayersView,
+  nutshell: renderNutshellView,
 };
 let dirtyViews = new Set(Object.keys(VIEW_RENDERERS));
 function markAllDirty(){ dirtyViews = new Set(Object.keys(VIEW_RENDERERS)); }
@@ -4038,7 +4381,7 @@ function setView(view){
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', flageditor:'view-flageditor', admin:'view-admin'};
+  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', flageditor:'view-flageditor', admin:'view-admin'};
   document.getElementById(map[view]).classList.add('active');
   const adminToggle = document.getElementById('adminToggle');
   if(adminToggle) adminToggle.classList.toggle('on', view==='admin');
