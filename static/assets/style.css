@@ -284,20 +284,24 @@
     box-shadow:0 6px 18px rgba(0,0,0,0.25);
   }
   .tdp-header{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
-  .match-detail-row{display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap;padding:20px 0;}
+  .match-detail-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;padding:20px 0;}
   .match-detail-team{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:160px;text-align:center;}
   .match-detail-team .team-link{flex-direction:column;gap:10px;}
   .match-detail-team .teamname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:19px;}
-  .match-detail-team.winner .teamname{color:var(--gold);}
+  /* Score sits next to its own team so it's always clear who scored what. Winning
+     score is gold, losing score dimmed — the team NAME stays neutral. */
+  .mdt-score{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;line-height:1;}
+  .mdt-score.score-win{color:var(--gold);}
+  .mdt-score.score-lose{color:var(--dim);}
+  .match-detail-mid{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--dim);text-align:center;}
+  .match-detail-mid .md-vs{text-transform:uppercase;font-size:20px;}
+  .match-detail-mid .md-upcoming-date{font-size:16px;color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;margin-top:6px;text-transform:none;}
   .match-detail-players-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
   .race-chart-wrap{margin-top:28px;}
   .race-chart-title{font-size:15px;color:var(--gold);margin-bottom:10px;}
   .race-chart-legend{display:flex;gap:18px;margin-top:8px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
   .race-chart-legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
   .mdp-col{display:flex;flex-direction:column;gap:3px;}
-  .match-detail-score{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--cream);white-space:nowrap;text-align:center;}
-  .match-detail-score .md-vs{text-transform:uppercase;color:var(--dim);}
-  .match-detail-score .md-upcoming-date{font-size:16px;color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;margin-top:6px;text-transform:none;}
   .tdp-header h2{font-size:26px;}
   .stat-strip{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:12px;}
   .stat-strip .s{background:var(--panel-3);padding:6px 10px;border-radius:6px;border:1px solid var(--line);}
@@ -501,9 +505,21 @@
     .cal-item:has(.cal-teams-opp) .cal-score{grid-column:2;width:auto;}
     .cal-item:has(.cal-teams-opp) .cal-teams-opp{grid-column:3;justify-content:flex-start;}
 
-    .match-detail-row{flex-direction:column;gap:10px;padding:10px 0;}
-    .match-detail-team{min-width:0;width:100%;}
-    .match-detail-score{font-size:26px;}
+    /* On phones, stack each team as its own full-width row with the score pinned to
+       the right, so it's obvious which score belongs to which team. */
+    .match-detail-row{flex-direction:column;gap:8px;padding:10px 0;}
+    .match-detail-team{
+      min-width:0;width:100%;flex-direction:row;justify-content:space-between;
+      align-items:center;text-align:left;gap:12px;
+      background:var(--panel-2);border:1px solid var(--line-strong);border-radius:10px;padding:10px 14px;
+    }
+    .match-detail-team .team-link{flex-direction:row;gap:10px;}
+    .match-detail-team .teamname{font-size:17px;}
+    .mdt-score{font-size:26px;}
+    /* The middle dash is redundant once teams are stacked rows — hide it for played
+       matches; keep "vs" + the upcoming date for matches not yet played. */
+    .match-detail-row.is-played .match-detail-mid{display:none;}
+    .match-detail-mid{font-size:14px;padding:2px 0;}
     .match-detail-players-row{grid-template-columns:1fr;gap:16px;}
 
     .amr-players{grid-template-columns:1fr;}

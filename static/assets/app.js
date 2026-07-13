@@ -730,12 +730,10 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
   });
   return `<div class="group-card"${anchorId?` id="${anchorId}"`:''}>
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
-    <div style="overflow-x:auto;">
     <table class="standings">
       <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    </div>
   </div>`;
 }
 
@@ -905,13 +903,15 @@ function renderMatchDetail(ref){
         <span class="${anchor?'stage-link':''}"${anchor?` data-anchor="${anchor}"`:''}>${stage}</span> · ${date}
       </div>
       ${forfeitSideFor(ref) ? `<div class="forfeit-note">🏳️ ${t('forfeitNote')}</div>` : ''}
-      <div class="match-detail-row">
-        <div class="match-detail-team ${hWin?'winner':''}">
+      <div class="match-detail-row ${played?'is-played':'is-upcoming'}">
+        <div class="match-detail-team">
           ${h? teamLinkHTML(h,'lg') : `${tbdEl()}<span class="tbdname">${t('tbd')}</span>`}
+          ${played? `<span class="mdt-score ${hWin?'score-win':'score-lose'}">${sc[0]}</span>` : ''}
         </div>
-        <div class="match-detail-score">${played? (sc[0]+' – '+sc[1]) : `<span class="md-vs">${t('vs')}</span><div class="md-upcoming-date">${date}</div>`}</div>
-        <div class="match-detail-team ${aWin?'winner':''}">
+        <div class="match-detail-mid">${played? `<span class="md-dash">–</span>` : `<span class="md-vs">${t('vs')}</span><div class="md-upcoming-date">${date}</div>`}</div>
+        <div class="match-detail-team">
           ${a? teamLinkHTML(a,'lg') : `${tbdEl()}<span class="tbdname">${t('tbd')}</span>`}
+          ${played? `<span class="mdt-score ${aWin?'score-win':'score-lose'}">${sc[1]}</span>` : ''}
         </div>
       </div>
       ${(players.h.some(p=>p.n) || players.a.some(p=>p.n)) ? `<div class="match-detail-players-row">
