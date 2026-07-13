@@ -724,8 +724,6 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
       <td class="num">${r.w}</td>
       <td class="num">${r.d}</td>
       <td class="num">${r.l}</td>
-      <td class="num">${r.pf}</td>
-      <td class="num">${r.pa}</td>
       <td class="num">${r.diff>0?'+':''}${r.diff}</td>
       <td class="num pts-col">${r.pts}</td>
     </tr>`;
@@ -734,7 +732,7 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
     <div style="overflow-x:auto;">
     <table class="standings">
-      <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colF','tipF','num')}${th('colA','tipA','num')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
+      <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>
