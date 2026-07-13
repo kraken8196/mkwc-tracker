@@ -1432,9 +1432,11 @@ function renderCalendarView(){
    TEAM STATS
 ========================================================= */
 function getTeamStats(tag){
-  let w=0,l=0,d=0,pf=0,pa=0,played=0;
+  let w=0,l=0,d=0,pf=0,pa=0,played=0,playedMain=0;
   const appearances = [];
-  function scan(groupsObj, label, anchorPrefix){
+  // isMain=false for the Play-In (quali): those matches count in the totals but must not
+  // let a qualified team jump above group-stage teams that simply haven't played yet.
+  function scan(groupsObj, label, anchorPrefix, isMain){
     for(const id in groupsObj){
       const g = groupsObj[id];
       const idx = g.slots.indexOf(tag);
@@ -1448,14 +1450,14 @@ function getTeamStats(tag){
         if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) return;
         const meIsHome = i===idx;
         const my = Number(meIsHome?sc[0]:sc[1]), opp = Number(meIsHome?sc[1]:sc[0]);
-        played++; pf+=my; pa+=opp;
+        played++; if(isMain) playedMain++; pf+=my; pa+=opp;
         if(my>opp) w++; else if(opp>my) l++; else d++;
       });
     }
   }
-  scan(STATE.quali, t('stageQuali'), 'quali');
-  scan(STATE.top, t('stagePhaseGroupes'), 'top');
-  scan(STATE.mid, t('stagePhaseGroupes'), 'mid');
+  scan(STATE.quali, t('stageQuali'), 'quali', false);
+  scan(STATE.top, t('stagePhaseGroupes'), 'top', true);
+  scan(STATE.mid, t('stagePhaseGroupes'), 'mid', true);
   // bracket
   const {rounds, roundScores} = deriveBracketRounds();
   for(let r=0;r<4;r++){
@@ -1468,11 +1470,11 @@ function getTeamStats(tag){
     if(sc && sc[0]!==''&&sc[1]!==''&&sc[0]!=null&&sc[1]!=null){
       const meIsHome = idx%2===0;
       const my = Number(meIsHome?sc[0]:sc[1]), opp = Number(meIsHome?sc[1]:sc[0]);
-      played++; pf+=my; pa+=opp;
+      played++; playedMain++; pf+=my; pa+=opp;
       if(my>opp) w++; else if(opp>my) l++; else d++;
     }
   }
-  return {w,l,d,pf,pa,played,diff:pf-pa,appearances};
+  return {w,l,d,pf,pa,played,playedMain,diff:pf-pa,appearances};
 }
 
 function stdDev(arr){
@@ -2108,8 +2110,14 @@ function renderPlayersView(){
     }
   } else {
     const TIER_ORDER = {higher:0, middle:1, lower:2};
+    // Once the Play-In is over, its matches no longer decide table position: a team that
+    // only played the Play-In shouldn't sit above a group-stage team that hasn't played
+    // yet. During the Play-In itself, those matches still count. `activePlayed` picks the
+    // right match count for the current phase.
+    const playInOver = allGroupMatchesPlayed(STATE.quali);
+    const activePlayed = tm => playInOver ? tm.playedMain : tm.played;
     function compareTeams(a, b){
-      const aPlayed = a.played>0, bPlayed = b.played>0;
+      const aPlayed = activePlayed(a)>0, bPlayed = activePlayed(b)>0;
       if(!aPlayed && !bPlayed){
         // neither has played yet: pure pre-tournament projected ranking (can cross tiers)
         return projectedRank(a.tag)-projectedRank(b.tag);
