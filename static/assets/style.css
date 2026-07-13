@@ -181,6 +181,9 @@
   table.standings th.num{text-align:center;letter-spacing:normal;}
   table.standings td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,0.04);}
   table.standings tr.qualified td:first-child{box-shadow:inset 3px 0 0 var(--green);}
+  /* Points column: the headline number of the standings, echoing the official sheet. */
+  table.standings td.pts-col{color:var(--gold);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  table.standings th.pts-col .col-help,table.standings th.pts-col{color:var(--gold);}
   .pos{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:11px;width:26px;}
   .pos.p1{color:var(--dim);}
   .teamcell{display:flex;align-items:center;gap:8px;}

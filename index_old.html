@@ -192,6 +192,9 @@
   table.standings th.num{text-align:center;letter-spacing:normal;}
   table.standings td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,0.04);}
   table.standings tr.qualified td:first-child{box-shadow:inset 3px 0 0 var(--green);}
+  /* Points column: the headline number of the standings, echoing the official sheet. */
+  table.standings td.pts-col{color:var(--gold);font-weight:700;font-family:'JetBrains Mono',monospace;}
+  table.standings th.pts-col .col-help,table.standings th.pts-col{color:var(--gold);}
   .pos{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:11px;width:26px;}
   .pos.p1{color:var(--dim);}
   .teamcell{display:flex;align-items:center;gap:8px;}
@@ -758,7 +761,8 @@ const I18N = {
     stagePhaseGroupes:'Phase de groupes', subheadAB:'Groupes A & B', tierAB:'Équipes les mieux classées', noteAB:'Les 4 équipes de chaque groupe avancent en bracket.',
     subhead14:'Groupes 1 à 4', tier14:'Équipes moyennement classées', note14:'Les 2 premiers de chaque groupe avancent en bracket.',
     stageBracket:'Phase de Bracket', noteBracket:'Élimination directe à 16 équipes.',
-    group:'Groupe', colTeam:'Équipe', colW:'V', colL:'D', colD:'N', colGB:'GB', colDiff:'Diff', tbd:'à définir',
+    group:'Groupe', colTeam:'Équipe', colP:'J', colW:'V', colL:'D', colD:'N', colF:'PP', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts', tbd:'à définir',
+    tipP:'Nombre de matchs joués.', tipF:'Points marqués (total sur tous les matchs).', tipA:'Points encaissés (total sur tous les matchs).', tipPts:'Points de classement : 3 par victoire, 1 par nul, 0 par défaite.',
     round16:'Round 1', quarterfinals:'Quarts de finale', semifinals:'Demi-finales', final:'Finale',
     dateQuali:'10–12 juil.', datePhase:'17–19 juil.', dateR16:'24 juillet', dateQF:'25 juillet', dateSF:'1 août', dateF:'2 août',
     calNoMatch:"Aucun match programmé pour l'instant — plusieurs groupes ont encore des équipes à définir.",
@@ -823,7 +827,8 @@ const I18N = {
     stagePhaseGroupes:'Group Stage', subheadAB:'Groups A & B', tierAB:'Higher-projected teams', noteAB:'All 4 teams of each group advance to the bracket.',
     subhead14:'Groups 1 to 4', tier14:'Middle-projected teams', note14:'The top 2 of each group advance to the bracket.',
     stageBracket:'Bracket Stage', noteBracket:'16-team single elimination.',
-    group:'Group', colTeam:'Team', colW:'W', colL:'L', colD:'D', colGB:'GB', colDiff:'Diff', tbd:'TBD',
+    group:'Group', colTeam:'Team', colP:'P', colW:'W', colL:'L', colD:'D', colF:'F', colA:'A', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'TBD',
+    tipP:'Matches played.', tipF:'Points for (total scored across all matches).', tipA:'Points against (total conceded across all matches).', tipPts:'Standings points: 3 per win, 1 per draw, 0 per loss.',
     round16:'Round 1', quarterfinals:'Quarterfinals', semifinals:'Semifinals', final:'Final',
     dateQuali:'Jul 10–12', datePhase:'Jul 17–19', dateR16:'July 24', dateQF:'July 25', dateSF:'Aug 1', dateF:'Aug 2',
     calNoMatch:'No matches scheduled yet — several groups still have teams to be determined.',
@@ -888,7 +893,8 @@ const I18N = {
     stagePhaseGroupes:'Fase de grupos', subheadAB:'Grupos A y B', tierAB:'Equipos con proyección más alta', noteAB:'Los 4 equipos de cada grupo avanzan al cuadro final.',
     subhead14:'Grupos 1 a 4', tier14:'Equipos con proyección media', note14:'Los 2 primeros de cada grupo avanzan al cuadro final.',
     stageBracket:'Fase de Bracket', noteBracket:'Eliminación directa a 16 equipos.',
-    group:'Grupo', colTeam:'Equipo', colW:'G', colL:'P', colD:'E', colGB:'GB', colDiff:'Dif', tbd:'por determinar',
+    group:'Grupo', colTeam:'Equipo', colP:'PJ', colW:'G', colL:'P', colD:'E', colF:'PF', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'por determinar',
+    tipP:'Partidos jugados.', tipF:'Puntos a favor (total anotado en todos los partidos).', tipA:'Puntos en contra (total recibido en todos los partidos).', tipPts:'Puntos de clasificación: 3 por victoria, 1 por empate, 0 por derrota.',
     round16:'Ronda 1', quarterfinals:'Cuartos de final', semifinals:'Semifinales', final:'Final',
     dateQuali:'10–12 jul.', datePhase:'17–19 jul.', dateR16:'24 de julio', dateQF:'25 de julio', dateSF:'1 de agosto', dateF:'2 de agosto',
     calNoMatch:'Todavía no hay partidos programados — varios grupos aún tienen equipos por determinar.',
@@ -953,7 +959,8 @@ const I18N = {
     stagePhaseGroupes:'グループステージ', subheadAB:'グループA・B', tierAB:'上位予想チーム', noteAB:'各グループの4チーム全てが決勝トーナメントに進出。',
     subhead14:'グループ1〜4', tier14:'中位予想チーム', note14:'各グループの上位2チームが決勝トーナメントに進出。',
     stageBracket:'ブラケットステージ', noteBracket:'16チームによるノックアウト方式。',
-    group:'グループ', colTeam:'チーム', colW:'勝', colL:'負', colD:'分', colGB:'GB', colDiff:'得失点差', tbd:'未定',
+    group:'グループ', colTeam:'チーム', colP:'試合', colW:'勝', colL:'負', colD:'分', colF:'得点', colA:'失点', colGB:'GB', colDiff:'+/-', colPts:'勝点', tbd:'未定',
+    tipP:'試合数。', tipF:'総得点（全試合の合計）。', tipA:'総失点（全試合の合計）。', tipPts:'順位ポイント：勝ち3、引き分け1、負け0。',
     round16:'ラウンド1', quarterfinals:'準々決勝', semifinals:'準決勝', final:'決勝',
     dateQuali:'7月10〜12日', datePhase:'7月17〜19日', dateR16:'7月24日', dateQF:'7月25日', dateSF:'8月1日', dateF:'8月2日',
     calNoMatch:'まだ試合は組まれていません — いくつかのグループはチームが未確定です。',
@@ -1692,8 +1699,9 @@ function computeStandings(slots, scores){
     rows[j].pf+=aa; rows[j].pa+=hh;
     if(hh>aa){ rows[i].w++; rows[j].l++; } else if(aa>hh){ rows[j].w++; rows[i].l++; } else { rows[i].d++; rows[j].d++; }
   });
-  const sorted = rows.map((r,idx)=>({...r, diff:r.pf-r.pa, slotIdx:idx}))
-    .sort((a,b)=> b.w-a.w || b.diff-a.diff || b.pf-a.pf || projectedRank(a.tag)-projectedRank(b.tag));
+  // Standings points, MKWC style: 3 per win, 1 per draw, 0 per loss.
+  const sorted = rows.map((r,idx)=>({...r, played:r.w+r.d+r.l, pts:r.w*3+r.d, diff:r.pf-r.pa, slotIdx:idx}))
+    .sort((a,b)=> b.pts-a.pts || b.diff-a.diff || b.pf-a.pf || projectedRank(a.tag)-projectedRank(b.tag));
   const leader = sorted.find(r=>r.tag!=null);
   sorted.forEach(r=>{
     r.gb = (leader && r.tag!=null) ? ((leader.w - r.w) + (r.l - leader.l)) / 2 : null;
@@ -1722,18 +1730,21 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
     rows += `<tr class="${isQ?'qualified':''}">
       <td class="${posClass}">P${i+1}</td>
       <td><div class="teamcell">${r.tag? teamLinkHTML(r.tag) : tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</div></td>
+      <td class="num">${r.played}</td>
       <td class="num">${r.w}</td>
       <td class="num">${r.d}</td>
       <td class="num">${r.l}</td>
-      <td class="num">${r.gb==null?'—':(r.gb===0?'—':r.gb)}</td>
+      <td class="num">${r.pf}</td>
+      <td class="num">${r.pa}</td>
       <td class="num">${r.diff>0?'+':''}${r.diff}</td>
+      <td class="num pts-col">${r.pts}</td>
     </tr>`;
   });
   return `<div class="group-card"${anchorId?` id="${anchorId}"`:''}>
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
     <div style="overflow-x:auto;">
     <table class="standings">
-      <thead><tr><th></th>${th('colTeam')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colGB','tipGB','num')}${th('colDiff','tipDiff','num')}</tr></thead>
+      <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colF','tipF','num')}${th('colA','tipA','num')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
     </div>
