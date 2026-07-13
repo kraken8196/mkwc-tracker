@@ -163,6 +163,26 @@
     100%{box-shadow:0 0 0 0 rgba(229,72,77,0);}
   }
 
+  /* Next-match hero block: the home page's main hook, with a live countdown. */
+  .next-match-block{
+    margin-top:18px;padding:18px 20px;border-radius:12px;text-align:center;cursor:pointer;
+    background:linear-gradient(160deg, rgba(255,206,84,0.14), rgba(240,148,47,0.10));
+    border:1px solid var(--gold);transition:transform .15s, box-shadow .15s;
+  }
+  .next-match-block:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,0.3);}
+  .nmb-label{
+    font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;
+    font-family:'JetBrains Mono',monospace;font-weight:700;margin-bottom:12px;
+  }
+  .nmb-teams{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;}
+  .nmb-team{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;}
+  .nmb-vs{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:15px;text-transform:uppercase;}
+  .nmb-meta{font-size:13px;color:var(--dim);margin-top:10px;}
+  .nmb-countdown{
+    font-family:'JetBrains Mono',monospace;font-size:30px;color:var(--gold);font-weight:700;
+    margin-top:10px;letter-spacing:0.04em;
+  }
+
   .format-card{
     background:linear-gradient(160deg, #4a2a12, #5c3618);
     border:1px solid rgba(255,206,84,0.35);

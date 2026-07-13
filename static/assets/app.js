@@ -101,7 +101,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -167,7 +167,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -233,7 +233,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -299,7 +299,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -1096,8 +1096,31 @@ function isCurrentlyLive(rawIso, sc){
 function getLiveMatchesNow(){
   return getAllMatchItems().filter(it => isCurrentlyLive(it.rawIso, it.sc));
 }
+// The next not-yet-played match that has a scheduled kickoff time still in the future,
+// both teams known. Used for the "next match" countdown block on the home page.
+function getNextScheduledMatch(){
+  const now = Date.now();
+  return getAllMatchItems()
+    .filter(it => it.rawIso && it.h!=null && it.a!=null && !isPlayed(it.sc) && new Date(it.rawIso).getTime() > now)
+    .sort((a,b)=> new Date(a.rawIso).getTime() - new Date(b.rawIso).getTime())[0] || null;
+}
 function getPlayInStartMs(){
   return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
+}
+// The "next match" hero block on the home page: both teams, stage, local time and a
+// live countdown to kickoff. Clicking it opens the match detail.
+function nextMatchBlockHTML(it){
+  const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
+  return `<div class="next-match-block match-card" data-matchref="${it.matchRef}">
+    <div class="nmb-label">${t('nextMatch')}</div>
+    <div class="nmb-teams">
+      <span class="nmb-team">${teamPlainHTML(it.h,'lg')}</span>
+      <span class="nmb-vs">${t('vs')}</span>
+      <span class="nmb-team">${teamPlainHTML(it.a,'lg')}</span>
+    </div>
+    <div class="nmb-meta">${it.stage}${ff} · ${it.date}</div>
+    <div class="nmb-countdown" id="nextMatchCountdown"></div>
+  </div>`;
 }
 // True only when every scheduled match of the given group stage (both teams known)
 // actually has a score. Used so a "stage finished" banner can't appear while a
@@ -1143,6 +1166,8 @@ function renderHomeView(){
   const pct = totalMatches ? Math.round((matchesPlayed/totalMatches)*100) : 0;
   const status = getTournamentPhaseStatus();
   const liveNow = status.phase!=='before' ? getLiveMatchesNow() : [];
+  // Show the next-match countdown only when nothing is live right now.
+  const nextMatch = liveNow.length ? null : getNextScheduledMatch();
 
   let html = `
     <div class="phase-banner phase-${status.phase}">${t(status.key)}${status.phase==='before' ? `<div id="playinCountdown" class="phase-countdown"></div>` : ''}</div>
@@ -1150,6 +1175,7 @@ function renderHomeView(){
       <h3 class="live-now-title">${t('homeLiveNow')}</h3>
       <div class="cal-list">${liveNow.map(matchCardHTML).join('')}</div>
     </div>` : ''}
+    ${nextMatch ? nextMatchBlockHTML(nextMatch) : ''}
     <div class="stage-note" style="font-size:15px;margin:18px 0 24px;">${t('homeIntro')}</div>
 
     <div class="match-progress" style="margin-bottom:30px;">
@@ -1202,7 +1228,9 @@ function renderHomeView(){
       window.scrollTo({top:0,behavior:'smooth'});
     };
   });
-  if(status.phase==='before') startCountdown(getPlayInStartMs()); else clearCountdownInterval();
+  if(status.phase==='before') startCountdown(getPlayInStartMs(), 'playinCountdown');
+  else if(nextMatch) startCountdown(new Date(nextMatch.rawIso).getTime(), 'nextMatchCountdown');
+  else clearCountdownInterval();
   ensureHomeLiveRefresh();
 }
 let homeLiveRefreshStarted = false;
@@ -1216,21 +1244,23 @@ function ensureHomeLiveRefresh(){
 }
 let countdownInterval = null;
 function clearCountdownInterval(){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval=null; } }
-function startCountdown(targetMs){
+// Live countdown into #elementId until targetMs, re-rendering home when it hits zero.
+function startCountdown(targetMs, elementId){
+  elementId = elementId || 'playinCountdown';
   clearCountdownInterval();
   function tick(){
-    const el = document.getElementById('playinCountdown');
+    const el = document.getElementById(elementId);
     if(!el){ clearCountdownInterval(); return; } // navigated away from home — stop updating a detached element
     const diff = targetMs - Date.now();
     if(diff <= 0){
       clearCountdownInterval();
-      renderHomeView(); // flips the banner over to "happening now" as soon as it hits zero
+      renderHomeView(); // flips over to "happening now" / next match as soon as it hits zero
       return;
     }
     const s = Math.floor(diff/1000);
     const days = Math.floor(s/86400), hours = Math.floor((s%86400)/3600), minutes = Math.floor((s%3600)/60), seconds = s%60;
     const pad = n=>String(n).padStart(2,'0');
-    el.textContent = (days>0 ? `${days}d ` : '') + `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    el.textContent = (days>0 ? `${days}${t('countdownDay')} ` : '') + `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
   tick();
   countdownInterval = setInterval(tick, 1000);
