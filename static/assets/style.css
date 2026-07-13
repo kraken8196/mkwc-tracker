@@ -120,7 +120,7 @@
   .stage-note{font-size:13px;color:var(--dim);margin-bottom:16px;}
   .cal-provisional-note{
     font-size:13px;line-height:1.5;color:var(--dim);
-    margin:26px 0 0;
+    margin:4px 0 10px;
   }
   .stage-subhead{font-size:15px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;margin:6px 0 4px;text-transform:uppercase;letter-spacing:0.04em;}
   .tier-badge{

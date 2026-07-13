@@ -1424,12 +1424,13 @@ function renderCalendarView(){
     items.forEach(it=>{
       if(it.dateKey !== currentDate){
         if(currentDate!==null) html += `</div>`;
-        // Provisional-dates note, shown once right before the first Group Stage day.
+        html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div>`;
+        // Provisional-dates note, shown once just under the first Group Stage day heading.
         if(!groupNoteShown && isGroupStage(it)){
           html += `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
           groupNoteShown = true;
         }
-        html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div><div class="cal-list">`;
+        html += `<div class="cal-list">`;
         currentDate = it.dateKey;
       }
       html += matchCardHTML(it);
