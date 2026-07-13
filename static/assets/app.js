@@ -1919,9 +1919,9 @@ function renderPlayersView(){
         if(tierDiff !== 0) return tierDiff;
         return aPlayed ? -1 : 1;
       }
-      // both have played: rank purely on average score per match, regardless of how many
-      // matches each has played. Win%, point diff and projection only break exact ties.
-      return (b.avg-a.avg) || b.winPct-a.winPct || b.diff-a.diff || projectedRank(a.tag)-projectedRank(b.tag);
+      // both have played: rank by win percentage first, then point differential, as
+      // stated in the note above the table. Average and projection only break ties.
+      return (b.winPct-a.winPct) || (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
