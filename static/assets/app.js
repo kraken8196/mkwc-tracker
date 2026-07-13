@@ -1137,7 +1137,7 @@ function renderHomeView(){
   const el = document.getElementById('view-home');
   const items = getAllMatchItems().sort((a,b)=>a.dateOrder-b.dateOrder);
   const upcoming = items.filter(it=>!isPlayed(it.sc)).slice(0,6);
-  const recent = items.filter(it=>isPlayed(it.sc)).slice(-5).reverse();
+  const recent = items.filter(it=>isPlayed(it.sc)).slice(-6).reverse();
   const matchesPlayed = items.filter(it=>isPlayed(it.sc)).length;
   const totalMatches = getTotalMatchCount();
   const pct = totalMatches ? Math.round((matchesPlayed/totalMatches)*100) : 0;
@@ -1174,12 +1174,12 @@ function renderHomeView(){
     </div>
 
     <div class="stage-block">
-      <h2 class="outline" style="font-size:20px;margin-bottom:12px;">${t('homeUpcoming')}</h2>
-      ${upcoming.length? `<div class="cal-list">${upcoming.map(matchCardHTML).join('')}</div>` : `<div class="helptext">${t('calNoMatch')}</div>`}
-    </div>
-    <div class="stage-block">
       <h2 class="outline" style="font-size:20px;margin-bottom:12px;">${t('homeRecent')}</h2>
       ${recent.length? `<div class="cal-list">${recent.map(matchCardHTML).join('')}</div>` : `<div class="helptext">${t('homeNoResults')}</div>`}
+    </div>
+    <div class="stage-block">
+      <h2 class="outline" style="font-size:20px;margin-bottom:12px;">${t('homeUpcoming')}</h2>
+      ${upcoming.length? `<div class="cal-list">${upcoming.map(matchCardHTML).join('')}</div>` : `<div class="helptext">${t('calNoMatch')}</div>`}
     </div>
 
     <h2 class="outline" style="font-size:20px;margin-bottom:14px;">${t('homeExploreTitle')}</h2>
