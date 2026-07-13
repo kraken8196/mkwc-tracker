@@ -111,13 +111,13 @@ const I18N = {
     tipW:'Nombre de matchs gagnés.', tipD:'Nombre de matchs nuls.', tipL:'Nombre de matchs perdus.',
     tipWinPct:'Pourcentage de matchs gagnés sur le total de matchs joués.',
     tipDiff:'Différence entre les points marqués et les points encaissés, tous matchs confondus.',
-    tipAvg:'Score moyen du joueur par course.', tipTeamAvg:'Score moyen de l\'équipe par match.',
+    tipAvg:'Score moyen du joueur par match (un match = 12 courses).', tipTeamAvg:'Score moyen de l\'équipe par match.',
     tipBestTrack:'Circuit sur lequel le meilleur score moyen a été obtenu.',
     tipConsistency:'Écart entre la meilleure et la pire course du joueur. Plus c\'est bas, plus il est régulier.',
     tipClutch:'Moyenne des 3 dernières courses moins celle des 9 premières. Positif = finit plus fort qu\'il n\'a commencé.',
     tipBalance:'Répartition des points entre les 6 joueurs, en moyenne par match. Plus c\'est bas, plus les points sont partagés équitablement.',
     tipRacesPlayed:'Nombre de courses jouées sur ce circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
-    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible',
+    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible', forfeitBadge:'Forfait', forfeitNote:'Match remporté par forfait (150–0), non joué.',
     adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
@@ -176,13 +176,13 @@ const I18N = {
     tipW:'Number of matches won.', tipD:'Number of drawn matches.', tipL:'Number of matches lost.',
     tipWinPct:'Share of matches won out of all matches played.',
     tipDiff:'Points scored minus points conceded, across all matches.',
-    tipAvg:'Player\'s average score per race.', tipTeamAvg:'Team\'s average score per match.',
+    tipAvg:'Player\'s average score per match (one match = 12 races).', tipTeamAvg:'Team\'s average score per match.',
     tipBestTrack:'Track with the best average score.',
     tipConsistency:'Gap between the player\'s best and worst race. Lower means steadier.',
     tipClutch:'Average of the last 3 races minus the first 9. Positive = finishes stronger than they started.',
     tipBalance:'How evenly the 6 players share the points, averaged per match. Lower means more evenly shared.',
     tipRacesPlayed:'Number of races played on this track.', tipGB:'Points scored by the team in the group.',
-    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available',
+    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available', forfeitBadge:'Forfeit', forfeitNote:'Won by forfeit (150–0), not played.',
     adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
@@ -241,13 +241,13 @@ const I18N = {
     tipW:'Número de partidos ganados.', tipD:'Número de partidos empatados.', tipL:'Número de partidos perdidos.',
     tipWinPct:'Porcentaje de partidos ganados sobre el total jugado.',
     tipDiff:'Puntos anotados menos puntos recibidos, en todos los partidos.',
-    tipAvg:'Puntuación media del jugador por carrera.', tipTeamAvg:'Puntuación media del equipo por partido.',
+    tipAvg:'Puntuación media del jugador por partido (un partido = 12 carreras).', tipTeamAvg:'Puntuación media del equipo por partido.',
     tipBestTrack:'Circuito con la mejor puntuación media.',
     tipConsistency:'Diferencia entre la mejor y la peor carrera del jugador. Cuanto más bajo, más regular.',
     tipClutch:'Media de las 3 últimas carreras menos las 9 primeras. Positivo = termina más fuerte de lo que empezó.',
     tipBalance:'Cómo reparten los puntos los 6 jugadores, en promedio por partido. Cuanto más bajo, más equilibrado.',
     tipRacesPlayed:'Número de carreras jugadas en este circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
-    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible',
+    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible', forfeitBadge:'Abandono', forfeitNote:'Ganado por abandono (150–0), no jugado.',
     adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
@@ -306,13 +306,13 @@ const I18N = {
     tipW:'勝った試合数。', tipD:'引き分けた試合数。', tipL:'負けた試合数。',
     tipWinPct:'全試合数に対する勝利の割合。',
     tipDiff:'全試合を通じた、獲得ポイントから失点を引いた差。',
-    tipAvg:'選手の1レースあたりの平均スコア。', tipTeamAvg:'チームの1試合あたりの平均スコア。',
+    tipAvg:'選手の1試合あたりの平均スコア（1試合＝12レース）。', tipTeamAvg:'チームの1試合あたりの平均スコア。',
     tipBestTrack:'平均スコアが最も高かったコース。',
     tipConsistency:'選手のベストとワーストのレース差。小さいほど安定。',
     tipClutch:'最後の3レースの平均から最初の9レースの平均を引いた値。プラスなら尻上がり。',
     tipBalance:'6人の選手のポイント配分の均等さ（1試合平均）。小さいほど均等。',
     tipRacesPlayed:'このコースで走ったレース数。', tipGB:'グループでチームが獲得したポイント。',
-    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません',
+    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません', forfeitBadge:'棄権', forfeitNote:'棄権により勝利（150–0）、試合は行われていません。',
     adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
@@ -478,7 +478,7 @@ let STATE = {
 };
 
 function defaultState(){
-  const s = {quali:{},mid:{},top:{},streams:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
+  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
   for(const g in QUALI_GROUPS) s.quali[g] = {slots:[...QUALI_GROUPS[g].teams], scores:{}, players:{}};
   for(const g in MID_GROUPS) s.mid[g] = {slots:[...MID_GROUPS[g].fixed, null, null], scores:{}, players:{}};
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
@@ -487,27 +487,45 @@ function defaultState(){
 function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill('')})); }
 function playerTotal(p){ return (p.races||[]).reduce((sum,v)=> sum + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
 function playerRacesFilled(p){ return (p.races||[]).some(v=>v!=='' && v!=null); }
-// A player can be substituted mid-match (e.g. connection issue). subFromRace is 1-indexed:
-// races before it belong to the original player (p.n), races from it onward belong to p.subName.
+// A player's score can be entered two ways: either the 12 individual races, or just a
+// hand-typed match total (p.total) when the detail isn't encoded yet. Races, once present,
+// always win over the typed total.
+function playerHasTypedTotal(p){ return p && p.total!=='' && p.total!=null && !isNaN(Number(p.total)); }
+function effectivePlayerTotal(p){
+  if(!p) return 0;
+  if(playerRacesFilled(p)) return playerTotal(p);
+  return playerHasTypedTotal(p) ? Number(p.total) : 0;
+}
+function playerHasScore(p){ return playerRacesFilled(p) || playerHasTypedTotal(p); }
+// A player can be substituted for part of a match (e.g. connection issue). subFromRace and
+// subToRace are 1-indexed and inclusive: races in [from, to] belong to p.subName, the rest to
+// p.n. subToRace is optional and defaults to 12 (sub plays until the end) for older data.
+function subRange(p){
+  if(!p || !p.subName || !p.subFromRace) return null;
+  const from = Math.max(1, Math.min(12, Number(p.subFromRace)));
+  const to = p.subToRace ? Math.max(from, Math.min(12, Number(p.subToRace))) : 12;
+  return {from, to};
+}
 function raceOwnerName(p, raceIdx){
-  if(p.subName && p.subFromRace && (raceIdx+1) >= Number(p.subFromRace)) return p.subName;
+  const r = subRange(p);
+  if(r && (raceIdx+1) >= r.from && (raceIdx+1) <= r.to) return p.subName;
   return p.n;
 }
-// Splits a slot into one or two "segments" (original player, and substitute if any), each with
-// their own name and the subset of the 12 races that belongs to them. Used everywhere stats need
-// to credit the right person instead of assuming one name covers the whole match.
+// Splits a slot into segments (original player, and substitute for their range if any), each
+// with their own name and the subset of the 12 races that belongs to them. Used everywhere
+// stats need to credit the right person instead of assuming one name covers the whole match.
 function playerSegments(p){
   if(!p || !p.n) return [];
   const races = p.races || Array(12).fill('');
-  if(!p.subName || !p.subFromRace){
+  const r = subRange(p);
+  if(!r){
     return [{ name: p.n, races, raceIndices: races.map((_,i)=>i) }];
   }
-  const cut = Math.max(1, Math.min(12, Number(p.subFromRace))) - 1; // 0-indexed cutoff
-  const beforeIdx = [], afterIdx = [];
-  races.forEach((_,i)=> (i<cut ? beforeIdx : afterIdx).push(i));
+  const mainIdx = [], subIdx = [];
+  races.forEach((_,i)=>{ const race = i+1; (race>=r.from && race<=r.to ? subIdx : mainIdx).push(i); });
   const segs = [];
-  if(beforeIdx.length) segs.push({ name: p.n, races: beforeIdx.map(i=>races[i]), raceIndices: beforeIdx });
-  if(afterIdx.length) segs.push({ name: p.subName, races: afterIdx.map(i=>races[i]), raceIndices: afterIdx });
+  if(mainIdx.length) segs.push({ name: p.n, races: mainIdx.map(i=>races[i]), raceIndices: mainIdx });
+  if(subIdx.length) segs.push({ name: p.subName, races: subIdx.map(i=>races[i]), raceIndices: subIdx });
   return segs;
 }
 
@@ -618,6 +636,7 @@ async function loadState(){
       if(!STATE.bracket) STATE.bracket = d.bracket;
       if(!STATE.bracket.players) STATE.bracket.players = {r0:{},r1:{},r2:{},r3:{}};
       if(!STATE.streams || typeof STATE.streams !== 'object') STATE.streams = {};
+      if(!STATE.forfeits || typeof STATE.forfeits !== 'object') STATE.forfeits = {};
     } else { STATE = defaultState(); }
   }catch(e){ STATE = defaultState(); }
 }
@@ -856,8 +875,10 @@ function renderMatchDetail(ref){
   }
   const {h, a, sc, players, stage, date, anchor, rawIso} = md;
   const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
-  const hWin = played && Number(sc[0])>Number(sc[1]);
-  const aWin = played && Number(sc[1])>Number(sc[0]);
+  // A draw counts as a win for both teams, so both names show in gold.
+  const draw = played && Number(sc[0])===Number(sc[1]);
+  const hWin = played && (draw || Number(sc[0])>Number(sc[1]));
+  const aWin = played && (draw || Number(sc[1])>Number(sc[0]));
   const isLiveNow = isCurrentlyLive(rawIso, sc);
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
@@ -868,6 +889,7 @@ function renderMatchDetail(ref){
       <div class="helptext" style="margin-bottom:18px;">
         <span class="${anchor?'stage-link':''}"${anchor?` data-anchor="${anchor}"`:''}>${stage}</span> · ${date}
       </div>
+      ${forfeitSideFor(ref) ? `<div class="forfeit-note">🏳️ ${t('forfeitNote')}</div>` : ''}
       <div class="match-detail-row">
         <div class="match-detail-team ${hWin?'winner':''}">
           ${h? teamLinkHTML(h,'lg') : `${tbdEl()}<span class="tbdname">${t('tbd')}</span>`}
@@ -1015,12 +1037,15 @@ function matchCardHTML(it){
   const played = isPlayed(it.sc);
   let scoreHTML = '';
   if(played){
-    const hWin = Number(it.sc[0])>Number(it.sc[1]);
-    const aWin = Number(it.sc[1])>Number(it.sc[0]);
+    // A draw counts as a win for both sides, so both scores show in gold.
+    const draw = Number(it.sc[0])===Number(it.sc[1]);
+    const hWin = draw || Number(it.sc[0])>Number(it.sc[1]);
+    const aWin = draw || Number(it.sc[1])>Number(it.sc[0]);
     scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
+  const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
   return `<div class="cal-item match-card" data-matchref="${it.matchRef}">
-    <span class="cal-stage">${it.stage}</span>
+    <span class="cal-stage">${it.stage}${ff}</span>
     <span class="cal-teams">${teamPlainHTML(it.h)} <span class="vs">${t('vs')}</span> ${teamPlainHTML(it.a)}</span>
     <span class="cal-score ${played?'done':''}">${scoreHTML}</span>
     <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
@@ -1043,6 +1068,8 @@ function streamLinkFor(ref){
   const url = STATE.streams && STATE.streams[ref];
   return (typeof url === 'string' && url.trim() !== '') ? url.trim() : null;
 }
+// A forfeited match is stored in STATE.forfeits[matchRef] as the losing side ('H'|'A').
+function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A') ? v : null; }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a war/set is assumed to last about an hour
 function isCurrentlyLive(rawIso, sc){
@@ -1450,6 +1477,20 @@ function getPlayerStats(){
   // unprojected points — so their average per match stays fair without inventing scores.
   function segWeight(seg){ return seg.races.filter(v=>v!=='' && v!=null).length / 12; }
   function segTotal(seg){ return seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
+  // Credit one team's slots for a match. Players with detailed races are credited per
+  // segment; a player with only a hand-typed match total (no races yet) is credited as one
+  // full match with that total — so team score and per-match average stay right, while the
+  // race-level stats (best track, consistency, clutch) simply skip them until detail exists.
+  function creditSlots(arr, tag, result){
+    (arr||[]).forEach(p=>{
+      if(!p || !p.n) return;
+      if(playerRacesFilled(p)){
+        playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(tag, seg.name, segTotal(seg), result, segWeight(seg)); });
+      } else if(playerHasTypedTotal(p)){
+        add(tag, p.n, Number(p.total), result, 1);
+      }
+    });
+  }
   function scan(groupsObj){
     for(const id in groupsObj){
       const g = groupsObj[id];
@@ -1457,8 +1498,8 @@ function getPlayerStats(){
         const [i,j] = key.split('-').map(Number);
         const pl = g.players[key];
         const [hRes,aRes] = resultsFor(g.scores[key]);
-        (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[i], seg.name, segTotal(seg), hRes, segWeight(seg)); }));
-        (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(g.slots[j], seg.name, segTotal(seg), aRes, segWeight(seg)); }));
+        creditSlots(pl.h, g.slots[i], hRes);
+        creditSlots(pl.a, g.slots[j], aRes);
       }
     }
   }
@@ -1471,8 +1512,8 @@ function getPlayerStats(){
       const pl = pls[m];
       const h = slots[m*2], a = slots[m*2+1];
       const [hRes,aRes] = resultsFor(roundScores[r][m]);
-      (pl.h||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(h, seg.name, segTotal(seg), hRes, segWeight(seg)); }));
-      (pl.a||[]).forEach(p=> playerSegments(p).forEach(seg=>{ if(segFilled(seg)) add(a, seg.name, segTotal(seg), aRes, segWeight(seg)); }));
+      creditSlots(pl.h, h, hRes);
+      creditSlots(pl.a, a, aRes);
     }
   }
   // compute averages
@@ -1649,10 +1690,12 @@ function renderTeamDetail(tag){
       ${stats.appearances.length? `<div class="helptext" style="margin:10px 0;">${stats.appearances.map(a=>a.anchor?`<span class="stage-link" data-anchor="${a.anchor}">${a.label}</span>`:a.label).join(' · ')}</div>` : ''}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
       ${recent.length? `<div class="cal-list" style="margin-bottom:8px;">${recent.map(u=>{
-          const won = Number(u.sc[0])>Number(u.sc[1]);
-          const lost = Number(u.sc[0])<Number(u.sc[1]);
+          const draw = Number(u.sc[0])===Number(u.sc[1]);
+          const won = draw || Number(u.sc[0])>Number(u.sc[1]);
+          const lost = draw || Number(u.sc[0])<Number(u.sc[1]);
+          const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
-          <span class="cal-stage">${u.stage}</span>
+          <span class="cal-stage">${u.stage}${ff}</span>
           <span class="cal-teams"><span class="cal-team-side ${won?'is-winner':''}">${teamPlainHTML(tag)}</span></span>
           <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
           <span class="cal-teams cal-teams-opp"><span class="cal-team-side ${lost?'is-winner':''}">${teamPlainHTML(u.opp)}</span></span>
@@ -1677,9 +1720,9 @@ function renderTeamDetail(tag){
               const pkey = tag+'|'+p.n;
               const cons = advStats.consistency[pkey];
               const clu = advStats.clutch[pkey];
-              return `<tr class="player-row-link" data-player-tag="${tag}" data-player-name="${p.n}">
+              return `<tr>
               <td style="text-align:center;"><span class="nat-badge" data-tooltip="${natName(p.nat)}">${p.nat}</span></td>
-              <td class="lname">${p.n}</td>
+              <td class="lname"><span class="player-name-link" data-player-tag="${tag}" data-player-name="${p.n}">${p.n}</span></td>
               <td class="num">${s?formatMatchCount(s.count):'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
               <td class="num ${s?'highlight':''}">${s?s.avg.toFixed(1):'—'}</td>
@@ -1710,10 +1753,11 @@ function renderTeamDetail(tag){
 function wireTeamDetailEvents(){
   const btn = document.getElementById('backToTeamsBtn');
   if(btn) btn.onclick = goBack;
-  document.querySelectorAll('.player-row-link').forEach(row=>{
-    row.onclick = ()=>{
+  document.querySelectorAll('.player-name-link').forEach(link=>{
+    link.onclick = (e)=>{
+      e.stopPropagation();
       pushNavHistory();
-      selectedPlayer = {tag: row.dataset.playerTag, name: row.dataset.playerName};
+      selectedPlayer = {tag: link.dataset.playerTag, name: link.dataset.playerName};
       setView('player');
       renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
       window.scrollTo({top:0,behavior:'smooth'});
@@ -1740,7 +1784,7 @@ function renderPlayerDetail(tag, name){
         <span class="team-link" data-team="${tag}">${flagEl(tag,'lg')}</span>
         <div>
           <h2 class="outline" style="margin-bottom:2px;">${name}</h2>
-          <span class="team-link" data-team="${tag}" style="font-size:14px;color:var(--dim);cursor:pointer;">${teamName(tag)}</span>
+          <span class="team-link" data-team="${tag}" style="font-size:14px;color:var(--dim);"><span class="teamname">${teamName(tag)}</span></span>
           ${natEntry? `<span class="nat-badge" data-tooltip="${natName(natEntry.nat)}" style="margin-left:8px;">${natEntry.nat}</span>` : ''}
         </div>
       </div>
@@ -1765,6 +1809,18 @@ function renderPlayerDetail(tag, name){
     </div>
   `;
   document.getElementById('backToPlayerBtn').onclick = goBack;
+  // Both the flag and the team name in the header lead to the team page. The
+  // global .team-link delegation already covers this, but wire it explicitly
+  // too so it's robust regardless of event bubbling.
+  el.querySelectorAll('.team-link').forEach(link=>{
+    link.onclick = ()=>{
+      pushNavHistory();
+      selectedTeam = link.dataset.team;
+      setView('teams');
+      renderTeamsView();
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  });
 }
 
 /* =========================================================
@@ -1801,9 +1857,9 @@ function renderPlayersView(){
         const pkey = p.tag+'|'+p.name;
         const cons = advStats.consistency[pkey];
         const clu = advStats.clutch[pkey];
-        html += `<tr class="leader-row player-row-link" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}" data-player-tag="${p.tag}" data-player-name="${p.name}">
+        html += `<tr class="leader-row" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}">
           <td class="lp ${i===0?'top1':''}">${i+1}</td>
-          <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname">${p.name}</span></span></td>
+          <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname"><span class="player-name-link" data-player-tag="${p.tag}" data-player-name="${p.name}">${p.name}</span></span></span></td>
           <td class="lteam">${teamName(p.tag)}</td>
           <td class="num">${formatMatchCount(p.count)}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
@@ -1861,10 +1917,11 @@ function renderPlayersView(){
 
   el.innerHTML = html;
   el.querySelectorAll('[data-statsmode]').forEach(b=> b.onclick = ()=>{ statsMode = b.dataset.statsmode; renderPlayersView(); });
-  el.querySelectorAll('.player-row-link').forEach(row=>{
-    row.onclick = ()=>{
+  el.querySelectorAll('.player-name-link').forEach(link=>{
+    link.onclick = (e)=>{
+      e.stopPropagation();
       pushNavHistory();
-      selectedPlayer = {tag: row.dataset.playerTag, name: row.dataset.playerName};
+      selectedPlayer = {tag: link.dataset.playerTag, name: link.dataset.playerName};
       setView('player');
       renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
       window.scrollTo({top:0,behavior:'smooth'});
