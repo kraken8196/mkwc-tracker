@@ -141,7 +141,8 @@
     background:linear-gradient(180deg, var(--panel-2), var(--panel));
     border:1px solid var(--line-strong);border-radius:var(--radius);
     padding:16px;box-shadow:0 6px 18px rgba(0,0,0,0.25);
-    contain:content;
+    /* No `contain:content` here: its paint containment would clip the column
+       tooltips at the card's edges, making them unreadable. */
   }
   .group-card h3{font-size:17px;color:var(--gold);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
   .group-card h3 .qual-tag{font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;text-transform:none;letter-spacing:0;}
@@ -354,6 +355,20 @@
      off the right side of the (horizontally-clipping) table wrapper. */
   .stats-table thead th:last-child .col-help::after,
   .stats-table thead th:nth-last-child(2) .col-help::after{
+    left:auto; right:0; transform:none;
+  }
+  /* Group standings live in narrow cards (~300px), so a centered 230px bubble would
+     always spill. Keep the bubble narrower here and anchor each column's bubble to
+     the side it's nearest: left-half columns to the left, right-half to the right. */
+  table.standings .col-help::after{max-width:200px;}
+  table.standings thead th:nth-child(3) .col-help::after,
+  table.standings thead th:nth-child(4) .col-help::after{
+    left:0; right:auto; transform:none;
+  }
+  table.standings thead th:nth-child(5) .col-help::after,
+  table.standings thead th:nth-child(6) .col-help::after,
+  table.standings thead th:nth-child(7) .col-help::after,
+  table.standings thead th:nth-child(8) .col-help::after{
     left:auto; right:0; transform:none;
   }
 
