@@ -130,9 +130,8 @@
   .stage-head .stage-date{font-size:12px;color:#3a2100;background:var(--gold);padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:700;}
   .stage-note{font-size:13px;color:var(--dim);margin-bottom:16px;}
   .cal-provisional-note{
-    font-size:13.5px;line-height:1.5;color:var(--cream);
-    background:rgba(255,206,84,0.10);border:1px solid var(--gold);border-radius:10px;
-    padding:11px 14px;margin-bottom:18px;
+    font-size:13px;line-height:1.5;color:var(--dim);
+    margin:26px 0 0;
   }
   .stage-subhead{font-size:15px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;margin:6px 0 4px;text-transform:uppercase;letter-spacing:0.04em;}
   .tier-badge{
@@ -2503,15 +2502,22 @@ function renderCalendarView(){
   const el = document.getElementById('view-calendar');
   const items = getAllMatchItems();
 
-  let html = `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
+  let html = '';
   if(items.length===0){
     html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
     items.sort((a,b)=> a.dateOrder-b.dateOrder);
     let currentDate = null;
+    let groupNoteShown = false;
+    const isGroupStage = it => /^g\|(mid|top)\|/.test(it.matchRef||'');
     items.forEach(it=>{
       if(it.dateKey !== currentDate){
         if(currentDate!==null) html += `</div>`;
+        // Provisional-dates note, shown once right before the first Group Stage day.
+        if(!groupNoteShown && isGroupStage(it)){
+          html += `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
+          groupNoteShown = true;
+        }
         html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div><div class="cal-list">`;
         currentDate = it.dateKey;
       }

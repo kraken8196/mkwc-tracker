@@ -1413,15 +1413,22 @@ function renderCalendarView(){
   const el = document.getElementById('view-calendar');
   const items = getAllMatchItems();
 
-  let html = `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
+  let html = '';
   if(items.length===0){
     html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
     items.sort((a,b)=> a.dateOrder-b.dateOrder);
     let currentDate = null;
+    let groupNoteShown = false;
+    const isGroupStage = it => /^g\|(mid|top)\|/.test(it.matchRef||'');
     items.forEach(it=>{
       if(it.dateKey !== currentDate){
         if(currentDate!==null) html += `</div>`;
+        // Provisional-dates note, shown once right before the first Group Stage day.
+        if(!groupNoteShown && isGroupStage(it)){
+          html += `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
+          groupNoteShown = true;
+        }
         html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div><div class="cal-list">`;
         currentDate = it.dateKey;
       }
