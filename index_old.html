@@ -992,7 +992,7 @@ const SCHEDULED_TIMES = {
   'quali|X|2-3':'2026-07-12T23:00:00+02:00',
   'quali|X|0-2':'2026-07-11T22:00:00+02:00',
   'quali|X|1-2':'2026-07-12T21:00:00+02:00',
-  'quali|X|0-3':'2026-07-12T21:00:00+02:00',
+  'quali|X|0-3':'2026-07-13T22:00:00+02:00',
   'quali|Y|0-3':'2026-07-11T21:00:00+02:00',
   'quali|Y|2-3':'2026-07-12T20:00:00+02:00',
   'quali|Y|0-1':'2026-07-12T20:00:00+02:00',
@@ -1667,6 +1667,14 @@ function th(labelKey, tipKey, extraClass){
   const tip = t(tipKey).replace(/"/g,'&quot;');
   return `<th${cls}><span class="col-help" data-tooltip="${tip}">${t(labelKey)}</span></th>`;
 }
+// A stat-strip tile (label + value) whose label carries the same hover tooltip as
+// the matching stats-table column.
+function statTile(labelKey, tipKey, valueHTML){
+  const label = tipKey
+    ? `<span class="col-help" data-tooltip="${t(tipKey).replace(/"/g,'&quot;')}">${t(labelKey)}</span>`
+    : t(labelKey);
+  return `<div class="s">${label} <b>${valueHTML}</b></div>`;
+}
 
 /* =========================================================
    STANDINGS CALC
@@ -2078,6 +2086,21 @@ function getLiveMatchesNow(){
 function getPlayInStartMs(){
   return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
 }
+// True only when every scheduled match of the given group stage (both teams known)
+// actually has a score. Used so a "stage finished" banner can't appear while a
+// postponed match is still pending, even if the calendar date has passed.
+function allGroupMatchesPlayed(groupsObj){
+  for(const id in groupsObj){
+    const g = groupsObj[id];
+    if(!g) continue;
+    const pairs = pairsFor(g.slots.length);
+    for(const [i,j] of pairs){
+      if(g.slots[i]==null || g.slots[j]==null) continue; // opponent not set yet
+      if(!isPlayed(g.scores[i+'-'+j])) return false;
+    }
+  }
+  return true;
+}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
@@ -2086,9 +2109,12 @@ function getTournamentPhaseStatus(){
   const groupStart=dOnly(2026,7,17), groupEnd=dOnly(2026,7,20);
   const bracketStart=dOnly(2026,7,24), bracketEnd=dOnly(2026,8,3);
   if(now.getTime() < getPlayInStartMs()) return {phase:'before', key:'homeStatusBefore'};
-  if(today < playInEnd) return {phase:'playin', key:'homeStatusPlayin'};
+  // Don't declare the Play-In finished until its matches are actually all played —
+  // a postponement can push a match past the planned end date.
+  if(today < playInEnd || !allGroupMatchesPlayed(STATE.quali)) return {phase:'playin', key:'homeStatusPlayin'};
   if(today < groupStart) return {phase:'between1', key:'homeStatusBetween1'};
-  if(today < groupEnd) return {phase:'group', key:'homeStatusGroup'};
+  // Same guard for the Group Stage (top + mid groups).
+  if(today < groupEnd || !(allGroupMatchesPlayed(STATE.top) && allGroupMatchesPlayed(STATE.mid))) return {phase:'group', key:'homeStatusGroup'};
   if(today < bracketStart) return {phase:'between2', key:'homeStatusBetween2'};
   if(today < bracketEnd) return {phase:'bracket', key:'homeStatusBracket'};
   return {phase:'after', key:'homeStatusAfter'};
@@ -2671,15 +2697,15 @@ function renderTeamDetail(tag){
         <h2 class="outline">${teamFullName(tag)}</h2>
       </div>
       <div class="stat-strip">
-        <div class="s">${t('statMatches')} <b>${stats.played}</b></div>
-        <div class="s">${t('statW')} <b>${stats.w}</b></div>
-        <div class="s">${t('colD')} <b>${stats.d}</b></div>
-        <div class="s">${t('statL')} <b>${stats.l}</b></div>
-        <div class="s">${t('colWinPct')} <b>${winPct!=null?winPct+'%':'—'}</b></div>
-        <div class="s">${t('statDiff')} <b>${stats.diff>0?'+':''}${stats.diff}</b></div>
-        <div class="s">${t('statPlayers')} <b>${players.length}</b></div>
-        <div class="s">${t('colBestTrack')} <b>${teamBestTrack?trackName(teamBestTrack):'—'}</b></div>
-        <div class="s">${t('colBalance')} <b>${advStats.balance[tag]!=null?advStats.balance[tag].toFixed(1):'—'}</b></div>
+        ${statTile('statMatches','tipMatches', stats.played)}
+        ${statTile('statW','tipW', stats.w)}
+        ${statTile('colD','tipD', stats.d)}
+        ${statTile('statL','tipL', stats.l)}
+        ${statTile('colWinPct','tipWinPct', winPct!=null?winPct+'%':'—')}
+        ${statTile('statDiff','tipDiff', (stats.diff>0?'+':'')+stats.diff)}
+        ${statTile('statPlayers',null, players.length)}
+        ${statTile('colBestTrack','tipBestTrack', teamBestTrack?trackName(teamBestTrack):'—')}
+        ${statTile('colBalance','tipBalance', advStats.balance[tag]!=null?advStats.balance[tag].toFixed(1):'—')}
       </div>
       ${stats.appearances.length? `<div class="helptext" style="margin:10px 0;">${stats.appearances.map(a=>a.anchor?`<span class="stage-link" data-anchor="${a.anchor}">${a.label}</span>`:a.label).join(' · ')}</div>` : ''}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
@@ -2783,12 +2809,12 @@ function renderPlayerDetail(tag, name){
         </div>
       </div>
       <div class="stat-strip">
-        <div class="s">${t('colWarsPlayed')} <b>${s?formatMatchCount(s.count):'—'}</b></div>
-        <div class="s">${t('colWinPct')} <b>${s?Math.round(s.winPct*100)+'%':'—'}</b></div>
-        <div class="s">${t('colAvg')} <b>${s?s.avg.toFixed(1):'—'}</b></div>
-        <div class="s">${t('colBestTrack')} <b>${bestTid?trackName(bestTid):'—'}</b></div>
-        <div class="s">${t('colConsistency')} <b>${cons!=null?cons.toFixed(1):'—'}</b></div>
-        <div class="s">${t('colClutch')} <b>${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</b></div>
+        ${statTile('colWarsPlayed','tipWarsPlayed', s?formatMatchCount(s.count):'—')}
+        ${statTile('colWinPct','tipWinPct', s?Math.round(s.winPct*100)+'%':'—')}
+        ${statTile('colAvg','tipAvg', s?s.avg.toFixed(1):'—')}
+        ${statTile('colBestTrack','tipBestTrack', bestTid?trackName(bestTid):'—')}
+        ${statTile('colConsistency','tipConsistency', cons!=null?cons.toFixed(1):'—')}
+        ${statTile('colClutch','tipClutch', clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—')}
       </div>
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('colTrack')}</h3>
       <div class="stats-table-wrap">
