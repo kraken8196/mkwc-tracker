@@ -1563,6 +1563,25 @@ function getPlayerStats(){
   }
   return stats;
 }
+// Ranking key that avoids the "saw-tooth" you get from sorting by match count first:
+// a Bayesian-adjusted average that gently pulls small samples toward the global mean,
+// so more matches earns trust without letting one lucky match top the board. Players are
+// still shown with their REAL average; only the ORDER uses this adjusted value.
+const RANK_CONFIDENCE = 2; // ~how many matches of "prior" weight a player is shrunk toward
+function makePlayerRanker(playerStats){
+  let totalPoints = 0, totalCount = 0;
+  for(const tag in playerStats){
+    for(const name in playerStats[tag]){
+      const s = playerStats[tag][name];
+      totalPoints += s.total; totalCount += s.count;
+    }
+  }
+  const globalMean = totalCount ? totalPoints/totalCount : 0;
+  return function adjustedAvg(count, avg){
+    if(!count) return 0;
+    return (RANK_CONFIDENCE*globalMean + count*avg) / (RANK_CONFIDENCE + count);
+  };
+}
 function getAllTeamStats(){
   return Object.keys(TEAMS).map(tag=>{
     const st = getTeamStats(tag);
@@ -1701,11 +1720,13 @@ function renderTeamDetail(tag){
   const raceStats = getRaceStats();
   const advStats = getAdvancedStats();
   const myStats = playerStats[tag] || {};
+  const rankAvg = makePlayerRanker(playerStats);
   const winPct = stats.played ? Math.round((stats.w/stats.played)*100) : null;
   const teamBestTrack = raceStats.bestTrackForTeam[tag];
+  // Rank roster by sample-size-adjusted average (players who haven't played go last).
   const playerRows = players
     .map(p=>({p, s:myStats[p.n]||null}))
-    .sort((a,b)=> (b.s?b.s.count:-1) - (a.s?a.s.count:-1) || (b.s?b.s.avg:-1) - (a.s?a.s.avg:-1));
+    .sort((a,b)=> (b.s?rankAvg(b.s.count,b.s.avg):-1) - (a.s?rankAvg(a.s.count,a.s.avg):-1) || (b.s?b.s.avg:-1) - (a.s?a.s.avg:-1));
   return `
     <button class="back-btn" id="backToTeamsBtn">${backLabel()}</button>
     <div class="team-detail-page">
@@ -1877,6 +1898,7 @@ function renderPlayersView(){
 
   if(statsMode==='players'){
     const playerStats = getPlayerStats();
+    const rankAvg = makePlayerRanker(playerStats);
     let all = [];
     for(const tag in playerStats){
       for(const name in playerStats[tag]){
@@ -1884,7 +1906,9 @@ function renderPlayersView(){
         all.push({tag, name, avg:s.avg, count:s.count, w:s.w, l:s.l, winPct:s.winPct});
       }
     }
-    all.sort((a,b)=> b.count-a.count || b.avg-a.avg);
+    // Rank by the sample-size-adjusted average (no more count-first saw-tooth); ties by
+    // real average, then more matches. Display columns keep the real numbers.
+    all.sort((a,b)=> rankAvg(b.count,b.avg)-rankAvg(a.count,a.avg) || b.avg-a.avg || b.count-a.count);
 
     html += `<div class="stage-note">${t('playersNote')} ${all.length===0?t('playersEmpty'):''}</div>`;
     if(all.length){
