@@ -1729,9 +1729,9 @@ function renderTeamDetail(tag){
           const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}${ff}</span>
-          <span class="cal-teams"><span class="cal-team-side ${won?'is-winner':''}">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
           <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
-          <span class="cal-teams cal-teams-opp"><span class="cal-team-side ${lost?'is-winner':''}">${teamPlainHTML(u.opp)}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date">${u.date}</span>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}

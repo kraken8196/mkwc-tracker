@@ -232,7 +232,6 @@
   .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;justify-content:flex-end;}
   .cal-teams-opp{justify-content:flex-start;}
   .cal-team-side{display:flex;align-items:center;gap:10px;}
-  .cal-team-side.is-winner .teamname{color:var(--gold);}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{

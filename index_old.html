@@ -243,7 +243,6 @@
   .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;justify-content:flex-end;}
   .cal-teams-opp{justify-content:flex-start;}
   .cal-team-side{display:flex;align-items:center;gap:10px;}
-  .cal-team-side.is-winner .teamname{color:var(--gold);}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{
@@ -2739,9 +2738,9 @@ function renderTeamDetail(tag){
           const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
           <span class="cal-stage">${u.stage}${ff}</span>
-          <span class="cal-teams"><span class="cal-team-side ${won?'is-winner':''}">${teamPlainHTML(tag)}</span></span>
+          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
           <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
-          <span class="cal-teams cal-teams-opp"><span class="cal-team-side ${lost?'is-winner':''}">${teamPlainHTML(u.opp)}</span></span>
+          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
           <span class="cal-date">${u.date}</span>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}
