@@ -2119,8 +2119,14 @@ function renderPlayersView(){
     function compareTeams(a, b){
       const aPlayed = activePlayed(a)>0, bPlayed = activePlayed(b)>0;
       if(!aPlayed && !bPlayed){
-        // neither has played yet: pure pre-tournament projected ranking (can cross tiers)
-        return projectedRank(a.tag)-projectedRank(b.tag);
+        // Neither has played the current phase yet. Teams with no matches at all (e.g.
+        // group-stage fixtures still waiting) stay on top by projected order; Play-In
+        // qualifiers, who do have results, sit below them and are ranked among themselves
+        // by win% then point differential.
+        const aAny = a.played>0, bAny = b.played>0;
+        if(aAny !== bAny) return aAny ? 1 : -1; // teams with no matches first
+        if(!aAny && !bAny) return projectedRank(a.tag)-projectedRank(b.tag);
+        return (b.winPct-a.winPct) || (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
       }
       if(aPlayed !== bPlayed){
         // one has played, the other hasn't: only let real results override the projection
