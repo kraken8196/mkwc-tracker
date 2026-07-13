@@ -350,7 +350,11 @@
     opacity:0; pointer-events:none; transition:opacity .12s;
     box-shadow:0 6px 16px rgba(0,0,0,0.45); z-index:40;
   }
-  .col-help:hover::after{opacity:1;}
+  /* Show the tooltip when hovering the label itself, OR anywhere in its header cell /
+     stat tile, so it's easy to trigger without pinpointing the tiny label text. */
+  .col-help:hover::after,
+  th:hover .col-help::after,
+  .stat-strip .s:hover .col-help::after{opacity:1;}
   /* Edge columns: anchor the bubble to the cell's right edge so it can't spill
      off the right side of the (horizontally-clipping) table wrapper. */
   .stats-table thead th:last-child .col-help::after,

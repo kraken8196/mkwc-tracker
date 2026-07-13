@@ -325,7 +325,7 @@
     box-shadow:0 4px 10px rgba(0,0,0,0.35); z-index:20;
   }
   .nat-badge:hover::after{opacity:1;}
-  .col-help{position:relative;display:inline-block;cursor:help;border-bottom:1px dotted var(--dim);}
+  .col-help{position:relative;cursor:help;border-bottom:1px dotted var(--dim);}
   /* Tooltip opens DOWNWARD (into the table body) on purpose: the scrollable
      .stats-table-wrap clips anything above the header row, so an upward bubble
      would be cut off. */
@@ -339,7 +339,11 @@
     opacity:0; pointer-events:none; transition:opacity .12s;
     box-shadow:0 6px 16px rgba(0,0,0,0.45); z-index:40;
   }
-  .col-help:hover::after{opacity:1;}
+  /* Show the tooltip when hovering the label itself, OR anywhere in its header cell /
+     stat tile, so it's easy to trigger without pinpointing the tiny label text. */
+  .col-help:hover::after,
+  th:hover .col-help::after,
+  .stat-strip .s:hover .col-help::after{opacity:1;}
   /* Edge columns: anchor the bubble to the cell's right edge so it can't spill
      off the right side of the table. The group standings tables are narrow (in a
      card, no scroll), so anchor their last few columns' bubbles to the right too. */
