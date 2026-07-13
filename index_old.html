@@ -362,6 +362,10 @@
     width:100%;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line-strong);
     color:var(--cream);border-radius:10px;font-size:14px;margin-bottom:18px;
   }
+  .player-search:focus{outline:none;border-color:var(--gold);}
+  .players-more-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px;}
+  .players-more-wrap .chip{padding:9px 20px;font-size:14px;}
+  .players-empty-search{color:var(--dim);font-size:14px;}
   .stats-table-wrap{
     background:var(--panel-2);border:1px solid var(--line-strong);border-radius:var(--radius);
     box-shadow:0 6px 18px rgba(0,0,0,0.25);
@@ -784,7 +788,7 @@ const I18N = {
     backToTeams:'← Retour aux équipes', backToCalendar:'← Retour au calendrier', backGeneric:'Retour', statMatches:'Matchs', statW:'V', statL:'D', statDiff:'Diff', statPlayers:'Joueurs',
     bestPlayers:'Meilleurs joueurs :', ptsPerMatch:'pts/match', upcomingMatches:'Matchs à venir',
     noUpcoming:"Aucun match à venir programmé pour l'instant (adversaire pas encore déterminé, ou tous les matchs connus ont déjà été joués).",
-    roster:'Effectif', searchPlaceholder:'Rechercher un joueur ou une équipe...',
+    roster:'Effectif', searchPlaceholder:'Rechercher un joueur ou une équipe...', showMore:'Voir plus', searchNoResult:'Aucun joueur trouvé.',
     playersNote:'Classement par meilleur score moyen par match.', playersEmpty:"Aucune donnée pour l'instant — les scores se rempliront au fil des matchs.",
     tabPlayers:'Joueurs', tabTeamsStats:'Équipes', colPlayer:'Joueur', colWarsPlayed:'Matchs joués', colWinPct:'% Victoires', colAvg:'Moyenne',
     searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Classement des équipes par pourcentage de victoires, puis par différentiel de points.",
@@ -850,7 +854,7 @@ const I18N = {
     backToTeams:'← Back to teams', backToCalendar:'← Back to calendar', backGeneric:'Back', statMatches:'Matches', statW:'W', statL:'L', statDiff:'Diff', statPlayers:'Players',
     bestPlayers:'Top players:', ptsPerMatch:'pts/match', upcomingMatches:'Upcoming matches',
     noUpcoming:'No upcoming match scheduled yet (opponent not yet determined, or all known matches already played).',
-    roster:'Roster', searchPlaceholder:'Search for a player or team...',
+    roster:'Roster', searchPlaceholder:'Search for a player or team...', showMore:'Show more', searchNoResult:'No player found.',
     playersNote:'Ranked by best average score per match.', playersEmpty:'No data yet — scores will fill in as matches are played.',
     tabPlayers:'Players', tabTeamsStats:'Teams', colPlayer:'Player', colWarsPlayed:'Matches played', colWinPct:'Win %', colAvg:'Average',
     searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Teams ranked by win percentage, then by point differential.',
@@ -916,7 +920,7 @@ const I18N = {
     backToTeams:'← Volver a equipos', backToCalendar:'← Volver al calendario', backGeneric:'Volver', statMatches:'Partidos', statW:'G', statL:'P', statDiff:'Dif', statPlayers:'Jugadores',
     bestPlayers:'Mejores jugadores:', ptsPerMatch:'pts/partido', upcomingMatches:'Próximos partidos',
     noUpcoming:'No hay próximos partidos programados por ahora (rival aún no determinado, o todos los partidos conocidos ya se jugaron).',
-    roster:'Plantilla', searchPlaceholder:'Buscar un jugador o equipo...',
+    roster:'Plantilla', searchPlaceholder:'Buscar un jugador o equipo...', showMore:'Ver más', searchNoResult:'Ningún jugador encontrado.',
     playersNote:'Clasificación por mejor puntuación media por partido.', playersEmpty:'Todavía no hay datos — las puntuaciones se irán completando con los partidos.',
     tabPlayers:'Jugadores', tabTeamsStats:'Equipos', colPlayer:'Jugador', colWarsPlayed:'Partidos jugados', colWinPct:'% Victorias', colAvg:'Media',
     searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Equipos clasificados por porcentaje de victorias, luego por diferencia de puntos.',
@@ -982,7 +986,7 @@ const I18N = {
     backToTeams:'← チーム一覧に戻る', backToCalendar:'← カレンダーに戻る', backGeneric:'戻る', statMatches:'試合数', statW:'勝', statL:'負', statDiff:'得失点差', statPlayers:'選手数',
     bestPlayers:'注目選手：', ptsPerMatch:'点/試合', upcomingMatches:'今後の試合',
     noUpcoming:'現在予定されている試合はありません（対戦相手が未確定、またはすべての既知の試合が終了しています）。',
-    roster:'メンバー', searchPlaceholder:'選手名またはチーム名で検索...',
+    roster:'メンバー', searchPlaceholder:'選手名またはチーム名で検索...', showMore:'もっと見る', searchNoResult:'該当する選手がいません。',
     playersNote:'試合平均得点によるランキングです。', playersEmpty:'まだデータがありません — 試合が進むとスコアが表示されます。',
     tabPlayers:'選手', tabTeamsStats:'チーム', colPlayer:'選手', colWarsPlayed:'試合数', colWinPct:'勝率', colAvg:'平均',
     searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'勝率、次に得失点差でランキングしたチーム一覧です。',
@@ -1079,7 +1083,7 @@ USA:["Arezu|US|","AyyJayy|US|","CPE|US|","green|US|","gyrodos|US|","Mirymeg|US|"
 ENG:["Gold/Maisie|GB|","Ralsei|GB|","Hazza|GB|","James|GB|","Lee|GB|","L1am|GB|","Nxvy|GB|","oj|GB|","q.|GB|","RyanBritish|GB|","season|GB|","shiba|GB|","syn|GB|"],
 FR:["corrmo|FR|","Kirio|FR|","LOLmdr|FR|","OsDras|FR|","Popoff|FR|","Saru|FR|","Starlow|FR|","starxlx|FR|","Valer|FR|","WawayZz|FR|"],
 CA:["AFCHuayra / Garuda|CAM|","Anemoi Asura|CAM|","Azelix/Rei/Momone|CAM|","Cerezagt|CAM|","Clawx/Hak/Yamada|CAM|","CRISTHIAN|CAM|","Dark|CAM|","Fercho|CAM|","Gaboide|CAM|","J.Papu|CAM|","Lawx/Kanata|CAM|","Mucio|CAM|","Noname09|CAM|","PANDUX|CAM|","zXFlare|CAM|"],
-VE:["Aarones / Adokill|VE|","AK20|VE|","cosiam|VE|","Diego6|VE|","Fuuse/Nejire-san|VE|","G0thgrl......|VE|","Heb|VE|","José A.|VE|","kiwillius|VE|","Kr1ps|VE|","Monkey/Anna/Nami|VE|","RK CR0NO 64|VE|","Santipajas|VE|","Suarez|VE|","Suca|VE|"],
+VE:["Aarones / Adokill|VE|","AK20|VE|","cosiam|VE|","Diego6|VE|","Fuuse/Nejire-san|VE|","G0thgrl......|VE|","Heb|VE|","José A.|VE|","kiwillius|VE|","Kr1ps|VE|","Monkey/Anna/Nami|VE|","RK CR0NO 64|VE|","Santipajas|VE|","Suarez|VE|","Abocad0|VE|"],
 CB:["Chara|CBR|","FlashGordon|CBR|","Geozaki|CBR|","hrsnab|CBR|","Jacob147|CBR|","Keiran/Sylvio/Luigi|CBR|","Lucas / Chungus / Moose|CBR|","Mints|CBR|","Nathaniel/Wheels|CBR|","Nisc$|CBR|","Pigeon/Faye|CBR|","QuagStar|CBR|","TopHatBear / Alex|CBR|","Willo|CBR|"],
 LUX:["Blume187 / Nee Diggi|LU|","Butter_Chicken|LU|","Charel|LU|","James|LU|","Kakpu|LU|","Liam|LU|","Lowbro|LU|","Luca|LU|","MisterLPM|LU|","Rahpa 28|LU|","Spielpro|LU|","Francis|LU|","Yasn|LU|"],
 PT:["D3lt4/Froholdt/Will|PT|C","Lora|PT|R","Veigh|PT|R","Dump|PT|","Gerras15|PT|","Koshi|PT|","mozartx|PT|","ociuQ|PT|","SiniD|PT|","stendal8|PT|"],
@@ -1240,7 +1244,7 @@ const TRACKS = [
   {id:'t9_dk_pass', fr:'Alpes DK', en:'DK Pass', es:'DK Alpino', ja:'DKスノーマウンテン'},
   {id:'t10_starview_peak', fr:'Pic de l\'observatoire', en:'Starview Peak', es:'Mirador Estelar', ja:'ロゼッタてんもんだい'},
   {id:'t11_sky_high_sundae', fr:'Cité Sorbet', en:'Sky-High Sundae', es:'Cielos Helados', ja:'アイスビルディング'},
-  {id:'t12_wario_s_galleon', fr:'Galion de Wario', en:'Wario\'s Galleon', es:'Galeón de Wario', ja:'ワリオシップ'},
+  {id:'t12_wario_s_galleon', fr:'Galion de Wario', en:'Wario Shipyard', es:'Galeón de Wario', ja:'ワリオシップ'},
   {id:'t13_koopa_troopa_beach', fr:'Plage Koopa', en:'Koopa Troopa Beach', es:'Playa Koopa', ja:'ノコノコビーチ'},
   {id:'t14_faraway_oasis', fr:'Savane sauvage', en:'Faraway Oasis', es:'Sabana Salpicante', ja:'リバーサイドサファリ'},
   {id:'t15_peach_stadium', fr:'Stade Peach', en:'Peach Stadium', es:'Estadio Peach', ja:'ピーチスタジアム'},
@@ -2867,6 +2871,8 @@ function renderPlayerDetail(tag, name){
    RENDER: PLAYERS VIEW
 ========================================================= */
 let statsMode = 'players';
+const PLAYERS_PAGE = 60; // how many players to reveal per "show more" step
+let playersShown = PLAYERS_PAGE;
 function renderPlayersView(){
   const el = document.getElementById('view-players');
   const raceStats = getRaceStats();
@@ -2889,6 +2895,7 @@ function renderPlayersView(){
 
     html += `<div class="stage-note">${t('playersNote')} ${all.length===0?t('playersEmpty'):''}</div>`;
     if(all.length){
+      html += `<input type="text" class="player-search" id="playerSearch" placeholder="${t('searchPlaceholder')}" autocomplete="off">`;
       html += `<div class="stats-table-wrap"><table class="stats-table" id="leaderList">
         <thead><tr><th></th>${th('colPlayer')}${th('colTeam')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
         <tbody>`;
@@ -2897,7 +2904,7 @@ function renderPlayersView(){
         const pkey = p.tag+'|'+p.name;
         const cons = advStats.consistency[pkey];
         const clu = advStats.clutch[pkey];
-        html += `<tr class="leader-row" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}">
+        html += `<tr class="leader-row" data-rank="${i+1}" data-name="${p.name.toLowerCase()}" data-team="${teamName(p.tag).toLowerCase()}">
           <td class="lp ${i===0?'top1':''}">${i+1}</td>
           <td><span class="teamcell">${flagEl(p.tag,'sm')}<span class="lname"><span class="player-name-link" data-player-tag="${p.tag}" data-player-name="${p.name}">${p.name}</span></span></span></td>
           <td class="lteam">${teamName(p.tag)}</td>
@@ -2910,6 +2917,7 @@ function renderPlayersView(){
         </tr>`;
       });
       html += `</tbody></table></div>`;
+      html += `<div class="players-more-wrap"><button class="chip" id="playersMoreBtn" style="display:none;"></button><div class="players-empty-search" id="playersEmptySearch" style="display:none;">${t('searchNoResult')}</div></div>`;
     }
   } else {
     const TIER_ORDER = {higher:0, middle:1, lower:2};
@@ -2956,7 +2964,7 @@ function renderPlayersView(){
   }
 
   el.innerHTML = html;
-  el.querySelectorAll('[data-statsmode]').forEach(b=> b.onclick = ()=>{ statsMode = b.dataset.statsmode; renderPlayersView(); });
+  el.querySelectorAll('[data-statsmode]').forEach(b=> b.onclick = ()=>{ statsMode = b.dataset.statsmode; playersShown = PLAYERS_PAGE; renderPlayersView(); });
   el.querySelectorAll('.player-name-link').forEach(link=>{
     link.onclick = (e)=>{
       e.stopPropagation();
@@ -2967,6 +2975,40 @@ function renderPlayersView(){
       window.scrollTo({top:0,behavior:'smooth'});
     };
   });
+
+  // Players tab: live search + "show more" pagination (60 at a time). When a search
+  // is active every match is shown (no pagination); otherwise only the top N.
+  const searchEl = document.getElementById('playerSearch');
+  if(searchEl){
+    const rows = Array.from(el.querySelectorAll('#leaderList tbody tr'));
+    const moreBtn = document.getElementById('playersMoreBtn');
+    const emptyEl = document.getElementById('playersEmptySearch');
+    function applyPlayersFilter(){
+      const q = searchEl.value.trim().toLowerCase();
+      let shownCount = 0;
+      rows.forEach(row=>{
+        const matches = !q || row.dataset.name.includes(q) || row.dataset.team.includes(q);
+        if(!matches){ row.style.display = 'none'; return; }
+        if(q || shownCount < playersShown){ row.style.display = ''; shownCount++; }
+        else { row.style.display = 'none'; shownCount++; }
+      });
+      const totalMatching = q
+        ? rows.filter(r=> r.dataset.name.includes(q) || r.dataset.team.includes(q)).length
+        : rows.length;
+      if(emptyEl) emptyEl.style.display = (q && totalMatching===0) ? '' : 'none';
+      if(moreBtn){
+        const canShowMore = !q && playersShown < rows.length;
+        moreBtn.style.display = canShowMore ? '' : 'none';
+        if(canShowMore){
+          const next = Math.min(PLAYERS_PAGE, rows.length - playersShown);
+          moreBtn.textContent = `${t('showMore')} (+${next})`;
+        }
+      }
+    }
+    searchEl.addEventListener('input', ()=>{ applyPlayersFilter(); });
+    if(moreBtn) moreBtn.onclick = ()=>{ playersShown += PLAYERS_PAGE; applyPlayersFilter(); };
+    applyPlayersFilter();
+  }
 }
 
 /* =========================================================
