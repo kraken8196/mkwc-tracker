@@ -758,7 +758,7 @@ const I18N = {
     tipDiff:'Différence entre les points marqués et les points encaissés, tous matchs confondus.',
     tipAvg:'Score moyen du joueur par match (un match = 12 courses).', tipTeamAvg:'Score moyen de l\'équipe par match.',
     tipBestTrack:'Circuit sur lequel le meilleur score moyen a été obtenu.',
-    tipConsistency:'Écart entre la meilleure et la pire course du joueur. Plus c\'est bas, plus il est régulier.',
+    tipConsistency:'Écart-type des scores de course du joueur : à quel point il reste proche de sa moyenne. Plus c\'est bas, plus il est régulier.',
     tipClutch:'Moyenne des 3 dernières courses moins celle des 9 premières. Positif = finit plus fort qu\'il n\'a commencé.',
     tipBalance:'Répartition des points entre les 6 joueurs, en moyenne par match. Plus c\'est bas, plus les points sont partagés équitablement.',
     tipRacesPlayed:'Nombre de courses jouées sur ce circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
@@ -824,7 +824,7 @@ const I18N = {
     tipDiff:'Points scored minus points conceded, across all matches.',
     tipAvg:'Player\'s average score per match (one match = 12 races).', tipTeamAvg:'Team\'s average score per match.',
     tipBestTrack:'Track with the best average score.',
-    tipConsistency:'Gap between the player\'s best and worst race. Lower means steadier.',
+    tipConsistency:'Standard deviation of the player\'s race scores: how close they stay to their average. Lower means steadier.',
     tipClutch:'Average of the last 3 races minus the first 9. Positive = finishes stronger than they started.',
     tipBalance:'How evenly the 6 players share the points, averaged per match. Lower means more evenly shared.',
     tipRacesPlayed:'Number of races played on this track.', tipGB:'Points scored by the team in the group.',
@@ -890,7 +890,7 @@ const I18N = {
     tipDiff:'Puntos anotados menos puntos recibidos, en todos los partidos.',
     tipAvg:'Puntuación media del jugador por partido (un partido = 12 carreras).', tipTeamAvg:'Puntuación media del equipo por partido.',
     tipBestTrack:'Circuito con la mejor puntuación media.',
-    tipConsistency:'Diferencia entre la mejor y la peor carrera del jugador. Cuanto más bajo, más regular.',
+    tipConsistency:'Desviación típica de las puntuaciones de carrera del jugador: lo cerca que se mantiene de su media. Cuanto más bajo, más regular.',
     tipClutch:'Media de las 3 últimas carreras menos las 9 primeras. Positivo = termina más fuerte de lo que empezó.',
     tipBalance:'Cómo reparten los puntos los 6 jugadores, en promedio por partido. Cuanto más bajo, más equilibrado.',
     tipRacesPlayed:'Número de carreras jugadas en este circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
@@ -956,7 +956,7 @@ const I18N = {
     tipDiff:'全試合を通じた、獲得ポイントから失点を引いた差。',
     tipAvg:'選手の1試合あたりの平均スコア（1試合＝12レース）。', tipTeamAvg:'チームの1試合あたりの平均スコア。',
     tipBestTrack:'平均スコアが最も高かったコース。',
-    tipConsistency:'選手のベストとワーストのレース差。小さいほど安定。',
+    tipConsistency:'選手のレーススコアの標準偏差：平均からどれだけ離れないか。小さいほど安定。',
     tipClutch:'最後の3レースの平均から最初の9レースの平均を引いた値。プラスなら尻上がり。',
     tipBalance:'6人の選手のポイント配分の均等さ（1試合平均）。小さいほど均等。',
     tipRacesPlayed:'このコースで走ったレース数。', tipGB:'グループでチームが獲得したポイント。',
@@ -2377,12 +2377,15 @@ function getAdvancedStats(){
     for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
   }
 
-  // Consistency: gap between a player's best and worst individual race — smaller means steadier.
+  // Consistency: standard deviation of a player's individual race scores — smaller means
+  // steadier. (The old best-minus-worst range saturated near 14 for almost everyone, since
+  // any decent sample includes a ~15 and a ~1; stddev captures the real spread instead.)
   const consistency = {};
   for(const pkey in playerAllRaces){
     const races = playerAllRaces[pkey];
     if(races.length<2) continue;
-    consistency[pkey] = Math.max(...races) - Math.min(...races);
+    const sd = stdDev(races);
+    if(sd!=null) consistency[pkey] = sd;
   }
 
   // Clutch: average of the last 3 races minus average of the first 9, per match, then averaged —
