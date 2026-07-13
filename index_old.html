@@ -405,7 +405,9 @@
   .stats-table tbody tr:hover{background:rgba(255,206,84,0.06);}
   .stats-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);}
   .stats-table td.num{text-align:center;font-family:'JetBrains Mono',monospace;color:var(--cream);}
-  .stats-table td.num.highlight{color:var(--gold);font-weight:700;}
+  /* Stat values stay white like the rest of the row (no gold highlight on e.g. the
+     average), just kept slightly bold so the key number is still easy to spot. */
+  .stats-table td.num.highlight{color:var(--cream);font-weight:700;}
   .stats-table .lp{font-family:'JetBrains Mono',monospace;color:var(--dim);width:24px;text-align:center;}
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}
@@ -2801,6 +2803,7 @@ function renderTeamDetail(tag){
           <span class="cal-date emphasize">${u.date}</span>
         </div>`).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('noUpcoming')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
+      <div class="stage-note">${t('playersNote')}</div>
       <div class="stats-table-wrap">
         <table class="stats-table">
           <thead><tr><th></th>${th('colPlayer')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>

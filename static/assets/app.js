@@ -1769,6 +1769,7 @@ function renderTeamDetail(tag){
           <span class="cal-date emphasize">${u.date}</span>
         </div>`).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('noUpcoming')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
+      <div class="stage-note">${t('playersNote')}</div>
       <div class="stats-table-wrap">
         <table class="stats-table">
           <thead><tr><th></th>${th('colPlayer')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>

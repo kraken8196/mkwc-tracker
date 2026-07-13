@@ -397,7 +397,9 @@
   .stats-table tbody tr:hover{background:rgba(255,206,84,0.06);}
   .stats-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);}
   .stats-table td.num{text-align:center;font-family:'JetBrains Mono',monospace;color:var(--cream);}
-  .stats-table td.num.highlight{color:var(--gold);font-weight:700;}
+  /* Stat values stay white like the rest of the row (no gold highlight on e.g. the
+     average), just kept slightly bold so the key number is still easy to spot. */
+  .stats-table td.num.highlight{color:var(--cream);font-weight:700;}
   .stats-table .lp{font-family:'JetBrains Mono',monospace;color:var(--dim);width:24px;text-align:center;}
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}
