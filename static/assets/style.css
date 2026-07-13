@@ -118,6 +118,11 @@
   .stage-head h2{font-size:24px;}
   .stage-head .stage-date{font-size:12px;color:#3a2100;background:var(--gold);padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:700;}
   .stage-note{font-size:13px;color:var(--dim);margin-bottom:16px;}
+  .cal-provisional-note{
+    font-size:13.5px;line-height:1.5;color:var(--cream);
+    background:rgba(255,206,84,0.10);border:1px solid var(--gold);border-radius:10px;
+    padding:11px 14px;margin-bottom:18px;
+  }
   .stage-subhead{font-size:15px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;margin:6px 0 4px;text-transform:uppercase;letter-spacing:0.04em;}
   .tier-badge{
     font-family:'JetBrains Mono',monospace;font-size:11px;

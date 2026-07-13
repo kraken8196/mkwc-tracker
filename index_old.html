@@ -129,6 +129,11 @@
   .stage-head h2{font-size:24px;}
   .stage-head .stage-date{font-size:12px;color:#3a2100;background:var(--gold);padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:700;}
   .stage-note{font-size:13px;color:var(--dim);margin-bottom:16px;}
+  .cal-provisional-note{
+    font-size:13.5px;line-height:1.5;color:var(--cream);
+    background:rgba(255,206,84,0.10);border:1px solid var(--gold);border-radius:10px;
+    padding:11px 14px;margin-bottom:18px;
+  }
   .stage-subhead{font-size:15px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;margin:6px 0 4px;text-transform:uppercase;letter-spacing:0.04em;}
   .tier-badge{
     font-family:'JetBrains Mono',monospace;font-size:11px;
@@ -858,6 +863,7 @@ const I18N = {
     round16:'Round 1', quarterfinals:'Quarts de finale', semifinals:'Demi-finales', final:'Finale',
     dateQuali:'10–12 juil.', datePhase:'17–19 juil.', dateR16:'24 juillet', dateQF:'25 juillet', dateSF:'1 août', dateF:'2 août',
     calNoMatch:"Aucun match programmé pour l'instant — plusieurs groupes ont encore des équipes à définir.",
+    calGroupProvisional:'⚠️ Les dates du 17 au 19 juillet pour la phase de groupes sont provisoires : certains matchs pourront se dérouler en dehors de ces dates.',
     upcoming:'à venir', vs:'vs',
     teamsIntro:"Clique sur un drapeau pour voir la fiche de l'équipe (joueurs, statistiques...).",
     backToTeams:'← Retour aux équipes', backToCalendar:'← Retour au calendrier', backGeneric:'Retour', statMatches:'Matchs', statW:'V', statL:'D', statDiff:'Diff', statPlayers:'Joueurs',
@@ -924,6 +930,7 @@ const I18N = {
     round16:'Round 1', quarterfinals:'Quarterfinals', semifinals:'Semifinals', final:'Final',
     dateQuali:'Jul 10–12', datePhase:'Jul 17–19', dateR16:'July 24', dateQF:'July 25', dateSF:'Aug 1', dateF:'Aug 2',
     calNoMatch:'No matches scheduled yet — several groups still have teams to be determined.',
+    calGroupProvisional:'⚠️ The July 17–19 dates for the Group Stage are provisional: some matches may take place outside those dates.',
     upcoming:'upcoming', vs:'vs',
     teamsIntro:"Click on a flag to see the team's page (players, stats...).",
     backToTeams:'← Back to teams', backToCalendar:'← Back to calendar', backGeneric:'Back', statMatches:'Matches', statW:'W', statL:'L', statDiff:'Diff', statPlayers:'Players',
@@ -990,6 +997,7 @@ const I18N = {
     round16:'Ronda 1', quarterfinals:'Cuartos de final', semifinals:'Semifinales', final:'Final',
     dateQuali:'10–12 jul.', datePhase:'17–19 jul.', dateR16:'24 de julio', dateQF:'25 de julio', dateSF:'1 de agosto', dateF:'2 de agosto',
     calNoMatch:'Todavía no hay partidos programados — varios grupos aún tienen equipos por determinar.',
+    calGroupProvisional:'⚠️ Las fechas del 17 al 19 de julio para la fase de grupos son provisionales: algunos partidos podrían disputarse fuera de esas fechas.',
     upcoming:'por jugar', vs:'vs',
     teamsIntro:'Haz clic en una bandera para ver la ficha del equipo (jugadores, estadísticas...).',
     backToTeams:'← Volver a equipos', backToCalendar:'← Volver al calendario', backGeneric:'Volver', statMatches:'Partidos', statW:'G', statL:'P', statDiff:'Dif', statPlayers:'Jugadores',
@@ -1056,6 +1064,7 @@ const I18N = {
     round16:'ラウンド1', quarterfinals:'準々決勝', semifinals:'準決勝', final:'決勝',
     dateQuali:'7月10〜12日', datePhase:'7月17〜19日', dateR16:'7月24日', dateQF:'7月25日', dateSF:'8月1日', dateF:'8月2日',
     calNoMatch:'まだ試合は組まれていません — いくつかのグループはチームが未確定です。',
+    calGroupProvisional:'⚠️ グループステージの7月17〜19日の日程は暫定です。一部の試合はこの期間外に行われる可能性があります。',
     upcoming:'試合前', vs:'vs',
     teamsIntro:'旗をクリックするとチームページ（選手、成績など）が表示されます。',
     backToTeams:'← チーム一覧に戻る', backToCalendar:'← カレンダーに戻る', backGeneric:'戻る', statMatches:'試合数', statW:'勝', statL:'負', statDiff:'得失点差', statPlayers:'選手数',
@@ -2494,9 +2503,9 @@ function renderCalendarView(){
   const el = document.getElementById('view-calendar');
   const items = getAllMatchItems();
 
-  let html = '';
+  let html = `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
   if(items.length===0){
-    html = `<div class="cal-item">${t('calNoMatch')}</div>`;
+    html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
     items.sort((a,b)=> a.dateOrder-b.dateOrder);
     let currentDate = null;
