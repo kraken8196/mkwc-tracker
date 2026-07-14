@@ -880,6 +880,7 @@ const I18N = {
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
     colTrack:'Circuit', colRacesPlayed:'Courses jouées', colBestTrack:'Meilleur circuit', colRace:'Course',
     colConsistency:'Régularité', colClutch:'Fin de match', colBalance:'Équilibre',
+    colRankScore:'Indice', tipRankScore:'Indice de classement : le score moyen par match, ajusté selon le nombre de matchs joués. Un joueur avec peu de matchs voit son indice rapproché de la moyenne générale, si bien qu’un seul bon match ne suffit pas à finir en tête. C’est cet indice qui détermine le classement.',
     tipMatches:'Nombre de matchs (war) joués par l\'équipe.', tipWarsPlayed:'Nombre de matchs (war) auxquels le joueur a participé.',
     tipW:'Nombre de matchs gagnés.', tipD:'Nombre de matchs nuls.', tipL:'Nombre de matchs perdus.',
     tipWinPct:'Pourcentage de matchs gagnés sur le total de matchs joués.',
@@ -918,7 +919,7 @@ const I18N = {
     bestPlayers:'Meilleurs joueurs :', ptsPerMatch:'pts/match', upcomingMatches:'Matchs à venir',
     noUpcoming:"Aucun match à venir programmé pour l'instant (adversaire pas encore déterminé, ou tous les matchs connus ont déjà été joués).",
     roster:'Effectif', searchPlaceholder:'Rechercher un joueur ou une équipe...', showMore:'Voir plus', searchNoResult:'Aucun joueur trouvé.',
-    playersNote:'Classement par score moyen par match, pondéré par le nombre de matchs joués : jouer plus de matchs rend la moyenne plus fiable, donc un seul bon match ne suffit pas à finir en tête. La colonne « Moyenne » affiche le vrai score moyen.', playersEmpty:"Aucune donnée pour l'instant — les scores se rempliront au fil des matchs.",
+    playersNote:'Classement par indice (colonne « Indice ») : le score moyen par match, ajusté selon le nombre de matchs joués. La colonne « Moyenne » affiche le vrai score moyen.', playersEmpty:"Aucune donnée pour l'instant — les scores se rempliront au fil des matchs.",
     tabPlayers:'Joueurs', tabTeamsStats:'Équipes', colPlayer:'Joueur', colWarsPlayed:'Matchs joués', colWinPct:'% Victoires', colAvg:'Moyenne',
     searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Classement des équipes par pourcentage de victoires, puis par différentiel de points.",
     dateQualiFull:'10–12 JUILLET', datePhaseFull:'17–19 JUILLET', dateBracketFull:'24 JUIL – 2 AOÛT',
@@ -947,6 +948,7 @@ const I18N = {
     tracksNote:'Average score on each track, across every player and match.',
     colTrack:'Track', colRacesPlayed:'Races played', colBestTrack:'Best track', colRace:'Race',
     colConsistency:'Consistency', colClutch:'Late-match', colBalance:'Balance',
+    colRankScore:'Rating', tipRankScore:'Ranking rating: the average score per match, adjusted for the number of matches played. A player with few matches is pulled toward the overall average, so a single strong match won’t top the board. This rating is what sets the ranking.',
     tipMatches:'Number of matches (wars) the team has played.', tipWarsPlayed:'Number of matches (wars) the player took part in.',
     tipW:'Number of matches won.', tipD:'Number of drawn matches.', tipL:'Number of matches lost.',
     tipWinPct:'Share of matches won out of all matches played.',
@@ -985,7 +987,7 @@ const I18N = {
     bestPlayers:'Top players:', ptsPerMatch:'pts/match', upcomingMatches:'Upcoming matches',
     noUpcoming:'No upcoming match scheduled yet (opponent not yet determined, or all known matches already played).',
     roster:'Roster', searchPlaceholder:'Search for a player or team...', showMore:'Show more', searchNoResult:'No player found.',
-    playersNote:'Ranked by average score per match, weighted by matches played: more matches makes an average more reliable, so a single strong match won\'t top the board. The "Average" column shows the real average score.', playersEmpty:'No data yet — scores will fill in as matches are played.',
+    playersNote:'Ranked by rating (the "Rating" column): the average score per match, adjusted for the number of matches played. The "Average" column shows the real average score.', playersEmpty:'No data yet — scores will fill in as matches are played.',
     tabPlayers:'Players', tabTeamsStats:'Teams', colPlayer:'Player', colWarsPlayed:'Matches played', colWinPct:'Win %', colAvg:'Average',
     searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Teams ranked by win percentage, then by point differential.',
     dateQualiFull:'JUL 10–12', datePhaseFull:'JUL 17–19', dateBracketFull:'JUL 24 – AUG 2',
@@ -1014,6 +1016,7 @@ const I18N = {
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
     colTrack:'Circuito', colRacesPlayed:'Carreras jugadas', colBestTrack:'Mejor circuito', colRace:'Carrera',
     colConsistency:'Regularidad', colClutch:'Final de partido', colBalance:'Equilibrio',
+    colRankScore:'Índice', tipRankScore:'Índice de clasificación: la puntuación media por partido, ajustada según el número de partidos jugados. Un jugador con pocos partidos se acerca a la media general, así que un solo buen partido no basta para liderar. Este índice determina la clasificación.',
     tipMatches:'Número de partidos (wars) jugados por el equipo.', tipWarsPlayed:'Número de partidos (wars) en los que participó el jugador.',
     tipW:'Número de partidos ganados.', tipD:'Número de partidos empatados.', tipL:'Número de partidos perdidos.',
     tipWinPct:'Porcentaje de partidos ganados sobre el total jugado.',
@@ -1052,7 +1055,7 @@ const I18N = {
     bestPlayers:'Mejores jugadores:', ptsPerMatch:'pts/partido', upcomingMatches:'Próximos partidos',
     noUpcoming:'No hay próximos partidos programados por ahora (rival aún no determinado, o todos los partidos conocidos ya se jugaron).',
     roster:'Plantilla', searchPlaceholder:'Buscar un jugador o equipo...', showMore:'Ver más', searchNoResult:'Ningún jugador encontrado.',
-    playersNote:'Clasificación por puntuación media por partido, ponderada por partidos jugados: jugar más partidos hace la media más fiable, así que un solo buen partido no basta para liderar. La columna «Media» muestra la puntuación media real.', playersEmpty:'Todavía no hay datos — las puntuaciones se irán completando con los partidos.',
+    playersNote:'Clasificación por índice (columna «Índice»): la puntuación media por partido, ajustada según el número de partidos jugados. La columna «Media» muestra la puntuación media real.', playersEmpty:'Todavía no hay datos — las puntuaciones se irán completando con los partidos.',
     tabPlayers:'Jugadores', tabTeamsStats:'Equipos', colPlayer:'Jugador', colWarsPlayed:'Partidos jugados', colWinPct:'% Victorias', colAvg:'Media',
     searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Equipos clasificados por porcentaje de victorias, luego por diferencia de puntos.',
     dateQualiFull:'10–12 JUL', datePhaseFull:'17–19 JUL', dateBracketFull:'24 JUL – 2 AGO',
@@ -1081,6 +1084,7 @@ const I18N = {
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
     colTrack:'コース', colRacesPlayed:'走行回数', colBestTrack:'得意コース', colRace:'レース',
     colConsistency:'安定性', colClutch:'終盤の伸び', colBalance:'バランス',
+    colRankScore:'指数', tipRankScore:'ランキング指数：1試合あたりの平均得点を、試合数に応じて調整した値。試合数が少ない選手は全体平均に引き寄せられるため、1試合の好成績だけでは首位になりません。この指数が順位を決めます。',
     tipMatches:'チームが行った試合（war）数。', tipWarsPlayed:'選手が参加した試合（war）数。',
     tipW:'勝った試合数。', tipD:'引き分けた試合数。', tipL:'負けた試合数。',
     tipWinPct:'全試合数に対する勝利の割合。',
@@ -1119,7 +1123,7 @@ const I18N = {
     bestPlayers:'注目選手：', ptsPerMatch:'点/試合', upcomingMatches:'今後の試合',
     noUpcoming:'現在予定されている試合はありません（対戦相手が未確定、またはすべての既知の試合が終了しています）。',
     roster:'メンバー', searchPlaceholder:'選手名またはチーム名で検索...', showMore:'もっと見る', searchNoResult:'該当する選手がいません。',
-    playersNote:'1試合あたりの平均得点によるランキング（試合数で重み付け）。試合を多くこなすほど平均の信頼度が上がるため、1試合の好成績だけでは首位になりません。「平均」列には実際の平均得点を表示しています。', playersEmpty:'まだデータがありません — 試合が進むとスコアが表示されます。',
+    playersNote:'「指数」列によるランキング：1試合あたりの平均得点を試合数に応じて調整した値です。「平均」列には実際の平均得点を表示しています。', playersEmpty:'まだデータがありません — 試合が進むとスコアが表示されます。',
     tabPlayers:'選手', tabTeamsStats:'チーム', colPlayer:'選手', colWarsPlayed:'試合数', colWinPct:'勝率', colAvg:'平均',
     searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'勝率、次に得失点差でランキングしたチーム一覧です。',
     dateQualiFull:'7月10〜12日', datePhaseFull:'7月17〜19日', dateBracketFull:'7月24日〜8月2日',
@@ -3093,7 +3097,7 @@ function renderTeamDetail(tag){
       <div class="stage-note">${t('playersNote')}</div>
       <div class="stats-table-wrap">
         <table class="stats-table">
-          <thead><tr><th></th>${th('colPlayer')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
+          <thead><tr><th></th>${th('colPlayer')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colRankScore','tipRankScore','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
           <tbody>
             ${playerRows.map(({p,s})=>{
               const bestTid = raceStats.bestTrackForPlayer[tag+'|'+p.n];
@@ -3105,7 +3109,8 @@ function renderTeamDetail(tag){
               <td class="lname"><span class="player-name-link" data-player-tag="${tag}" data-player-name="${p.n}">${p.n}</span></td>
               <td class="num">${s?formatMatchCount(s.count):'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
-              <td class="num ${s?'highlight':''}">${s?s.avg.toFixed(1):'—'}</td>
+              <td class="num">${s?s.avg.toFixed(1):'—'}</td>
+              <td class="num ${s?'highlight':''}">${s?rankAvg(s.count,s.avg).toFixed(1):'—'}</td>
               <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
               <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
               <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
@@ -3234,7 +3239,7 @@ function renderPlayersView(){
     if(all.length){
       html += `<input type="text" class="player-search" id="playerSearch" placeholder="${t('searchPlaceholder')}" autocomplete="off">`;
       html += `<div class="stats-table-wrap"><table class="stats-table" id="leaderList">
-        <thead><tr><th></th>${th('colPlayer')}${th('colTeam')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
+        <thead><tr><th></th>${th('colPlayer')}${th('colTeam')}${th('colWarsPlayed','tipWarsPlayed','num')}${th('colWinPct','tipWinPct','num')}${th('colAvg','tipAvg','num')}${th('colRankScore','tipRankScore','num')}${th('colBestTrack','tipBestTrack')}${th('colConsistency','tipConsistency','num')}${th('colClutch','tipClutch','num')}</tr></thead>
         <tbody>`;
       all.forEach((p,i)=>{
         const bestTid = raceStats.bestTrackForPlayer[p.tag+'|'+p.name];
@@ -3247,7 +3252,8 @@ function renderPlayersView(){
           <td class="lteam">${teamName(p.tag)}</td>
           <td class="num">${formatMatchCount(p.count)}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
-          <td class="num highlight">${p.avg.toFixed(1)}</td>
+          <td class="num">${p.avg.toFixed(1)}</td>
+          <td class="num highlight">${rankAvg(p.count,p.avg).toFixed(1)}</td>
           <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
           <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
           <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
