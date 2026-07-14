@@ -321,14 +321,20 @@
   .cal-date{font-size:12px;color:var(--dim);white-space:nowrap;flex-shrink:0;text-align:right;}
   .cal-date.emphasize{color:var(--gold);font-weight:700;font-size:13px;}
 
-  /* Fixed 3-column fixture: home | centre | away. The two team columns are exactly
-     equal (1fr each) and the centre is a fixed-width column, so the score/"vs" is
-     always dead-centre and in the same spot on every card. */
+  /* Desktop: fixed 3-column fixture — home | centre | away. The two team columns are
+     exactly equal (1fr each) and the centre is a fixed-width column, so the score/"vs"
+     is always dead-centre and in the same spot on every card. The inline "mg-vs"
+     separator is hidden here (only used in the stacked mobile layout). */
   .mg-fixture{
     display:grid;
     grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);
+    grid-template-areas:"home score away";
     align-items:center;column-gap:8px;
   }
+  .mg-home{grid-area:home;}
+  .cal-score{grid-area:score;}
+  .mg-away{grid-area:away;}
+  .mg-vs{display:none;}
   .mg-side{
     display:flex;align-items:center;gap:9px;min-width:0;
     font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;
@@ -343,6 +349,7 @@
   .mg-side .teamname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);text-align:center;white-space:nowrap;font-weight:700;}
   .cal-score .vs{font-size:13px;color:var(--dim);text-transform:uppercase;}
+  .mg-vs{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:12px;text-transform:uppercase;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{
     display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:9px;
@@ -616,16 +623,25 @@
     .groups-grid{grid-template-columns:1fr;}
     .flag-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
 
-    /* Mobile match cards keep the same fixed, symmetric two-row layout; just tighten
-       the padding, fonts and the centre column so two names still fit on one line. */
+    /* Phones: two long names can't fit beside a centre score, so the fixture stacks —
+       line 1 is "A vs B", line 2 is the score underneath (upcoming matches show just
+       "A vs B", since the standalone "vs" already conveys it). */
     .cal-item{padding:10px 12px;gap:7px;}
     .cal-stage{font-size:10px;}
     .cal-date{font-size:11px;}
     .cal-date.emphasize{font-size:12px;}
-    .mg-fixture{grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr);column-gap:6px;}
-    .mg-side{font-size:13px;gap:7px;}
-    .cal-score{font-size:14px;}
+    .mg-fixture{
+      grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+      grid-template-areas:"home vs away" "score score score";
+      row-gap:4px;column-gap:8px;
+    }
+    .mg-vs{display:inline-block;grid-area:vs;}
+    .mg-side{font-size:14px;gap:7px;}
+    .cal-score{grid-area:score;font-size:15px;margin-top:1px;}
     .cal-score .vs{font-size:12px;}
+    /* Upcoming matches: the "vs" separator already says it — hide the redundant
+       centre score cell so there's no empty second line. */
+    .cal-item.is-upcoming .cal-score{display:none;}
 
     /* On phones, stack each team as its own full-width row with the score pinned to
        the right, so it's obvious which score belongs to which team. */

@@ -1118,17 +1118,17 @@ function matchCardHTML(it){
   const mid = played
     ? `<span class="cal-score done">${scoreHTML}</span>`
     : `<span class="cal-score"><span class="vs">${t('vs')}</span></span>`;
-  // Fixed, symmetric grid: home team (pushed toward the centre from the left) |
-  // score/vs in a fixed centre column | away team (from the centre to the right).
-  // The two team columns are exactly equal width, so the centre is always in the
-  // same place across every card and nothing can shift or wrap.
-  return `<div class="cal-item match-card" data-matchref="${it.matchRef}">
+  // Desktop: fixed symmetric grid — home team | score/vs centre column | away team.
+  // Phones: the fixture stacks into two lines — "A vs B" on top, the score below —
+  // so two long names no longer collide (handled purely in CSS via grid areas).
+  return `<div class="cal-item match-card ${played?'is-played':'is-upcoming'}" data-matchref="${it.matchRef}">
     <div class="mg-top">
       <span class="cal-stage">${it.stage}${ff}</span>
       <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
     </div>
     <div class="mg-fixture">
       <span class="mg-side mg-home">${teamPlainHTML(it.h)}</span>
+      <span class="mg-vs">${t('vs')}</span>
       ${mid}
       <span class="mg-side mg-away">${teamPlainHTML(it.a)}</span>
     </div>
@@ -2063,26 +2063,28 @@ function renderTeamDetail(tag){
           const won = draw || Number(u.sc[0])>Number(u.sc[1]);
           const lost = draw || Number(u.sc[0])<Number(u.sc[1]);
           const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
-          return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
+          return `<div class="cal-item match-card is-played" data-matchref="${u.matchRef}">
           <div class="mg-top">
             <span class="cal-stage">${u.stage}${ff}</span>
             <span class="cal-date">${u.date}</span>
           </div>
           <div class="mg-fixture">
             <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
+            <span class="mg-vs">${t('vs')}</span>
             <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
             <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
           </div>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('upcomingMatches')}</h3>
-      ${upcoming.length? `<div class="cal-list" style="margin-bottom:8px;">${upcoming.map(u=>`<div class="cal-item match-card" data-matchref="${u.matchRef}">
+      ${upcoming.length? `<div class="cal-list" style="margin-bottom:8px;">${upcoming.map(u=>`<div class="cal-item match-card is-upcoming" data-matchref="${u.matchRef}">
           <div class="mg-top">
             <span class="cal-stage">${u.stage}</span>
             <span class="cal-date emphasize">${u.date}</span>
           </div>
           <div class="mg-fixture">
             <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
+            <span class="mg-vs">${t('vs')}</span>
             <span class="cal-score"><span class="vs">${t('vs')}</span></span>
             <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
           </div>
