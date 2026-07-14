@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kraken8196.github.io/mkwc-tracker/sitemap.xml
