@@ -1218,6 +1218,9 @@ function getPlayInRecap(){
   const trackUses = {}; // trackId -> selections
   const teamPts = {}, teamGames = {}, teamRec = {}; // tag -> pts / games / [w,d,l]
   const distinctTracks = new Set();
+  // Count players by team+name so two different people sharing a nickname across teams
+  // (e.g. a "Francis" in both LUX and PE) are counted separately.
+  const distinctPlayers = new Set();
   let racesPlayed = 0, totalPoints = 0;
 
   function bump(obj,k,by){ obj[k]=(obj[k]||0)+by; }
@@ -1234,7 +1237,7 @@ function getPlayInRecap(){
     (m.tracks||[]).forEach(tid=>{ if(tid){ bump(trackUses,tid,1); distinctTracks.add(tid); } });
     // per race: credit the right player (handles substitutes) and per-track scoring
     const raceIdxSeen = new Set();
-    [['h',m.H],['a',m.A]].forEach(([side])=>{
+    [['h',m.H],['a',m.A]].forEach(([side, teamTag])=>{
       (m.pl[side]||[]).forEach(p=>{
         if(!p||!p.n) return;
         const races = p.races||[];
@@ -1244,6 +1247,7 @@ function getPlayInRecap(){
           const owner = raceOwnerName(p,i);
           praces[owner]=praces[owner]||[]; praces[owner].push(val);
           if(val===15) bump(p15,owner,1);
+          distinctPlayers.add(teamTag+'|'+owner);
           const tid = m.tracks[i];
           if(tid){ trackScores[tid]=trackScores[tid]||[]; trackScores[tid].push({n:owner,v:val}); }
           raceIdxSeen.add(i);
@@ -1264,7 +1268,7 @@ function getPlayInRecap(){
     });
   });
 
-  const playersPlayed = Object.keys(praces).length;
+  const playersPlayed = distinctPlayers.size;
 
   // --- Match highlights ---
   const draw = matches.find(m=>m.scH===m.scA) || null;
