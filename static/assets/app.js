@@ -1445,12 +1445,27 @@ function renderHomeView(){
   ensureHomeLiveRefresh();
 }
 let homeLiveRefreshStarted = false;
+let lastHomeLiveSig = null;
+// A compact signature of everything on the home page that changes on its own over
+// time: which matches are live right now, and which match is up next. We only
+// re-render the home view when this actually changes, so the periodic tick no longer
+// rebuilds the DOM (and reloads every flag image) every 30s for nothing.
+function homeLiveSignature(){
+  const live = getLiveMatchesNow().map(it=>it.matchRef).sort().join(',');
+  const next = getNextScheduledMatch();
+  return live + '|' + (next ? next.matchRef : '');
+}
 function ensureHomeLiveRefresh(){
   if(homeLiveRefreshStarted) return;
   homeLiveRefreshStarted = true;
+  lastHomeLiveSig = homeLiveSignature();
   setInterval(()=>{
     const el = document.getElementById('view-home');
-    if(el && el.classList.contains('active')) renderHomeView();
+    if(!el || !el.classList.contains('active')) return;
+    const sig = homeLiveSignature();
+    if(sig === lastHomeLiveSig) return; // nothing changed → leave the DOM (and flags) alone
+    lastHomeLiveSig = sig;
+    renderHomeView();
   }, 30000);
 }
 

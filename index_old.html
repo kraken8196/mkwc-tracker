@@ -2592,12 +2592,23 @@ function renderHomeView(){
   ensureHomeLiveRefresh();
 }
 let homeLiveRefreshStarted = false;
+let lastHomeLiveSig = null;
+function homeLiveSignature(){
+  const live = getLiveMatchesNow().map(it=>it.matchRef).sort().join(',');
+  const next = getNextScheduledMatch();
+  return live + '|' + (next ? next.matchRef : '');
+}
 function ensureHomeLiveRefresh(){
   if(homeLiveRefreshStarted) return;
   homeLiveRefreshStarted = true;
+  lastHomeLiveSig = homeLiveSignature();
   setInterval(()=>{
     const el = document.getElementById('view-home');
-    if(el && el.classList.contains('active')) renderHomeView();
+    if(!el || !el.classList.contains('active')) return;
+    const sig = homeLiveSignature();
+    if(sig === lastHomeLiveSig) return; // nothing changed → leave the DOM (and flags) alone
+    lastHomeLiveSig = sig;
+    renderHomeView();
   }, 30000);
 }
 
