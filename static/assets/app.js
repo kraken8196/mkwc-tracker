@@ -786,10 +786,10 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
   });
   return `<div class="group-card"${anchorId?` id="${anchorId}"`:''}>
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
-    <table class="standings">
+    <div class="standings-scroll"><table class="standings">
       <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num col-w')}${th('colD','tipD','num col-d')}${th('colL','tipL','num col-l')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
       <tbody>${rows}</tbody>
-    </table>
+    </table></div>
   </div>`;
 }
 
@@ -1115,10 +1115,14 @@ function matchCardHTML(it){
     scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
+  // Symmetric layout: home team | score-or-vs | away team, so the "–" / "vs" always
+  // sits dead-centre between the two teams (same shape as the team-page result cards).
+  const centre = played ? scoreHTML : `<span class="vs">${t('vs')}</span>`;
   return `<div class="cal-item match-card" data-matchref="${it.matchRef}">
     <span class="cal-stage">${it.stage}${ff}</span>
-    <span class="cal-teams">${teamPlainHTML(it.h)} <span class="vs">${t('vs')}</span> ${teamPlainHTML(it.a)}</span>
-    <span class="cal-score ${played?'done':''}">${scoreHTML}</span>
+    <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(it.h)}</span></span>
+    <span class="cal-score ${played?'done':''}">${centre}</span>
+    <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(it.a)}</span></span>
     <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
   </div>`;
 }
@@ -1375,15 +1379,15 @@ function renderHomeView(){
       <span class="nt-title">${nt('title')}</span>
       <span class="nt-cta">${t('nutshellRead')} →</span>
     </a>` : ''}
-    <div class="stage-note" style="font-size:15px;margin:18px 0 24px;">${t('homeIntro')}</div>
+    <div class="stage-note" style="font-size:14px;margin:14px 0 18px;">${t('homeIntro')}</div>
 
-    <div class="match-progress" style="margin-bottom:30px;">
+    <div class="match-progress" style="margin-bottom:24px;">
       <div class="match-progress-label">${t('homeFactMatches')} <b>${matchesPlayed} / ${totalMatches}</b></div>
       <div class="match-progress-bar"><div class="match-progress-fill" style="width:${pct}%;"></div></div>
     </div>
 
-    <h2 class="outline" style="font-size:22px;margin-bottom:14px;">${t('homeFormatTitle')}</h2>
-    <div class="groups-grid" style="margin-bottom:34px;align-items:stretch;">
+    <h2 class="outline" style="font-size:19px;margin-bottom:12px;">${t('homeFormatTitle')}</h2>
+    <div class="groups-grid" style="margin-bottom:26px;align-items:stretch;">
       <div class="group-card format-card">
         <h3>${t('homeStep1Title')} <span class="qual-tag">${t('homeStep1Date')}</span></h3>
         <div class="stage-note" style="margin-bottom:0;">${t('homeStep1Desc')}</div>
@@ -1399,15 +1403,15 @@ function renderHomeView(){
     </div>
 
     <div class="stage-block">
-      <h2 class="outline" style="font-size:20px;margin-bottom:12px;">${t('homeRecent')}</h2>
+      <h2 class="outline" style="font-size:18px;margin-bottom:10px;">${t('homeRecent')}</h2>
       ${recent.length? `<div class="cal-list">${recent.map(matchCardHTML).join('')}</div>` : `<div class="helptext">${t('homeNoResults')}</div>`}
     </div>
     <div class="stage-block">
-      <h2 class="outline" style="font-size:20px;margin-bottom:12px;">${t('homeUpcoming')}</h2>
+      <h2 class="outline" style="font-size:18px;margin-bottom:10px;">${t('homeUpcoming')}</h2>
       ${upcoming.length? `<div class="cal-list">${upcoming.map(matchCardHTML).join('')}</div>` : `<div class="helptext">${t('calNoMatch')}</div>`}
     </div>
 
-    <h2 class="outline" style="font-size:20px;margin-bottom:14px;">${t('homeExploreTitle')}</h2>
+    <h2 class="outline" style="font-size:18px;margin-bottom:12px;">${t('homeExploreTitle')}</h2>
     <div class="groups-grid" style="margin-bottom:10px;">
       <div class="group-card explore-card" data-navto="standings"><h3>${t('homeLinkStandings')}</h3></div>
       <div class="group-card explore-card" data-navto="calendar"><h3>${t('homeLinkCalendar')}</h3></div>
