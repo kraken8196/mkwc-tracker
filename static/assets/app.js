@@ -1112,7 +1112,7 @@ function matchCardHTML(it){
     const draw = Number(it.sc[0])===Number(it.sc[1]);
     const hWin = draw || Number(it.sc[0])>Number(it.sc[1]);
     const aWin = draw || Number(it.sc[1])>Number(it.sc[0]);
-    scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
+    scoreHTML = `<span class="sc-h ${hWin?'score-win':'score-lose'}">${it.sc[0]}</span><span class="sc-d">–</span><span class="sc-a ${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
   const mid = played
@@ -2071,7 +2071,7 @@ function renderTeamDetail(tag){
           <div class="mg-fixture">
             <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
             <span class="mg-vs">${t('vs')}</span>
-            <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+            <span class="cal-score done"><span class="sc-h ${won?'score-win':'score-lose'}">${u.sc[0]}</span><span class="sc-d">–</span><span class="sc-a ${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
             <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
           </div>
         </div>`;

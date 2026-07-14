@@ -327,7 +327,7 @@
      separator is hidden here (only used in the stacked mobile layout). */
   .mg-fixture{
     display:grid;
-    grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr);
     grid-template-areas:"home score away";
     align-items:center;column-gap:8px;
   }
@@ -349,6 +349,13 @@
   .mg-side .teamname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);text-align:center;white-space:nowrap;font-weight:700;}
   .cal-score .vs{font-size:13px;color:var(--dim);text-transform:uppercase;}
+  /* Score as an inner 3-cell grid (left number | dash | right number) so the dash is
+     always dead-centre — even for a lopsided score like 150–0 — and lands exactly
+     where the "vs" would be. */
+  .cal-score.done{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;column-gap:5px;}
+  .cal-score.done .sc-h{text-align:right;}
+  .cal-score.done .sc-a{text-align:left;}
+  .cal-score.done .sc-d{color:var(--dim);}
   .mg-vs{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:12px;text-transform:uppercase;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{

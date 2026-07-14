@@ -313,7 +313,7 @@
 
   .mg-fixture{
     display:grid;
-    grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr);
     grid-template-areas:"home score away";
     align-items:center;column-gap:8px;
   }
@@ -332,6 +332,10 @@
   .mg-side .teamname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
   .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);text-align:center;white-space:nowrap;font-weight:700;}
   .cal-score .vs{font-size:13px;color:var(--dim);text-transform:uppercase;}
+  .cal-score.done{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;column-gap:5px;}
+  .cal-score.done .sc-h{text-align:right;}
+  .cal-score.done .sc-a{text-align:left;}
+  .cal-score.done .sc-d{color:var(--dim);}
   .mg-vs{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:12px;text-transform:uppercase;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{
@@ -2273,7 +2277,7 @@ function matchCardHTML(it){
     const draw = Number(it.sc[0])===Number(it.sc[1]);
     const hWin = draw || Number(it.sc[0])>Number(it.sc[1]);
     const aWin = draw || Number(it.sc[1])>Number(it.sc[0]);
-    scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
+    scoreHTML = `<span class="sc-h ${hWin?'score-win':'score-lose'}">${it.sc[0]}</span><span class="sc-d">–</span><span class="sc-a ${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
   const mid = played
@@ -3213,7 +3217,7 @@ function renderTeamDetail(tag){
           <div class="mg-fixture">
             <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
             <span class="mg-vs">${t('vs')}</span>
-            <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+            <span class="cal-score done"><span class="sc-h ${won?'score-win':'score-lose'}">${u.sc[0]}</span><span class="sc-d">–</span><span class="sc-a ${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
             <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
           </div>
         </div>`;
