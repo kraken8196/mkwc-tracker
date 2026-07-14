@@ -806,6 +806,55 @@ function teamFullName(tag){
   const f = FULL_TEAM_NAMES[LANG] || FULL_TEAM_NAMES.fr;
   return (f && f[tag]) || teamName(tag);
 }
+// French definite article per team, so generated sentences read correctly
+// ("la Grande Colombie", "les Pays-Bas", "l'Europe de l'Est", "le Pérou").
+// Value: 'le' | 'la' | 'les' | "l'" | '' (no article, e.g. acronyms).
+const TEAM_ARTICLE_FR = {
+  FR:'la', JPN:'le', ESP:"l'", USA:'les', CAN:'le', ENG:"l'", ITA:"l'", GER:"l'",
+  KOR:'la', MEX:'le', BE:'la', AUS:"l'", IRE:"l'", CB:'la', EEU:"l'", CL:'le',
+  VE:'le', PE:'le', EC:'la', RD:'la', ASIA:"l'", MENA:'', CA:"l'", PT:'le',
+  BRA:'le', CH:'la', HKT:'', NL:'les', PR:'', AUT:"l'", LUX:'le'
+};
+// Teams whose French name is plural (take "les" and a plural verb).
+const TEAM_PLURAL_FR = new Set(['USA','NL']);
+function teamIsPluralFr(tag){ return TEAM_PLURAL_FR.has(tag); }
+// French plural verb ending: 'nt' for plural teams (les Pays-Bas affiche+nt), '' otherwise.
+function frVerbEnding(tag){ return (LANG==='fr' && teamIsPluralFr(tag)) ? 'nt' : ''; }
+// Returns the team name prefixed with its French article. cap=true capitalizes the
+// article for sentence starts. Non-FR languages just return the plain name.
+function teamWithArticle(tag, cap){
+  const name = teamName(tag);
+  if(LANG!=='fr') return name;
+  let art = TEAM_ARTICLE_FR[tag];
+  if(art==null) art = 'le';
+  if(art==='') return name; // no article (acronyms, proper compounds)
+  const elided = art==="l'"; // no space after an elided article ("l'Europe")
+  if(cap) art = art.charAt(0).toUpperCase()+art.slice(1);
+  return elided ? art+name : art+' '+name;
+}
+// Team name after a French preposition, applying contractions:
+// de+le=du, de+les=des ; à+le=au, à+les=aux ; contre keeps the article as-is.
+function teamAfterPrep(tag, prep){
+  const name = teamName(tag);
+  if(LANG!=='fr') return prep+' '+name;
+  const art = TEAM_ARTICLE_FR[tag];
+  if(art==null || art==='') return prep+' '+name; // no article → keep preposition + name
+  if(prep==='de'){
+    if(art==='le') return 'du '+name;
+    if(art==='les') return 'des '+name;
+    if(art==='la') return 'de la '+name;
+    if(art==="l'") return "de l'"+name;
+  }
+  if(prep==='à'){
+    if(art==='le') return 'au '+name;
+    if(art==='les') return 'aux '+name;
+    if(art==='la') return 'à la '+name;
+    if(art==="l'") return "à l'"+name;
+  }
+  // other prepositions (contre, pour...) just take the article: "contre la Grande Colombie"
+  return prep+' '+(art==="l'" ? art+name : art+' '+name);
+}
+
 
 const I18N = {
   fr:{
@@ -4190,11 +4239,11 @@ const NUTSHELL_I18N = {
     hTracks:'Les circuits',
     hDyk:'Le saviez-vous ?',
     draw:'Sur l’ensemble de la phase, un seul match n’a pas trouvé de vainqueur : <b>{h}</b> et <b>{a}</b> se sont quittés dos à dos, incapables de se départager au terme des douze courses.',
-    comeback:'<b>{winner}</b> signe aussi la plus belle remontée de la phase. Mené de <fig>{deficit}</fig> points contre <b>{loser}</b>, l’équipe a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé du Play-In.',
+    comeback:'<b>{winner}</b> signe{verb} aussi la plus belle remontée de la phase. Menée de <fig>{deficit}</fig> points contre <b>{loser}</b>, l’équipe a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé du Play-In.',
     indiv:'Un nom revient plus que les autres : <b>{player}</b>. Il détient le meilleur total individuel de la phase avec <fig>{best}</fig> points sur un seul match, et a franchi la ligne en tête à <fig>{perfect}</fig> reprises — le plus grand nombre de courses gagnées par un joueur sur le Play-In.',
     consistent:'Côté régularité, <b>{player}</b> se distingue comme le joueur le plus constant du plateau : ses scores restent au plus près de sa moyenne d’une course à l’autre.',
     undefeated:'{count} nations terminent le Play-In sans la moindre défaite : {list}.',
-    offense:'<b>{team}</b> affiche la meilleure moyenne offensive, avec <fig>{avg}</fig> points marqués par match.',
+    offense:'<b>{team}</b> affiche{verb} la meilleure moyenne offensive, avec <fig>{avg}</fig> points marqués par match.',
     trackMost:'Parmi les trente circuits du jeu, un seul a été choisi plus souvent que les autres : <b>{track}</b>, sélectionné à <fig>{n}</fig> reprises par les équipes.',
     trackSkill:'Mais tous les tracés ne se valent pas pour l’élite. En regardant le score moyen des meilleurs joueurs de la phase, circuit par circuit, deux profils se détachent nettement. C’est sur <b>{skill}</b> que le niveau s’exprime le plus : les joueurs du haut du classement y marquent en moyenne <fig>{skillAvg}</fig> points par course, bien au-dessus de leur moyenne générale. À l’inverse, <b>{leveller}</b> est le circuit où ils peinent le plus à se détacher, avec <fig>{levAvg}</fig> de moyenne : un tracé qui a tendance à rebattre les cartes.',
     dyk1:'En tout, la phase de Play-In aura réuni <fig>{players}</fig> joueurs sur la piste, pour <fig>{matches}</fig> matchs et <fig>{races}</fig> courses disputées. Mises bout à bout, ces courses représentent <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
@@ -4287,11 +4336,11 @@ function renderNutshellView(){
 
   paras.push(`<h2 class="np-h2">${nt('hMatches')}</h2>`);
   if(r.draw){
-    paras.push(`<p>${nt('draw',{h:teamName(r.draw.H), a:teamName(r.draw.A)})}</p>`);
+    paras.push(`<p>${nt('draw',{h:teamWithArticle(r.draw.H,true), a:teamWithArticle(r.draw.A,false)})}</p>`);
     paras.push(`<div class="np-score"><span class="t">${teamName(r.draw.H)}</span><span class="n">${r.draw.scH}</span><span class="d">–</span><span class="n">${r.draw.scA}</span><span class="t">${teamName(r.draw.A)}</span></div>`);
   }
   if(r.comeback){
-    paras.push(`<p>${nt('comeback',{winner:teamName(r.comeback.winner), loser:teamName(r.comeback.loser), deficit:Math.abs(r.comeback.deficit), scW:r.comeback.scW, scL:r.comeback.scL})}</p>`);
+    paras.push(`<p>${nt('comeback',{winner:teamWithArticle(r.comeback.winner,true), verb:frVerbEnding(r.comeback.winner), loser:teamWithArticle(r.comeback.loser,false), deficit:Math.abs(r.comeback.deficit), scW:r.comeback.scW, scL:r.comeback.scL})}</p>`);
   }
 
   paras.push(`<h2 class="np-h2">${nt('hIndiv')}</h2>`);
@@ -4309,7 +4358,7 @@ function renderNutshellView(){
     paras.push(`<p>${nt('undefeated',{count:list.length, list:joined})}</p>`);
   }
   if(r.bestOffense){
-    paras.push(`<p>${nt('offense',{team:teamName(r.bestOffense[0]), avg:Math.round(r.bestOffense[1])})}</p>`);
+    paras.push(`<p>${nt('offense',{team:teamWithArticle(r.bestOffense[0],true), verb:frVerbEnding(r.bestOffense[0]), avg:Math.round(r.bestOffense[1])})}</p>`);
   }
 
   paras.push(`<h2 class="np-h2">${nt('hTracks')}</h2>`);
