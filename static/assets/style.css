@@ -89,6 +89,17 @@
   }
   .lang-switch button:hover{color:var(--cream);}
   .lang-switch button.active{background:var(--gold);color:#3a2100;}
+  /* Share button in the header — shares the current view's URL. */
+  .share-btn{
+    display:inline-flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line-strong);border-radius:8px;
+    color:var(--dim);padding:6px 11px;font-family:'JetBrains Mono',monospace;font-size:11px;
+    font-weight:700;letter-spacing:0.03em;text-transform:uppercase;transition:color .15s, border-color .15s;
+  }
+  .share-btn:hover{color:var(--cream);border-color:var(--gold);}
+  .share-btn.copied{color:var(--gold);border-color:var(--gold);}
+  .share-btn svg{display:block;}
+  @media (max-width:680px){ .share-btn .share-label{display:none;} .share-btn{padding:6px 8px;} }
 
   /* ---------- hero ---------- */
   .hero{

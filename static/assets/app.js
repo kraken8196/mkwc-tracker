@@ -133,7 +133,7 @@ function teamAfterPrep(tag, prep){
 
 const I18N = {
   fr:{
-    liveTracking:'Suivi en direct', navHome:'Accueil', navStandings:'Classements & Bracket', navCalendar:'Calendrier', navTeams:'Équipes', navPlayers:'Stats', navFlags:'🎨 Drapeaux', navAdmin:'⚙ Admin',
+    liveTracking:'Suivi en direct', navHome:'Accueil', navStandings:'Classements & Bracket', navCalendar:'Calendrier', navTeams:'Équipes', navPlayers:'Stats', navFlags:'🎨 Drapeaux', navAdmin:'⚙ Admin', share:'Partager', shareCopied:'Lien copié !', shareText:'MKWC 2026 — Suivi en direct',
     heroTitleStandings:'Classements & Bracket', heroSubStandings:'Résultats et classement de chaque groupe, et bracket final',
     homeIntro:"Bienvenue sur le site de suivi de la Coupe du Monde Mario Kart World 2026 ! 31 équipes nationales s'affrontent en trois étapes, du 10 juillet au 2 août, pour désigner le champion du monde.",
     homeFormatTitle:'Comment ça marche ?',
@@ -201,7 +201,7 @@ const I18N = {
     footer:'Projet de suivi communautaire, non affilié à Nintendo. Les données sont saisies manuellement et visibles par toute personne ayant ce lien.',
   },
   en:{
-    liveTracking:'Live tracking', navHome:'Home', navStandings:'Standings & Bracket', navCalendar:'Calendar', navTeams:'Teams', navPlayers:'Stats', navFlags:'🎨 Flags', navAdmin:'⚙ Admin',
+    liveTracking:'Live tracking', navHome:'Home', navStandings:'Standings & Bracket', navCalendar:'Calendar', navTeams:'Teams', navPlayers:'Stats', navFlags:'🎨 Flags', navAdmin:'⚙ Admin', share:'Share', shareCopied:'Link copied!', shareText:'MKWC 2026 — Live tracking',
     heroTitleStandings:'Standings & Bracket', heroSubStandings:'Results and standings for every group, and the final bracket',
     homeIntro:"Welcome to the live tracker for the 2026 Mario Kart World Cup! 31 national teams compete over three stages, from July 10 to August 2, to crown the world champion.",
     homeFormatTitle:'How it works',
@@ -269,7 +269,7 @@ const I18N = {
     footer:"Community tracking project, not affiliated with Nintendo. Data is entered manually and visible to anyone with this link.",
   },
   es:{
-    liveTracking:'Seguimiento en directo', navHome:'Inicio', navStandings:'Clasificación y Cuadro', navCalendar:'Calendario', navTeams:'Equipos', navPlayers:'Stats', navFlags:'🎨 Banderas', navAdmin:'⚙ Admin',
+    liveTracking:'Seguimiento en directo', navHome:'Inicio', navStandings:'Clasificación y Cuadro', navCalendar:'Calendario', navTeams:'Equipos', navPlayers:'Stats', navFlags:'🎨 Banderas', navAdmin:'⚙ Admin', share:'Compartir', shareCopied:'¡Enlace copiado!', shareText:'MKWC 2026 — Seguimiento en directo',
     heroTitleStandings:'Clasificación y Cuadro', heroSubStandings:'Resultados y clasificación de cada grupo, y el cuadro final',
     homeIntro:'¡Bienvenido al sitio de seguimiento de la Copa Mundial de Mario Kart World 2026! 31 selecciones nacionales compiten en tres fases, del 10 de julio al 2 de agosto, para coronar al campeón del mundo.',
     homeFormatTitle:'¿Cómo funciona?',
@@ -337,7 +337,7 @@ const I18N = {
     footer:'Proyecto de seguimiento comunitario, no afiliado a Nintendo. Los datos se introducen manualmente y son visibles para cualquiera que tenga este enlace.',
   },
   ja:{
-    liveTracking:'ライブ速報', navHome:'ホーム', navStandings:'順位表・トーナメント表', navCalendar:'カレンダー', navTeams:'チーム', navPlayers:'スタッツ', navFlags:'🎨 旗エディタ', navAdmin:'⚙ 管理者',
+    liveTracking:'ライブ速報', navHome:'ホーム', navStandings:'順位表・トーナメント表', navCalendar:'カレンダー', navTeams:'チーム', navPlayers:'スタッツ', navFlags:'🎨 旗エディタ', navAdmin:'⚙ 管理者', share:'シェア', shareCopied:'リンクをコピーしました！', shareText:'MKWC 2026 — ライブ速報',
     heroTitleStandings:'順位表・トーナメント表', heroSubStandings:'各グループの結果・順位と決勝トーナメント表',
     homeIntro:'マリオカートワールドカップ2026 ライブ速報サイトへようこそ！31の国・地域代表チームが7月10日から8月2日まで3つのステージを戦い、世界チャンピオンを決定します。',
     homeFormatTitle:'大会形式',
@@ -2589,11 +2589,36 @@ function renderLangSwitch(){
     try{ localStorage.setItem('mkwc_lang_pref', LANG); }catch(e){}
     applyStaticI18n();
     renderLangSwitch();
+    wireShareButton();
     updateHero(currentView);
     renderAll();
     if(currentView==='match') renderMatchDetail(selectedMatch);
     if(currentView==='player' && selectedPlayer) renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
   });
+}
+// Header "Share" button: uses the native share sheet on mobile, otherwise copies the
+// current view's URL to the clipboard with a brief "Link copied!" confirmation.
+function wireShareButton(){
+  const btn = document.getElementById('shareBtn');
+  if(!btn) return;
+  btn.title = t('share'); btn.setAttribute('aria-label', t('share'));
+  btn.onclick = async ()=>{
+    const url = location.href; // hash already reflects the current view
+    if(navigator.share){
+      try{ await navigator.share({title:t('shareText'), url}); return; }
+      catch(e){ if(e && e.name==='AbortError') return; /* user cancelled */ }
+    }
+    // Desktop / no native share: copy the link
+    try{ await navigator.clipboard.writeText(url); }
+    catch(e){
+      const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta);
+      ta.select(); try{ document.execCommand('copy'); }catch(_){ } ta.remove();
+    }
+    const label = btn.querySelector('.share-label');
+    const prev = label ? label.textContent : '';
+    btn.classList.add('copied'); if(label) label.textContent = t('shareCopied');
+    setTimeout(()=>{ btn.classList.remove('copied'); if(label) label.textContent = prev || t('share'); }, 1800);
+  };
 }
 async function loadLangPref(){
   // English by default for a visitor's very first visit; their own past choice
@@ -2604,9 +2629,34 @@ async function loadLangPref(){
   }catch(e){ /* stick with the English default */ }
 }
 
+// Restore the view encoded in the URL hash so shared deep links open the right page
+// (#teams/FR, #match/<ref>, #player/FR/<name>, or a plain view like #nutshell).
+// Returns true if a specific view was applied.
+function applyHashRoute(){
+  const h = (location.hash || '').replace(/^#/, '');
+  if(!h) return false;
+  const parts = h.split('/');
+  const view = parts[0];
+  try{
+    if(view==='teams' && parts[1] && TEAMS[parts[1]]){
+      selectedTeam = parts[1]; setView('teams'); renderTeamsView(); return true;
+    }
+    if(view==='match' && parts[1]){
+      selectedMatch = decodeURIComponent(parts.slice(1).join('/')); setView('match'); renderMatchDetail(selectedMatch); return true;
+    }
+    if(view==='player' && parts[1] && parts[2]){
+      selectedPlayer = {tag:parts[1], name:decodeURIComponent(parts.slice(2).join('/'))};
+      setView('player'); renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name); return true;
+    }
+    if(['home','standings','calendar','teams','players','nutshell'].includes(view)){
+      setView(view); return true;
+    }
+  }catch(e){ /* malformed hash — fall back to the page's default view */ }
+  return false;
+}
+
 (async function init(){
   __trace('init() démarre');
-  try{ history.replaceState({view: currentView, selectedTeam:null, selectedMatch:null}, '', '#'+currentView); }catch(e){}
   __trace('avant loadState');
   await loadState();
   __trace('après loadState');
@@ -2614,10 +2664,13 @@ async function loadLangPref(){
   await loadLangPref();
   applyStaticI18n();
   renderLangSwitch();
+  wireShareButton();
   updateHero(currentView);
   __trace('avant renderAll (premier rendu)');
   renderAll();
   __trace('après renderAll (premier rendu)');
+  // A shared deep link (#teams/FR, #match/…, #player/…) opens straight to that view.
+  applyHashRoute();
   const loadScreen = document.getElementById('loadScreen');
   if(loadScreen){
     loadScreen.style.transition = 'opacity .25s ease';
