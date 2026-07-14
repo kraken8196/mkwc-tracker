@@ -777,9 +777,9 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
       <td class="${posClass}">P${i+1}</td>
       <td><div class="teamcell">${r.tag? teamLinkHTML(r.tag) : tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</div></td>
       <td class="num">${r.played}</td>
-      <td class="num">${r.w}</td>
-      <td class="num">${r.d}</td>
-      <td class="num">${r.l}</td>
+      <td class="num col-w">${r.w}</td>
+      <td class="num col-d">${r.d}</td>
+      <td class="num col-l">${r.l}</td>
       <td class="num">${r.diff>0?'+':''}${r.diff}</td>
       <td class="num pts-col">${r.pts}</td>
     </tr>`;
@@ -787,7 +787,7 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
   return `<div class="group-card"${anchorId?` id="${anchorId}"`:''}>
     <h3>${title} <span class="qual-tag">${hint||''}</span></h3>
     <table class="standings">
-      <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num')}${th('colD','tipD','num')}${th('colL','tipL','num')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
+      <thead><tr><th></th>${th('colTeam')}${th('colP','tipP','num')}${th('colW','tipW','num col-w')}${th('colD','tipD','num col-d')}${th('colL','tipL','num col-l')}${th('colDiff','tipDiff','num')}${th('colPts','tipPts','num pts-col')}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>`;
@@ -2680,6 +2680,63 @@ function wireShareButton(){
     setTimeout(()=>{ btn.classList.remove('copied'); if(label) label.textContent = prev || t('share'); }, 1800);
   };
 }
+/* =========================================================
+   MOBILE NAV — a hamburger button toggles the nav as a dropdown panel.
+   On phones the share button and language switch are moved into that panel
+   so the top bar stays clean; on wider screens they sit inline in the header
+   as before. The move is reversed when the viewport grows back.
+========================================================= */
+function wireMobileNav(){
+  const toggle = document.getElementById('navToggle');
+  const header = document.querySelector('header');
+  const nav = document.getElementById('primaryNav');
+  if(!toggle || !header || !nav) return;
+
+  // A backdrop element lets a tap outside the panel close it.
+  if(!header.querySelector('.nav-backdrop')){
+    const bd = document.createElement('div'); bd.className='nav-backdrop';
+    header.appendChild(bd);
+    bd.addEventListener('click', closeNav);
+  }
+  const MOBILE = () => window.matchMedia('(max-width:680px)').matches;
+  const shareBtn = document.getElementById('shareBtn');
+  const langSwitch = document.getElementById('langSwitch');
+  // Remember where share/lang originally live so we can put them back on desktop.
+  const shareHome = shareBtn ? {parent:shareBtn.parentNode, next:shareBtn.nextSibling} : null;
+  const langHome  = langSwitch ? {parent:langSwitch.parentNode, next:langSwitch.nextSibling} : null;
+
+  function placeControls(){
+    if(MOBILE()){
+      if(shareBtn && shareBtn.parentNode!==nav) nav.appendChild(shareBtn);
+      if(langSwitch && langSwitch.parentNode!==nav) nav.appendChild(langSwitch);
+    }else{
+      if(shareHome && shareBtn && shareBtn.parentNode!==shareHome.parent)
+        shareHome.parent.insertBefore(shareBtn, shareHome.next);
+      if(langHome && langSwitch && langSwitch.parentNode!==langHome.parent)
+        langHome.parent.insertBefore(langSwitch, langHome.next);
+    }
+  }
+  function openNav(){ header.classList.add('nav-open'); toggle.setAttribute('aria-expanded','true'); }
+  function closeNav(){ header.classList.remove('nav-open'); toggle.setAttribute('aria-expanded','false'); }
+  window.__closeMobileNav = closeNav;
+
+  toggle.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    header.classList.contains('nav-open') ? closeNav() : openNav();
+  });
+  // Tapping a nav link navigates and should close the panel.
+  nav.addEventListener('click', (e)=>{ if(e.target.closest('.navbtn')) closeNav(); });
+  // Esc closes it too.
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeNav(); });
+
+  placeControls();
+  let rt=null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(rt);
+    rt=setTimeout(()=>{ placeControls(); if(!MOBILE()) closeNav(); }, 150);
+  });
+}
+
 async function loadLangPref(){
   // English by default for a visitor's very first visit; their own past choice
   // (if any) takes over on later visits.
@@ -2725,6 +2782,7 @@ function applyHashRoute(){
   applyStaticI18n();
   renderLangSwitch();
   wireShareButton();
+  wireMobileNav();
   updateHero(currentView);
   __trace('avant renderAll (premier rendu)');
   renderAll();

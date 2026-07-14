@@ -17,6 +17,9 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  /* Never let a stray wide element push the whole page sideways on a phone —
+     wide content (tables, bracket) scrolls inside its own container instead. */
+  html,body{overflow-x:hidden;max-width:100%;}
   body{
     color:var(--cream);
     font-family:'Inter',sans-serif;
@@ -74,6 +77,11 @@
   }
   .navbtn:hover{color:#fff;}
   .navbtn.active{background:var(--gold);color:#3a2100;border-color:var(--gold);}
+  /* Hamburger: desktop hides it (inline nav is shown); mobile shows it. */
+  .nav-toggle{display:none;background:transparent;border:1px solid var(--line-strong);color:var(--cream);
+    border-radius:8px;padding:6px;margin-left:auto;cursor:pointer;line-height:0;flex-shrink:0;}
+  .nav-toggle .ic-close{display:none;}
+  .nav-backdrop{display:none;}
   .adminbtn{
     background:transparent;border:1px solid transparent;color:var(--dim);
     padding:6px 9px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'JetBrains Mono',monospace;
@@ -628,6 +636,45 @@
 
     .stats-table{font-size:12px;}
     .stats-table td,.stats-table thead th{padding:7px 8px;}
+
+    /* ---- Mobile header: a hamburger opens the nav as a dropdown panel ---- */
+    .header-inner{padding:9px 14px;gap:10px;overflow:visible;flex-wrap:nowrap;}
+    .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;}
+    /* The panel: full-width, drops below the sticky header, hidden until opened. */
+    nav{
+      position:absolute;left:0;right:0;top:100%;
+      flex-direction:column;gap:4px;margin:0;padding:8px;
+      background:rgba(20,10,3,0.98);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line-strong);
+      box-shadow:0 14px 24px rgba(0,0,0,0.35);
+      opacity:0;visibility:hidden;transform:translateY(-8px);
+      transition:opacity .16s ease, transform .16s ease, visibility .16s;
+    }
+    nav .navbtn{width:100%;text-align:left;padding:13px 16px;font-size:16px;border-radius:10px;}
+    /* Share + language live inside the panel on mobile, so the top bar stays clean. */
+    nav .share-btn{width:100%;justify-content:flex-start;padding:13px 16px;margin-top:4px;
+      border-top:1px solid var(--line);border-radius:0;}
+    nav .share-btn .share-label{display:inline;}
+    nav .lang-switch{align-self:flex-start;margin-top:8px;}
+    header.nav-open nav{opacity:1;visibility:visible;transform:translateY(0);}
+    /* Dim the page behind the open panel so a tap outside closes it. */
+    header.nav-open .nav-backdrop{display:block;position:fixed;inset:0;top:0;z-index:-1;background:rgba(0,0,0,0.35);}
+
+    /* Standings on a narrow screen: the essentials are Team · Played · Diff · Points.
+       Wins/Draws/Losses are secondary and squeeze the team name, so hide them here —
+       the same numbers are still on each team's page. */
+    table.standings{font-size:12px;}
+    table.standings th,table.standings td{padding:6px 5px;}
+  }
+
+  /* Extra-narrow phones: drop the W/D/L columns so team names never get crushed. */
+  @media (max-width:560px){
+    table.standings .col-w,
+    table.standings .col-d,
+    table.standings .col-l{display:none;}
+    .hero h1{font-size:clamp(19px,6.5vw,34px);}
+    .stat-strip{gap:8px;}
+    .stat-strip .s{padding:5px 9px;}
   }
   .editor-preview-box{
     background:var(--panel-2);border:1px solid var(--line-strong);border-radius:var(--radius);

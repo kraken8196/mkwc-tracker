@@ -45,7 +45,11 @@
         <div class="t2" data-i18n="liveTracking">Suivi en direct</div>
       </div>
     </a>
-    <nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="primaryNav">
+      <svg class="ic-open" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+      <svg class="ic-close" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+    </button>
+    <nav id="primaryNav">
       <a class="navbtn" data-view="home" data-i18n="navHome" href="home.html">Accueil</a>
       <a class="navbtn" data-view="standings" data-i18n="navStandings" href="standings.html">Classements &amp; Bracket</a>
       <a class="navbtn active" data-view="calendar" data-i18n="navCalendar" href="calendar.html">Calendrier</a>
