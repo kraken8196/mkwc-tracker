@@ -457,6 +457,8 @@
   /* Stat values stay white like the rest of the row (no gold highlight on e.g. the
      average), just kept slightly bold so the key number is still easy to spot. */
   .stats-table td.num.highlight{color:var(--cream);font-weight:700;}
+  /* The ranking rating is always gold — it's the value the table is sorted on. */
+  .stats-table td.num.rating{color:var(--gold);font-weight:700;}
   .stats-table .lp{font-family:'JetBrains Mono',monospace;color:var(--dim);width:24px;text-align:center;}
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}

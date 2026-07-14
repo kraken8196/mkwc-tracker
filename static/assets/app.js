@@ -2020,7 +2020,7 @@ function renderTeamDetail(tag){
               <td class="num">${s?formatMatchCount(s.count):'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
               <td class="num">${s?s.avg.toFixed(1):'—'}</td>
-              <td class="num ${s?'highlight':''}">${s?rankAvg(s.count,s.avg).toFixed(1):'—'}</td>
+              <td class="num rating">${s?rankAvg(s.count,s.avg).toFixed(1):'—'}</td>
               <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
               <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
               <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
@@ -2165,7 +2165,7 @@ function renderPlayersView(){
           <td class="num">${formatMatchCount(p.count)}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
           <td class="num">${p.avg.toFixed(1)}</td>
-          <td class="num highlight">${rankAvg(p.count,p.avg).toFixed(1)}</td>
+          <td class="num rating">${rankAvg(p.count,p.avg).toFixed(1)}</td>
           <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
           <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
           <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>

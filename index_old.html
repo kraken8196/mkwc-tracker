@@ -465,6 +465,8 @@
   /* Stat values stay white like the rest of the row (no gold highlight on e.g. the
      average), just kept slightly bold so the key number is still easy to spot. */
   .stats-table td.num.highlight{color:var(--cream);font-weight:700;}
+  /* The ranking rating is always gold — it's the value the table is sorted on. */
+  .stats-table td.num.rating{color:var(--gold);font-weight:700;}
   .stats-table .lp{font-family:'JetBrains Mono',monospace;color:var(--dim);width:24px;text-align:center;}
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}
@@ -3110,7 +3112,7 @@ function renderTeamDetail(tag){
               <td class="num">${s?formatMatchCount(s.count):'—'}</td>
               <td class="num">${s?Math.round(s.winPct*100)+'%':'—'}</td>
               <td class="num">${s?s.avg.toFixed(1):'—'}</td>
-              <td class="num ${s?'highlight':''}">${s?rankAvg(s.count,s.avg).toFixed(1):'—'}</td>
+              <td class="num rating">${s?rankAvg(s.count,s.avg).toFixed(1):'—'}</td>
               <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
               <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
               <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
@@ -3253,7 +3255,7 @@ function renderPlayersView(){
           <td class="num">${formatMatchCount(p.count)}</td>
           <td class="num">${Math.round(p.winPct*100)}%</td>
           <td class="num">${p.avg.toFixed(1)}</td>
-          <td class="num highlight">${rankAvg(p.count,p.avg).toFixed(1)}</td>
+          <td class="num rating">${rankAvg(p.count,p.avg).toFixed(1)}</td>
           <td class="lteam">${bestTid?trackName(bestTid):'—'}</td>
           <td class="num">${cons!=null?cons.toFixed(1):'—'}</td>
           <td class="num">${clu!=null?(clu>0?'+':'')+clu.toFixed(1):'—'}</td>
