@@ -1441,6 +1441,66 @@ function ensureHomeLiveRefresh(){
     if(el && el.classList.contains('active')) renderHomeView();
   }, 30000);
 }
+
+/* =========================================================
+   LIVE FAVICON — a red dot on the tab icon while a match is on air,
+   plus a 🔴 in the tab title, so the tournament reads as "live" even
+   from a background tab. Refreshed on its own timer, every page.
+========================================================= */
+let __faviconBase = null;      // the plain logo image, loaded once
+let __faviconLiveState = null; // remembers the last state so we don't redraw needlessly
+let __baseTitle = null;        // the page's original <title>, captured once
+function getFaviconLink(){
+  let link = document.querySelector('link[rel="icon"]');
+  if(!link){ link = document.createElement('link'); link.rel='icon'; document.head.appendChild(link); }
+  return link;
+}
+// The logo source: prefer the already-loaded header logo (works when it's a data: URI,
+// as in the admin), otherwise fall back to the file the favicon points at.
+function logoSrc(){
+  const mark = document.querySelector('img.brand-mark');
+  if(mark && mark.src) return mark.src;
+  const link = document.querySelector('link[rel="icon"]');
+  return (link && link.getAttribute('href')) || 'img/logo.png';
+}
+let __faviconBaseHref = null;   // the plain (non-live) icon to restore
+function drawLiveFavicon(img){
+  const size = 64;
+  const c = document.createElement('canvas'); c.width=size; c.height=size;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, size, size);
+  // red "live" dot, bottom-right, with a dark ring so it stands out on any tab colour
+  const r = 15, cx = size-r-3, cy = size-r-3;
+  ctx.beginPath(); ctx.arc(cx, cy, r+2.5, 0, Math.PI*2); ctx.fillStyle='#1a0d03'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fillStyle='#E5484D'; ctx.fill();
+  return c.toDataURL('image/png');
+}
+function applyLiveFavicon(isLive){
+  if(__faviconLiveState === isLive) return; // no change
+  __faviconLiveState = isLive;
+  // Title marker
+  if(__baseTitle==null) __baseTitle = document.title;
+  document.title = isLive ? ('🔴 '+__baseTitle) : __baseTitle;
+  // Icon
+  const link = getFaviconLink();
+  if(__faviconBaseHref==null) __faviconBaseHref = link.getAttribute('href') || logoSrc();
+  if(!isLive){ link.href = __faviconBaseHref; return; }
+  if(__faviconBase){ link.href = drawLiveFavicon(__faviconBase); return; }
+  const img = new Image();
+  img.onload = ()=>{ __faviconBase = img; if(__faviconLiveState) link.href = drawLiveFavicon(img); };
+  img.onerror = ()=>{ /* logo missing: leave the icon as-is */ };
+  img.src = logoSrc();
+}
+function refreshLiveFavicon(){
+  try{ applyLiveFavicon(getLiveMatchesNow().length > 0); }catch(e){ /* never let this break the page */ }
+}
+let liveFaviconStarted = false;
+function ensureLiveFaviconRefresh(){
+  if(liveFaviconStarted) return;
+  liveFaviconStarted = true;
+  refreshLiveFavicon();
+  setInterval(refreshLiveFavicon, 30000);
+}
 let countdownInterval = null;
 function clearCountdownInterval(){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval=null; } }
 // Live countdown into #elementId until targetMs, re-rendering home when it hits zero.
@@ -2671,6 +2731,8 @@ function applyHashRoute(){
   __trace('après renderAll (premier rendu)');
   // A shared deep link (#teams/FR, #match/…, #player/…) opens straight to that view.
   applyHashRoute();
+  // Red dot on the tab icon while a match is live (updates every page, on its own timer).
+  ensureLiveFaviconRefresh();
   const loadScreen = document.getElementById('loadScreen');
   if(loadScreen){
     loadScreen.style.transition = 'opacity .25s ease';
