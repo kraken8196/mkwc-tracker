@@ -306,35 +306,43 @@
 
   /* calendar */
   .cal-list{display:flex;flex-direction:column;gap:10px;}
+  /* A match card is two stacked rows: a top meta row (stage + date) and a fixed,
+     symmetric fixture row. Everything about the fixture row is column-based, so
+     cards line up perfectly with each other and never wrap. */
   .cal-item{
     background:var(--panel-2);border:1px solid var(--line-strong);border-radius:var(--radius);
-    padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    padding:12px 16px;display:flex;flex-direction:column;gap:8px;
   }
   .match-card{cursor:pointer;transition:border-color .15s, box-shadow .15s;}
   .match-card:hover{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
-  .cal-stage{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;min-width:160px;white-space:nowrap;}
-  .cal-teams{display:flex;align-items:center;gap:10px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;flex:1;justify-content:flex-end;min-width:0;}
-  .cal-teams-opp{justify-content:flex-start;}
-  .cal-team-side{display:flex;align-items:center;gap:10px;min-width:0;}
-  /* A team name must never spill outside its card — it stays on one line and
-     ellipsises if there isn't room (the flag keeps its size). */
-  .cal-team-side .teamname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-  .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);width:88px;flex-shrink:0;text-align:center;white-space:nowrap;}
 
-  /* Team-page result card: own team | score | opponent laid out as a symmetric
-     grid so the middle (the "–" or "vs") is dead-centre and the two team columns
-     are exactly mirrored. Stage sits top-left, date top-right. Same on every screen. */
-  .cal-item:has(.cal-teams-opp){
+  .mg-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .cal-stage{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;}
+  .cal-date{font-size:12px;color:var(--dim);white-space:nowrap;flex-shrink:0;text-align:right;}
+  .cal-date.emphasize{color:var(--gold);font-weight:700;font-size:13px;}
+
+  /* Fixed 3-column fixture: home | centre | away. The two team columns are exactly
+     equal (1fr each) and the centre is a fixed-width column, so the score/"vs" is
+     always dead-centre and in the same spot on every card. */
+  .mg-fixture{
     display:grid;
-    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-    grid-template-areas:"stage stage date" "home score away";
-    align-items:center;gap:8px 14px;
+    grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);
+    align-items:center;column-gap:8px;
   }
-  .cal-item:has(.cal-teams-opp) .cal-stage{grid-area:stage;min-width:0;}
-  .cal-item:has(.cal-teams-opp) .cal-date{grid-area:date;min-width:0;text-align:right;justify-self:end;}
-  .cal-item:has(.cal-teams-opp) .cal-teams{grid-area:home;justify-content:flex-end;flex:initial;}
-  .cal-item:has(.cal-teams-opp) .cal-score{grid-area:score;width:auto;}
-  .cal-item:has(.cal-teams-opp) .cal-teams-opp{grid-area:away;justify-content:flex-start;}
+  .mg-side{
+    display:flex;align-items:center;gap:9px;min-width:0;
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;
+  }
+  /* Home team sits on the left, pushed toward the centre; its flag/name order is
+     mirrored (name then flag) so both teams "face" the score symmetrically. */
+  .mg-home{justify-content:flex-end;text-align:right;}
+  .mg-away{justify-content:flex-start;text-align:left;}
+  .mg-home .team-plain{flex-direction:row-reverse;}
+  /* Team name never overflows: one line, ellipsis when there isn't room. */
+  .mg-side .team-plain{min-width:0;}
+  .mg-side .teamname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .cal-score{font-family:'JetBrains Mono',monospace;color:var(--dim);text-align:center;white-space:nowrap;font-weight:700;}
+  .cal-score .vs{font-size:13px;color:var(--dim);text-transform:uppercase;}
   .score-win{color:var(--gold);font-weight:700;}
   .forfeit-badge{
     display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:9px;
@@ -360,8 +368,6 @@
   .sub-tag{color:var(--dim);font-size:11px;font-weight:400;}
   .score-lose{color:var(--dim);}
   .cal-score.done{color:var(--cream);}
-  .cal-date{font-size:12px;color:var(--dim);min-width:150px;flex-shrink:0;text-align:right;white-space:nowrap;}
-  .cal-date.emphasize{color:var(--gold);font-weight:700;font-size:13px;}
 
   /* teams grid */
   .flag-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;}
@@ -610,27 +616,16 @@
     .groups-grid{grid-template-columns:1fr;}
     .flag-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
 
-    /* Mobile match cards: a clean, regular 2-row layout.
-       Row 1 = stage (left) + date (right). Row 2 = the teams and score.
-       Works for both card shapes: calendar cards (teams block + score) and
-       team-page cards (own team | score | opponent). */
-    .cal-item{
-      padding:10px 12px;
-      display:grid;
-      grid-template-columns:1fr auto;
-      align-items:center;
-      gap:8px 10px;
-    }
-    .cal-stage{grid-column:1;min-width:0;font-size:10px;white-space:normal;}
-    .cal-date{grid-column:2;min-width:0;text-align:right;font-size:11px;white-space:nowrap;justify-self:end;}
+    /* Mobile match cards keep the same fixed, symmetric two-row layout; just tighten
+       the padding, fonts and the centre column so two names still fit on one line. */
+    .cal-item{padding:10px 12px;gap:7px;}
+    .cal-stage{font-size:10px;}
+    .cal-date{font-size:11px;}
     .cal-date.emphasize{font-size:12px;}
-    /* Calendar-style card (teams block already contains "A vs B") */
-    .cal-teams{grid-column:1 / -1;font-size:14px;justify-content:center;flex-wrap:wrap;}
-    .cal-score{grid-column:1 / -1;width:auto;justify-self:center;text-align:center;font-size:15px;}
-    /* Team-page card keeps its symmetric 3-column grid (defined above) on mobile too;
-       just tighten the spacing a touch. */
-    .cal-item:has(.cal-teams-opp){gap:6px 8px;}
-    .cal-item:has(.cal-teams-opp) .cal-teams{font-size:14px;flex-wrap:nowrap;}
+    .mg-fixture{grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr);column-gap:6px;}
+    .mg-side{font-size:13px;gap:7px;}
+    .cal-score{font-size:14px;}
+    .cal-score .vs{font-size:12px;}
 
     /* On phones, stack each team as its own full-width row with the score pinned to
        the right, so it's obvious which score belongs to which team. */

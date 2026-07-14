@@ -1115,11 +1115,23 @@ function matchCardHTML(it){
     scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
+  const mid = played
+    ? `<span class="cal-score done">${scoreHTML}</span>`
+    : `<span class="cal-score"><span class="vs">${t('vs')}</span></span>`;
+  // Fixed, symmetric grid: home team (pushed toward the centre from the left) |
+  // score/vs in a fixed centre column | away team (from the centre to the right).
+  // The two team columns are exactly equal width, so the centre is always in the
+  // same place across every card and nothing can shift or wrap.
   return `<div class="cal-item match-card" data-matchref="${it.matchRef}">
-    <span class="cal-stage">${it.stage}${ff}</span>
-    <span class="cal-teams">${teamPlainHTML(it.h)} <span class="vs">${t('vs')}</span> ${teamPlainHTML(it.a)}</span>
-    <span class="cal-score ${played?'done':''}">${scoreHTML}</span>
-    <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
+    <div class="mg-top">
+      <span class="cal-stage">${it.stage}${ff}</span>
+      <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
+    </div>
+    <div class="mg-fixture">
+      <span class="mg-side mg-home">${teamPlainHTML(it.h)}</span>
+      ${mid}
+      <span class="mg-side mg-away">${teamPlainHTML(it.a)}</span>
+    </div>
   </div>`;
 }
 
@@ -2052,20 +2064,28 @@ function renderTeamDetail(tag){
           const lost = draw || Number(u.sc[0])<Number(u.sc[1]);
           const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
           return `<div class="cal-item match-card" data-matchref="${u.matchRef}">
-          <span class="cal-stage">${u.stage}${ff}</span>
-          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
-          <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
-          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
-          <span class="cal-date">${u.date}</span>
+          <div class="mg-top">
+            <span class="cal-stage">${u.stage}${ff}</span>
+            <span class="cal-date">${u.date}</span>
+          </div>
+          <div class="mg-fixture">
+            <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
+            <span class="cal-score done"><span class="${won?'score-win':'score-lose'}">${u.sc[0]}</span> – <span class="${lost?'score-win':'score-lose'}">${u.sc[1]}</span></span>
+            <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
+          </div>
         </div>`;
         }).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('homeNoResults')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('upcomingMatches')}</h3>
       ${upcoming.length? `<div class="cal-list" style="margin-bottom:8px;">${upcoming.map(u=>`<div class="cal-item match-card" data-matchref="${u.matchRef}">
-          <span class="cal-stage">${u.stage}</span>
-          <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(tag)}</span></span>
-          <span class="cal-score"><span class="vs">${t('vs')}</span></span>
-          <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(u.opp)}</span></span>
-          <span class="cal-date emphasize">${u.date}</span>
+          <div class="mg-top">
+            <span class="cal-stage">${u.stage}</span>
+            <span class="cal-date emphasize">${u.date}</span>
+          </div>
+          <div class="mg-fixture">
+            <span class="mg-side mg-home">${teamPlainHTML(tag)}</span>
+            <span class="cal-score"><span class="vs">${t('vs')}</span></span>
+            <span class="mg-side mg-away">${teamPlainHTML(u.opp)}</span>
+          </div>
         </div>`).join('')}</div>` : `<div class="helptext" style="margin-bottom:8px;">${t('noUpcoming')}</div>`}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('roster')}</h3>
       <div class="stage-note">${t('playersNote')}</div>
