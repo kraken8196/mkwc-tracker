@@ -1115,14 +1115,10 @@ function matchCardHTML(it){
     scoreHTML = `<span class="${hWin?'score-win':'score-lose'}">${it.sc[0]}</span> – <span class="${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
-  // Symmetric layout: home team | score-or-vs | away team, so the "–" / "vs" always
-  // sits dead-centre between the two teams (same shape as the team-page result cards).
-  const centre = played ? scoreHTML : `<span class="vs">${t('vs')}</span>`;
   return `<div class="cal-item match-card" data-matchref="${it.matchRef}">
     <span class="cal-stage">${it.stage}${ff}</span>
-    <span class="cal-teams"><span class="cal-team-side">${teamPlainHTML(it.h)}</span></span>
-    <span class="cal-score ${played?'done':''}">${centre}</span>
-    <span class="cal-teams cal-teams-opp"><span class="cal-team-side">${teamPlainHTML(it.a)}</span></span>
+    <span class="cal-teams">${teamPlainHTML(it.h)} <span class="vs">${t('vs')}</span> ${teamPlainHTML(it.a)}</span>
+    <span class="cal-score ${played?'done':''}">${scoreHTML}</span>
     <span class="cal-date${played?'':' emphasize'}">${it.date}</span>
   </div>`;
 }
