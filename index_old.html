@@ -204,19 +204,51 @@
     margin-top:8px;letter-spacing:0.04em;
   }
 
-  /* Play-In recap teaser on the home page — compact link card, not a big block. */
+  /* Play-In recap teaser — reads as an "article" card (icon chip + kicker + headline +
+     Read pill), with a gold accent rail and warm tint to stand out while keeping the DA. */
   .nutshell-teaser{
-    display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:14px;row-gap:2px;
-    margin:2px 0 26px;padding:12px 16px;border-radius:10px;
-    cursor:pointer;text-decoration:none;
-    background:linear-gradient(160deg, var(--panel-3), var(--panel-2));
-    border:1px solid var(--line-strong);transition:transform .15s, box-shadow .15s, border-color .15s;
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:16px;
+    margin:2px 0 26px;padding:16px 18px;border-radius:12px;
+    cursor:pointer;text-decoration:none;position:relative;overflow:hidden;
+    background:
+      linear-gradient(160deg, rgba(255,206,84,0.10), rgba(240,148,47,0.04)),
+      linear-gradient(160deg, var(--panel-3), var(--panel-2));
+    border:1px solid rgba(255,206,84,0.40);
+    box-shadow:0 4px 14px rgba(0,0,0,0.22);
+    transition:transform .15s, box-shadow .15s, border-color .15s;
   }
-  .nutshell-teaser:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,0.28);border-color:var(--gold);}
-  .nutshell-teaser .nt-eyebrow{grid-column:1;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:0.12em;}
-  .nutshell-teaser .nt-title{grid-column:1;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:19px;color:var(--cream);line-height:1.1;}
-  .nutshell-teaser .nt-cta{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:13px;color:var(--dim);white-space:nowrap;}
-  .nutshell-teaser:hover .nt-cta{color:var(--gold);}
+  .nutshell-teaser::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg, var(--gold), var(--orange-1));
+  }
+  .nutshell-teaser:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,0.32);border-color:var(--gold);}
+  .nutshell-teaser .nt-icon{
+    display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:11px;
+    background:linear-gradient(160deg, var(--gold), var(--orange-1));color:#3a2100;flex-shrink:0;
+    box-shadow:0 3px 8px rgba(0,0,0,0.28);
+  }
+  .nutshell-teaser .nt-body{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .nutshell-teaser .nt-eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);
+    text-transform:uppercase;letter-spacing:0.14em;
+  }
+  .nutshell-teaser .nt-title{
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:var(--cream);line-height:1.08;text-wrap:balance;
+  }
+  .nutshell-teaser .nt-cta{
+    display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:0.04em;
+    color:var(--gold);padding:8px 14px;border-radius:8px;border:1px solid rgba(255,206,84,0.45);
+    white-space:nowrap;transition:background .15s, color .15s;
+  }
+  .nutshell-teaser .nt-arrow{transition:transform .15s;}
+  .nutshell-teaser:hover .nt-cta{background:var(--gold);color:#3a2100;border-color:var(--gold);}
+  .nutshell-teaser:hover .nt-arrow{transform:translateX(3px);}
+  @media (max-width:560px){
+    .nutshell-teaser{grid-template-columns:auto 1fr;column-gap:12px;row-gap:10px;padding:14px;}
+    .nutshell-teaser .nt-cta{grid-column:1 / -1;justify-content:center;}
+    .nutshell-teaser .nt-title{font-size:20px;}
+  }
 
   /* Play-In recap article */
   .np-article{max-width:660px;margin:0 auto;}
@@ -2569,9 +2601,17 @@ function renderHomeView(){
     </div>
 
     ${allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
-      <span class="nt-eyebrow">${nt('eyebrow')}</span>
-      <span class="nt-title">${nt('title')}</span>
-      <span class="nt-cta">${t('nutshellRead')} →</span>
+      <span class="nt-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
+          <line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="13.5" x2="16" y2="13.5"></line><line x1="8" y1="17" x2="13" y2="17"></line>
+        </svg>
+      </span>
+      <span class="nt-body">
+        <span class="nt-eyebrow">${nt('eyebrow')}</span>
+        <span class="nt-title">${nt('title')}</span>
+      </span>
+      <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
     </a>` : ''}
 
     <div class="stage-block">
