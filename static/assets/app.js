@@ -1395,20 +1395,15 @@ function renderHomeView(){
   const nextMatch = liveNow.length ? null : getNextScheduledMatch();
 
   let html = `
-    <div class="phase-banner phase-${status.phase}">${t(status.key)}${status.phase==='before' ? `<div id="playinCountdown" class="phase-countdown"></div>` : ''}</div>
+    <div class="stage-note" style="font-size:14px;margin:0 0 16px;">${t('homeIntro')}</div>
+    ${status.phase==='before' ? `<div class="phase-banner phase-before">${t(status.key)}<div id="playinCountdown" class="phase-countdown"></div></div>` : ''}
     ${liveNow.length ? `<div class="live-now-block">
       <h3 class="live-now-title">${t('homeLiveNow')}</h3>
       <div class="cal-list">${liveNow.map(matchCardHTML).join('')}</div>
     </div>` : ''}
     ${nextMatch ? nextMatchBlockHTML(nextMatch) : ''}
-    ${allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
-      <span class="nt-eyebrow">${nt('eyebrow')}</span>
-      <span class="nt-title">${nt('title')}</span>
-      <span class="nt-cta">${t('nutshellRead')} →</span>
-    </a>` : ''}
-    <div class="stage-note" style="font-size:14px;margin:14px 0 18px;">${t('homeIntro')}</div>
 
-    <div class="match-progress" style="margin-bottom:24px;">
+    <div class="match-progress" style="margin:18px 0 24px;">
       <div class="match-progress-label">${t('homeFactMatches')} <b>${matchesPlayed} / ${totalMatches}</b></div>
       <div class="match-progress-bar"><div class="match-progress-fill" style="width:${pct}%;"></div></div>
     </div>
@@ -1428,6 +1423,12 @@ function renderHomeView(){
         <div class="stage-note" style="margin-bottom:0;">${t('homeStep3Desc')}</div>
       </div>
     </div>
+
+    ${allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
+      <span class="nt-eyebrow">${nt('eyebrow')}</span>
+      <span class="nt-title">${nt('title')}</span>
+      <span class="nt-cta">${t('nutshellRead')} →</span>
+    </a>` : ''}
 
     <div class="stage-block">
       <h2 class="outline" style="font-size:18px;margin-bottom:10px;">${t('homeRecent')}</h2>
