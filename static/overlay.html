@@ -131,6 +131,8 @@
     background:linear-gradient(90deg, var(--team-b), var(--team-b-2));
     transition:width .4s ease;
   }
+  /* When one side is exactly 0%, drop its separator so no sliver of it shows. */
+  .ov-bar-a.zero{border-right:0;}
 
   /* small brand mark */
   .ov-foot{
@@ -384,8 +386,8 @@
         const na = Math.max(0, va), nb = Math.max(0, vb), sum = na + nb;
         pctA = sum>0 ? (na/sum)*100 : 50;
       }
-      // Keep a minimum sliver visible on each side so both colours always show.
-      pctA = Math.max(6, Math.min(94, pctA));
+      // Respect the real numbers exactly — a team on 0 gets 0% of the bar.
+      pctA = Math.max(0, Math.min(100, pctA));
       let aWin=false, bWin=false;
       if(r.higher!=null && va!=null && vb!=null && va!==vb){
         const aBetter = r.higher ? va>vb : va<vb;
@@ -396,8 +398,8 @@
         <div class="ov-bar-line">
           <div class="ov-val a ${aWin?'win':''}">${r.fmt(va)}</div>
           <div class="ov-bar">
-            <div class="ov-bar-a" style="width:${pctA}%"></div>
-            <div class="ov-bar-b" style="width:${100-pctA}%"></div>
+            <div class="ov-bar-a ${pctA<=0?'zero':''}" style="width:${pctA}%"></div>
+            <div class="ov-bar-b ${pctA>=100?'zero':''}" style="width:${100-pctA}%"></div>
           </div>
           <div class="ov-val b ${bWin?'win':''}">${r.fmt(vb)}</div>
         </div>
