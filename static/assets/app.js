@@ -2816,7 +2816,7 @@ function applyHashRoute(){
   __trace('avant loadState');
   await loadState();
   __trace('après loadState');
-  migrateAllPlayerData();
+  try{ migrateAllPlayerData(); }catch(e){ /* never let a data quirk block startup */ }
   // Overlay/embed mode (e.g. the OBS stats overlay): we reuse this file only for its
   // data loading and stat helpers — the site DOM (nav, views, lang switch) isn't
   // present, so skip all rendering and just hand control back to the host page.

@@ -157,7 +157,21 @@
   const tagB = (params.get('b')||'').toUpperCase();
   const theme = params.get('theme')==='neutral' ? 'neutral' : 'mkwc';
   const customTitle = params.get('title');
+  const debug = params.has('debug');
   document.getElementById('ov').setAttribute('data-theme', theme);
+
+  // Surface any uncaught error on screen (helps diagnose a stuck "Loading…").
+  window.addEventListener('error', e=>{
+    const m = document.getElementById('ovMsg');
+    if(m && (debug || !window.getTeamStats)) m.textContent = 'Error: ' + (e.message || e.error || 'unknown');
+  });
+  // If nothing has rendered after 4s, say what's missing instead of hanging on "Loading…".
+  setTimeout(()=>{
+    const m = document.getElementById('ovMsg');
+    if(m && !m.classList.contains('hidden') && m.textContent.indexOf('Error')!==0){
+      if(!window.getTeamStats) m.textContent = 'Data not ready (app.js/getTeamStats missing).';
+    }
+  }, 4000);
 
   const $ = id => document.getElementById(id);
   function showMsg(m){ $('ovMsg').textContent = m; $('ovMsg').classList.remove('hidden'); $('ovContent').classList.add('hidden'); }
