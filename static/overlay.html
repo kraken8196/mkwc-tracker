@@ -193,6 +193,13 @@
   .tk-cell.a.win .tk-val{color:var(--team-a);}
   .tk-cell.b.win .tk-val{color:var(--team-b);}
   .tk-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);}
+  .tk-more{
+    display:block;width:100%;margin:6px 0 2px;padding:8px;border-radius:7px;cursor:pointer;
+    background:transparent;border:1px solid var(--edge);color:var(--label);
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  }
+  .tk-more:hover{color:var(--value);border-color:var(--accent);}
+  .tk-extra{margin-top:3px;}
 
   /* small brand mark */
   .ov-foot{
@@ -449,6 +456,7 @@
         id, name: tName(id) || id,
         aAvg: a ? a.total/a.count : null, aN: a ? a.count : 0,
         bAvg: b ? b.total/b.count : null, bN: b ? b.count : 0,
+        both: !!(a && b), // played by both teams → directly comparable
       });
     });
     // Most-played first (combined), then by name.
@@ -487,26 +495,55 @@
   }
 
   // A per-track table: team A avg (× times played) | track name | team B avg (× played).
-  // The higher average on each track is highlighted in the team colour.
-  function renderTracksTable(rows){
+  // Tracks both teams played come first; those only one team played are hidden behind a
+  // "Show more" toggle. The higher average on each track is highlighted.
+  function trackRowHTML(r){
     const cell = (avg, n, side, win)=>{
       const val = avg==null ? '—' : Math.round(avg);
       const times = n>0 ? `<span class="tk-n">×${n}</span>` : '';
-      return `<div class="tk-cell ${side} ${win?'win':''}">
-        <span class="tk-val">${val}</span>${times}
-      </div>`;
+      return `<div class="tk-cell ${side} ${win?'win':''}"><span class="tk-val">${val}</span>${times}</div>`;
     };
-    const body = rows.map(r=>{
-      const aWin = r.aAvg!=null && r.bAvg!=null && r.aAvg>r.bAvg;
-      const bWin = r.aAvg!=null && r.bAvg!=null && r.bAvg>r.aAvg;
-      return `<div class="tk-row">
-        ${cell(r.aAvg, r.aN, 'a', aWin)}
-        <div class="tk-name">${esc(r.name)}</div>
-        ${cell(r.bAvg, r.bN, 'b', bWin)}
-      </div>`;
-    }).join('');
-    $('ovRows').innerHTML = `<div class="tk-table">${body || '<div class="ov-msg">No track data yet.</div>'}</div>`;
+    const aWin = r.aAvg!=null && r.bAvg!=null && r.aAvg>r.bAvg;
+    const bWin = r.aAvg!=null && r.bAvg!=null && r.bAvg>r.aAvg;
+    return `<div class="tk-row">
+      ${cell(r.aAvg, r.aN, 'a', aWin)}
+      <div class="tk-name">${esc(r.name)}</div>
+      ${cell(r.bAvg, r.bN, 'b', bWin)}
+    </div>`;
   }
+  function renderTracksTable(rows){
+    const both = rows.filter(r=>r.both);
+    const one  = rows.filter(r=>!r.both);
+    const lang = (window.MKWC_LANG_OVERLAY) || 'en';
+    const L = ({
+      en:{more:'Show more', less:'Show less', empty:'No shared track data yet.'},
+      fr:{more:'Voir plus', less:'Voir moins', empty:'Aucun circuit joué par les deux équipes.'},
+      es:{more:'Ver más', less:'Ver menos', empty:'Ningún circuito jugado por ambos.'},
+      ja:{more:'もっと見る', less:'閉じる', empty:'共通のコースデータなし。'},
+    })[lang] || {more:'Show more', less:'Show less', empty:'No shared track data yet.'};
+
+    const bothHtml = both.length ? both.map(trackRowHTML).join('') : `<div class="ov-msg">${L.empty}</div>`;
+    const oneHtml  = one.map(trackRowHTML).join('');
+    const open = tracksExpanded; // remembered across auto-refreshes
+    const toggle = one.length
+      ? `<button class="tk-more" id="tkMore" type="button">${(open?L.less:L.more)} (${one.length})</button>`
+      : '';
+    $('ovRows').innerHTML = `
+      <div class="tk-table">${bothHtml}</div>
+      ${toggle}
+      <div class="tk-table tk-extra" id="tkExtra" style="display:${open?'':'none'};">${oneHtml}</div>`;
+
+    const btn = $('tkMore');
+    if(btn){
+      btn.onclick = ()=>{
+        tracksExpanded = !tracksExpanded;
+        const ex = $('tkExtra');
+        ex.style.display = tracksExpanded ? '' : 'none';
+        btn.textContent = (tracksExpanded ? L.less : L.more) + ' ('+one.length+')';
+      };
+    }
+  }
+  let tracksExpanded = false;
 
   let lastSig = null;
   function render(){
