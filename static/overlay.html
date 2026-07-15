@@ -186,9 +186,11 @@
     font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:var(--value);
     text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
   }
+  /* Mirror-symmetric: the score hugs the outer edge on each side (A left, B right),
+     the ×N sits just inside it. */
   .tk-cell{display:flex;align-items:baseline;gap:6px;}
-  .tk-cell.a{justify-content:flex-end;}
-  .tk-cell.b{justify-content:flex-start;flex-direction:row-reverse;}
+  .tk-cell.a{justify-content:flex-start;}
+  .tk-cell.b{justify-content:flex-end;flex-direction:row-reverse;}
   .tk-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:var(--value);}
   .tk-cell.a.win .tk-val{color:var(--team-a);}
   .tk-cell.b.win .tk-val{color:var(--team-b);}
