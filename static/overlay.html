@@ -425,6 +425,8 @@
       if(avg!=null){ sum+=avg; any=true; }
       return { name:n, avg };
     });
+    // Strongest first; players with no data sink to the bottom.
+    players.sort((p,q)=> (q.avg==null?-Infinity:q.avg) - (p.avg==null?-Infinity:p.avg));
     return { players, total: any ? sum : null };
   }
 
