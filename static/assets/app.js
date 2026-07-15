@@ -2643,7 +2643,10 @@ window.addEventListener('popstate', (e)=>{
   if(state.view==='player' && selectedPlayer) renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name);
   restoringFromHistory = false;
 });
-document.querySelector('main').addEventListener('click', (e)=>{
+// Delegated click handling for the whole app view area. Guarded because embed pages
+// (e.g. the OBS overlay) load this file without a <main> element.
+const __mainEl = document.querySelector('main');
+if(__mainEl) __mainEl.addEventListener('click', (e)=>{
   const link = e.target.closest('.team-link');
   if(link){
     pushNavHistory();
