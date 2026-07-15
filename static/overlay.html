@@ -530,7 +530,10 @@
     const toggle = one.length
       ? `<button class="tk-more" id="tkMore" type="button">${(open?L.less:L.more)} (${one.length})</button>`
       : '';
-    $('ovRows').innerHTML = `<div class="tk-table">${bothHtml}${toggle}${oneHtml}</div>`;
+    // Button goes AFTER the extra rows so it always sits at the bottom: collapsed, the
+    // hidden rows take no space so it's right under the shared list; expanded, the rows
+    // push it down.
+    $('ovRows').innerHTML = `<div class="tk-table">${bothHtml}${oneHtml}${toggle}</div>`;
 
     const btn = $('tkMore');
     if(btn){
