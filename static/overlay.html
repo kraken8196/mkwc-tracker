@@ -321,6 +321,16 @@
     }
     const signed = v => (v>0?'+':'') + v.toFixed(1);
 
+    // Bar share for points/match: a team's per-match score always sits in [252, 732],
+    // so basing the split on 0 makes two mid-range scores look nearly equal. Instead
+    // map each value to its position within [252, 732], which amplifies real gaps.
+    const PF_MIN = 252, PF_MAX = 732;
+    function sharePoints(a, b){
+      const pos = v => Math.max(0.02, Math.min(1, (v - PF_MIN) / (PF_MAX - PF_MIN)));
+      const pa = pos(a), pb = pos(b);
+      return (pa/(pa+pb))*100;
+    }
+
     const lang = (window.MKWC_LANG_OVERLAY) || 'en';
     const LBL = {
       en:{race:'Race win %', pf:'Points / match', w:'Matches won', cons:'Consistency', clu:'Late-match'},
@@ -331,7 +341,7 @@
     const M = LBL[lang] || LBL.en;
     return [
       { label:M.race, get:racePct,        higher:true,  fmt:v=>v==null?'—':Math.round(v)+'%' },
-      { label:M.pf,   get:pointsPerMatch, higher:true,  fmt:v=>v==null?'—':String(Math.round(v)) },
+      { label:M.pf,   get:pointsPerMatch, higher:true,  fmt:v=>v==null?'—':String(Math.round(v)), share:sharePoints },
       { label:M.w,    get:wins,           higher:true,  fmt:v=>v==null?'—':String(v) },
       { label:M.cons, get:consistency,    higher:false, fmt:v=>v==null?'—':v.toFixed(1), share:shareLower },
       { label:M.clu,  get:clutch,         higher:true,  fmt:v=>v==null?'—':signed(v),   share:shareSigned },
