@@ -2830,6 +2830,9 @@ function applyHashRoute(){
       const ovLang = new URLSearchParams(location.search).get('lang');
       if(ovLang && I18N[ovLang]) LANG = ovLang;
     }catch(e){ /* keep current LANG */ }
+    // STATE is reassigned on every loadState(), so hand the overlay an accessor that
+    // always returns the current reference rather than a stale snapshot.
+    window.MKWC_STATE = () => STATE;
     if(typeof window.MKWC_ON_READY === 'function') window.MKWC_ON_READY();
     return;
   }

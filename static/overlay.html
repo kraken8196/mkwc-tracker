@@ -70,32 +70,32 @@
 
   /* Header row: team A | title | team B */
   .ov-head{
-    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-    gap:12px;padding:12px 16px 10px;background:var(--head-bg);
+    display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
+    gap:16px;padding:14px 18px 12px;background:var(--head-bg);
   }
-  .ov-team{display:flex;align-items:center;gap:11px;min-width:0;}
-  .ov-team.b{flex-direction:row-reverse;text-align:right;}
-  /* A colour chip next to each name ties the team to its bar colour. */
+  .ov-team{display:flex;align-items:center;justify-content:center;}
+  .ov-team.a{justify-content:flex-start;}
+  .ov-team.b{justify-content:flex-end;}
   .ov-flag{
-    width:46px;height:31px;border-radius:5px;flex-shrink:0;overflow:hidden;position:relative;
-    box-shadow:0 0 0 1px rgba(255,255,255,0.35) inset, 0 2px 5px rgba(0,0,0,0.5);
+    width:58px;height:39px;border-radius:6px;flex-shrink:0;overflow:hidden;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.35) inset, 0 2px 6px rgba(0,0,0,0.5);
     background:#222;
   }
   .ov-flag img{width:100%;height:100%;object-fit:cover;display:block;}
-  .ov-flag::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;}
-  .ov-team.a .ov-flag::after{background:var(--team-a);}
-  .ov-team.b .ov-flag::after{background:var(--team-b);}
-  .ov-name{
-    font-weight:700;font-size:25px;line-height:1;letter-spacing:0.01em;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
-    text-shadow:0 2px 4px rgba(0,0,0,0.55);
-  }
+  /* The matchup title carries the team names (only place they appear now). */
   .ov-title{
-    font-family:'JetBrains Mono',monospace;font-weight:700;
-    font-size:12px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--label);text-align:center;white-space:nowrap;
+    font-family:'Rajdhani',sans-serif;font-weight:700;
+    font-size:30px;line-height:1.05;letter-spacing:0.01em;
+    color:var(--value);text-align:center;
+    text-shadow:0 2px 5px rgba(0,0,0,0.6);
+    overflow:hidden;
   }
-  .ov-title .vs{color:var(--accent);}
+  .ov-title #titleText{display:inline-block;max-width:100%;}
+  .ov-title .vs{
+    color:var(--label);font-family:'JetBrains Mono',monospace;font-weight:700;
+    font-size:16px;text-transform:uppercase;letter-spacing:0.1em;
+    padding:0 8px;vertical-align:middle;
+  }
 
   /* Stat rows: a centred label, then value A · split bar · value B (football-card style). */
   .ov-body{padding:10px 16px 14px;}
@@ -106,11 +106,11 @@
     text-align:center;white-space:nowrap;margin-bottom:7px;
   }
   .ov-bar-line{
-    display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:12px;
+    display:grid;grid-template-columns:64px 1fr 64px;align-items:center;gap:12px;
   }
   .ov-val{
-    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:23px;line-height:1;
-    color:var(--value);
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;line-height:1;
+    color:var(--value);white-space:nowrap;
   }
   .ov-val.a{text-align:right;}
   .ov-val.b{text-align:left;}
@@ -156,9 +156,9 @@
   <div class="ov-msg" id="ovMsg">Loading…</div>
   <div class="hidden" id="ovContent">
     <div class="ov-head">
-      <div class="ov-team a"><span class="ov-flag"><img id="flagA" alt=""></span><span class="ov-name" id="nameA">—</span></div>
+      <div class="ov-team a"><span class="ov-flag"><img id="flagA" alt=""></span></div>
       <div class="ov-title"><span id="titleText">Head&nbsp;to&nbsp;Head</span></div>
-      <div class="ov-team b"><span class="ov-flag"><img id="flagB" alt=""></span><span class="ov-name" id="nameB">—</span></div>
+      <div class="ov-team b"><span class="ov-flag"><img id="flagB" alt=""></span></div>
     </div>
     <div class="ov-body" id="ovRows"></div>
     <div class="ov-foot"><b>MKWC 2026</b> · stats</div>
@@ -207,37 +207,108 @@
   function showMsg(m){ $('ovMsg').textContent = m; $('ovMsg').classList.remove('hidden'); $('ovContent').classList.add('hidden'); }
   function showContent(){ $('ovMsg').classList.add('hidden'); $('ovContent').classList.remove('hidden'); }
 
-  // The stats shown, top to bottom. `higher` = a higher number is better (gold).
-  // Each `get(tag)` returns a number or null; `fmt` renders it for display.
-  function statRows(){
-    const ts = window.getTeamStats, ps = window.getPlayerStats, adv = window.getAdvancedStats;
-    const player = ps ? ps() : {};
-    const advanced = adv ? adv() : {consistency:{},clutch:{},balance:{}};
-
-    // Team average points per player-match, from the same per-player data the site uses.
-    function teamAvg(tag){
-      const t = player[tag]; if(!t) return null;
-      let tot=0,cnt=0; for(const n in t){ tot+=t[n].total; cnt+=t[n].count; }
-      return cnt>0 ? tot/cnt : null;
+  // Walk every played match in STATE with its per-race detail, once per render.
+  // Each entry: {H, A, scH, scA, tracks, plH:[players], plA:[players], hasDetail}.
+  function allDetailedMatches(){
+    const S = window.MKWC_STATE ? window.MKWC_STATE() : null; if(!S) return [];
+    const pairs = window.pairsFor;
+    if(!pairs) return [];
+    const out = [];
+    function scanGroups(groupsObj){
+      if(!groupsObj) return;
+      for(const id in groupsObj){
+        const g = groupsObj[id]; if(!g) continue;
+        pairs(g.slots.length).forEach(([i,j])=>{
+          const H=g.slots[i], A=g.slots[j]; if(H==null||A==null) return;
+          const key=i+'-'+j, sc=g.scores[key];
+          if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) return;
+          const pl = (g.players && g.players[key]) || {h:[],a:[],tracks:[]};
+          out.push(mkMatch(H,A,sc,pl));
+        });
+      }
     }
-    function winPct(tag){ const s=ts(tag); return s.played ? (s.w/s.played)*100 : null; }
-    function wins(tag){ const s=ts(tag); return s.played ? s.w : null; }
-    function avgFor(tag){ const s=ts(tag); return s.played ? s.pf/s.played : null; }
+    scanGroups(S.quali); scanGroups(S.top); scanGroups(S.mid);
+    // Bracket
+    if(window.deriveBracketRounds){
+      const {rounds, roundScores} = window.deriveBracketRounds();
+      const bp = (S.bracket && S.bracket.players) || {};
+      for(let r=0;r<4;r++){
+        const slots = rounds[r];
+        for(let m=0;m<slots.length/2;m++){
+          const H=slots[m*2], A=slots[m*2+1]; if(H==null||A==null) continue;
+          const sc = roundScores[r][m];
+          if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) continue;
+          const pl = (bp['r'+r] && bp['r'+r][m]) || {h:[],a:[],tracks:[]};
+          out.push(mkMatch(H,A,sc,pl));
+        }
+      }
+    }
+    return out;
+  }
+  function mkMatch(H,A,sc,pl){
+    const plH = pl.h||[], plA = pl.a||[];
+    const raceScore = (arr, r)=>{
+      let any=false, tot=0;
+      arr.forEach(p=>{ const v=p && p.races && p.races[r]; if(v!==''&&v!=null){ any=true; tot+=Number(v)||0; } });
+      return any ? tot : null;
+    };
+    // A match "has detail" if at least one race has scores on both sides — this is
+    // exactly what a forfeit (150–0, entered as a bare score) lacks.
+    let hasDetail=false;
+    for(let r=0;r<12;r++){ if(raceScore(plH,r)!=null && raceScore(plA,r)!=null){ hasDetail=true; break; } }
+    return { H, A, scH:Number(sc[0]), scA:Number(sc[1]), plH, plA, raceScore, hasDetail };
+  }
 
-    // Overlay labels, localised locally (avoids touching the site's i18n).
+  // The stats shown, top to bottom. `higher` = a higher number is better.
+  function statRows(){
+    const ts = window.getTeamStats;
+    const matches = allDetailedMatches();
+
+    // RACE WIN %: across every race where both teams have a score, how often this team
+    // had the higher combined race total. Far more granular than match win %.
+    function racePct(tag){
+      let won=0, total=0;
+      matches.forEach(m=>{
+        if(m.H!==tag && m.A!==tag) return;
+        if(!m.hasDetail) return;
+        const mine = (m.H===tag) ? m.plH : m.plA;
+        const opp  = (m.H===tag) ? m.plA : m.plH;
+        for(let r=0;r<12;r++){
+          const a=m.raceScore(mine,r), b=m.raceScore(opp,r);
+          if(a==null || b==null) continue;
+          if(a===b) continue; // a tied race counts for neither
+          total++; if(a>b) won++;
+        }
+      });
+      return total ? (won/total)*100 : null;
+    }
+    // POINTS / MATCH excluding forfeits (a 150–0 forfeit isn't a real scoring match
+    // and would drag the average down). Only matches with real race detail count.
+    function pointsPerMatch(tag){
+      let pts=0, games=0;
+      matches.forEach(m=>{
+        if(!m.hasDetail) return; // skip forfeits / detail-less matches
+        if(m.H===tag){ pts+=m.scH; games++; }
+        else if(m.A===tag){ pts+=m.scA; games++; }
+      });
+      return games ? pts/games : null;
+    }
+    function wins(tag){ const s=ts(tag); return s.played ? s.w : null; }
+    function played(tag){ const s=ts(tag); return s.played||0; }
+
     const lang = (window.MKWC_LANG_OVERLAY) || 'en';
     const LBL = {
-      en:{win:'Win %', avg:'Avg. score', pf:'Points / match', w:'Matches won'},
-      fr:{win:'% Victoires', avg:'Score moyen', pf:'Points / match', w:'Matchs gagnés'},
-      es:{win:'% Victorias', avg:'Puntuación media', pf:'Puntos / partido', w:'Partidos ganados'},
-      ja:{win:'勝率', avg:'平均スコア', pf:'ポイント/試合', w:'勝利数'},
+      en:{race:'Race win %', pf:'Points / match', w:'Matches won', pl:'Matches played'},
+      fr:{race:'% Courses gagnées', pf:'Points / match', w:'Matchs gagnés', pl:'Matchs joués'},
+      es:{race:'% Carreras ganadas', pf:'Puntos / partido', w:'Partidos ganados', pl:'Partidos jugados'},
+      ja:{race:'レース勝率', pf:'ポイント/試合', w:'勝利数', pl:'試合数'},
     };
     const M = LBL[lang] || LBL.en;
     return [
-      { label:M.win, get:winPct,   higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
-      { label:M.avg, get:teamAvg,  higher:true, fmt:v=>v==null?'—':v.toFixed(1) },
-      { label:M.pf,  get:avgFor,   higher:true, fmt:v=>v==null?'—':v.toFixed(1) },
-      { label:M.w,   get:wins,     higher:true, fmt:v=>v==null?'—':String(v) },
+      { label:M.race, get:racePct,       higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
+      { label:M.pf,   get:pointsPerMatch, higher:true, fmt:v=>v==null?'—':String(Math.round(v)) },
+      { label:M.w,    get:wins,          higher:true, fmt:v=>v==null?'—':String(v) },
+      { label:M.pl,   get:played,        higher:true, fmt:v=>String(v) },
     ];
   }
 
@@ -257,13 +328,12 @@
     if(sig === lastSig){ showContent(); return; }
     lastSig = sig;
 
-    $('nameA').textContent = name(tagA);
-    $('nameB').textContent = name(tagB);
     $('flagA').src = 'flags/'+tagA+'.png';
     $('flagB').src = 'flags/'+tagB+'.png';
+    const esc = s => String(s).replace(/</g,'&lt;');
     $('titleText').innerHTML = customTitle
-      ? customTitle.replace(/</g,'&lt;')
-      : (name(tagA)+' <span class="vs">vs</span> '+name(tagB));
+      ? esc(customTitle)
+      : (esc(name(tagA))+' <span class="vs">vs</span> '+esc(name(tagB)));
 
     const html = rows.map(r=>{
       const va = r.get(tagA), vb = r.get(tagB);
