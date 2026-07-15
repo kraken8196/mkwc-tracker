@@ -439,6 +439,20 @@ const SCHEDULED_TIMES = {
   'quali|Z|0-1':'2026-07-11T16:00:00+02:00',
   'quali|Z|0-2':'2026-07-11T17:00:00+02:00',
   'quali|Z|1-2':'2026-07-12T22:00:00+02:00',
+  // Group stage — Group A (FR, ESP, CAN, ITA) and Group B (JPN, USA, ENG, GER).
+  // Times are Belgium local (+02:00); the app renders each in the visitor's own zone.
+  'top|A|0-3':'2026-07-17T20:00:00+02:00',   // France vs Italy
+  'top|A|1-3':'2026-07-17T21:00:00+02:00',   // Spain vs Italy
+  'top|A|0-1':'2026-07-17T22:00:00+02:00',   // France vs Spain
+  'top|B|0-1':'2026-07-18T17:00:00+02:00',   // Japan vs USA
+  'top|A|1-2':'2026-07-18T19:00:00+02:00',   // Spain vs Canada
+  'top|A|2-3':'2026-07-18T20:00:00+02:00',   // Italy vs Canada
+  'top|B|1-3':'2026-07-18T22:00:00+02:00',   // USA vs Germany
+  'top|B|2-3':'2026-07-18T23:00:00+02:00',   // Germany vs England
+  'top|B|0-3':'2026-07-19T15:00:00+02:00',   // Japan vs Germany
+  'top|B|0-2':'2026-07-19T16:00:00+02:00',   // England vs Japan
+  'top|B|1-2':'2026-07-19T18:00:00+02:00',   // USA vs England
+  'top|A|0-2':'2026-07-19T20:00:00+02:00',   // Canada vs France
 };
 function scheduledTimeFor(anchorPrefix, groupId, key){
   return SCHEDULED_TIMES[`${anchorPrefix}|${groupId}|${key}`] || null;
