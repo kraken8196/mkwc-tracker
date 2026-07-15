@@ -1085,7 +1085,10 @@ function getAllMatchItems(){
         const key = i+'-'+j;
         const sc = g.scores[key];
         const iso = scheduledTimeFor(anchorPrefix, id, key);
-        let itemDate = dateStr, itemDayLabel = dateStr, itemDateKey = dateKey, itemDateOrder = dateOrder * 1e10;
+        // Matches with no confirmed kickoff time sort AFTER the timed ones within the
+        // same phase: a real kickoff timestamp (~1.78e9 s) is well under this 9e9 offset,
+        // which itself stays inside this phase's [dateOrder*1e10, (dateOrder+1)*1e10) window.
+        let itemDate = dateStr, itemDayLabel = dateStr, itemDateKey = dateKey, itemDateOrder = dateOrder * 1e10 + 9e9;
         if(iso){
           itemDate = formatScheduledLocal(iso);
           itemDayLabel = formatScheduledLocalDateOnly(iso);
@@ -2026,7 +2029,8 @@ function getAllTeamMatches(tag){
         const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
         const mySc = played ? (i===idx ? sc : [sc[1],sc[0]]) : null;
         const iso = scheduledTimeFor(anchorPrefix, id, key);
-        const dateOrder = coarseOrder*1e10 + (iso ? Math.floor(new Date(iso).getTime()/1000) : 0);
+        // No confirmed time → sort after timed matches of the same phase (see getAllMatchItems).
+        const dateOrder = coarseOrder*1e10 + (iso ? Math.floor(new Date(iso).getTime()/1000) : 9e9);
         items.push({stage:`${stageLabel} · Gr. ${id}`, date: iso ? formatScheduledLocal(iso) : dateStr, opp, sc:mySc, played, dateOrder, anchor:`group-${anchorPrefix}-${id}`, matchRef:`g|${anchorPrefix}|${id}|${i}|${j}`});
       });
     }
