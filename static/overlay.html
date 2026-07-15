@@ -294,21 +294,47 @@
       return games ? pts/games : null;
     }
     function wins(tag){ const s=ts(tag); return s.played ? s.w : null; }
-    function played(tag){ const s=ts(tag); return s.played||0; }
+
+    // Team consistency = average of its players' race-score standard deviations
+    // (lower = steadier). Team clutch = average of its players' 2nd-half − 1st-half
+    // race differential (positive = finishes stronger). Both from getAdvancedStats().
+    const adv = window.getAdvancedStats ? window.getAdvancedStats() : {consistency:{},clutch:{}};
+    function teamAvgOver(map, tag){
+      const vals=[]; for(const k in map){ if(k.indexOf(tag+'|')===0) vals.push(map[k]); }
+      return vals.length ? vals.reduce((s,v)=>s+v,0)/vals.length : null;
+    }
+    function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
+    function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
+
+    // Bar share when LOWER is better (consistency): the steadier team gets the bigger
+    // slice, so the bar still reads "more colour = better".
+    function shareLower(a, b){
+      const ia = 1/Math.max(a, 0.01), ib = 1/Math.max(b, 0.01);
+      return (ia/(ia+ib))*100;
+    }
+    // Bar share for a signed stat (clutch): shift both by a common baseline so the bar
+    // reflects who is relatively more clutch, even when values are negative.
+    function shareSigned(a, b){
+      const base = Math.min(a, b, 0) - 1;   // guarantees both shifted values are >0
+      const sa = a - base, sb = b - base;
+      return (sa/(sa+sb))*100;
+    }
+    const signed = v => (v>0?'+':'') + v.toFixed(1);
 
     const lang = (window.MKWC_LANG_OVERLAY) || 'en';
     const LBL = {
-      en:{race:'Race win %', pf:'Points / match', w:'Matches won', pl:'Matches played'},
-      fr:{race:'% Courses gagnées', pf:'Points / match', w:'Matchs gagnés', pl:'Matchs joués'},
-      es:{race:'% Carreras ganadas', pf:'Puntos / partido', w:'Partidos ganados', pl:'Partidos jugados'},
-      ja:{race:'レース勝率', pf:'ポイント/試合', w:'勝利数', pl:'試合数'},
+      en:{race:'Race win %', pf:'Points / match', w:'Matches won', cons:'Consistency', clu:'Late-match'},
+      fr:{race:'% Courses gagnées', pf:'Points / match', w:'Matchs gagnés', cons:'Régularité', clu:'Fin de match'},
+      es:{race:'% Carreras ganadas', pf:'Puntos / partido', w:'Partidos ganados', cons:'Regularidad', clu:'Final de partido'},
+      ja:{race:'レース勝率', pf:'ポイント/試合', w:'勝利数', cons:'安定性', clu:'終盤の伸び'},
     };
     const M = LBL[lang] || LBL.en;
     return [
-      { label:M.race, get:racePct,       higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
-      { label:M.pf,   get:pointsPerMatch, higher:true, fmt:v=>v==null?'—':String(Math.round(v)) },
-      { label:M.w,    get:wins,          higher:true, fmt:v=>v==null?'—':String(v) },
-      { label:M.pl,   get:played,        higher:true, fmt:v=>String(v) },
+      { label:M.race, get:racePct,        higher:true,  fmt:v=>v==null?'—':Math.round(v)+'%' },
+      { label:M.pf,   get:pointsPerMatch, higher:true,  fmt:v=>v==null?'—':String(Math.round(v)) },
+      { label:M.w,    get:wins,           higher:true,  fmt:v=>v==null?'—':String(v) },
+      { label:M.cons, get:consistency,    higher:false, fmt:v=>v==null?'—':v.toFixed(1), share:shareLower },
+      { label:M.clu,  get:clutch,         higher:true,  fmt:v=>v==null?'—':signed(v),   share:shareSigned },
     ];
   }
 
@@ -337,13 +363,17 @@
 
     const html = rows.map(r=>{
       const va = r.get(tagA), vb = r.get(tagB);
-      // Bar split: share of the (positive) magnitudes on each side. When a stat can go
-      // negative (e.g. point difference) we compare magnitudes so the bar still reads.
-      const na = (va==null) ? 0 : Math.max(0, va);
-      const nb = (vb==null) ? 0 : Math.max(0, vb);
-      const sum = na + nb;
-      // Default 50/50 when there's nothing to compare, so the bar never collapses.
-      let pctA = sum>0 ? (na/sum)*100 : 50;
+      // Bar split (share of team A, 0–100). A stat can supply its own `share` for
+      // "lower is better" or signed stats; otherwise it's the straight proportion.
+      let pctA;
+      if(va==null || vb==null){
+        pctA = 50; // nothing to compare yet
+      } else if(typeof r.share === 'function'){
+        pctA = r.share(va, vb);
+      } else {
+        const na = Math.max(0, va), nb = Math.max(0, vb), sum = na + nb;
+        pctA = sum>0 ? (na/sum)*100 : 50;
+      }
       // Keep a minimum sliver visible on each side so both colours always show.
       pctA = Math.max(6, Math.min(94, pctA));
       let aWin=false, bWin=false;
