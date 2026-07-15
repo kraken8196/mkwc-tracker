@@ -134,6 +134,41 @@
   /* When one side is exactly 0%, drop its separator so no sliver of it shows. */
   .ov-bar-a.zero{border-right:0;}
 
+  /* ---- Line-up mode: two player columns + line-up averages ---- */
+  .lu-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:2px 0 4px;
+  }
+  .lu-col{display:flex;flex-direction:column;gap:2px;}
+  .lu-player{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:8px 12px;border-radius:8px;background:var(--bar-track);
+  }
+  .lu-col.a .lu-player{border-left:3px solid var(--team-a);}
+  .lu-col.b .lu-player{border-right:3px solid var(--team-b);flex-direction:row-reverse;}
+  .lu-name{
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:17px;color:var(--value);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  }
+  .lu-avg{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;color:var(--value);
+    flex-shrink:0;
+  }
+  .lu-total-row{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
+    margin-top:8px;padding:10px 12px 2px;border-top:1px solid rgba(255,255,255,0.12);
+  }
+  .lu-total{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;line-height:1;color:var(--value);
+  }
+  .lu-total.a{text-align:right;}
+  .lu-total.b{text-align:left;}
+  .lu-total.a.win{color:var(--team-a);text-shadow:0 0 14px color-mix(in srgb, var(--team-a) 45%, transparent);}
+  .lu-total.b.win{color:var(--team-b);text-shadow:0 0 14px color-mix(in srgb, var(--team-b) 45%, transparent);}
+  .lu-total-lbl{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--label);text-align:center;white-space:nowrap;
+  }
+
   /* small brand mark */
   .ov-foot{
     display:flex;align-items:center;justify-content:center;gap:7px;
@@ -264,9 +299,7 @@
     // exactly what a forfeit (150–0, entered as a bare score) lacks.
     let hasDetail=false;
     for(let r=0;r<12;r++){ if(raceScore(plH,r)!=null && raceScore(plA,r)!=null){ hasDetail=true; break; } }
-    // Does a named player appear in this match's line-up for a given side?
-    const hasPlayer = (arr, nameSet)=> arr.some(p=> p && p.n && nameSet.has(p.n));
-    return { H, A, scH:Number(sc[0]), scA:Number(sc[1]), plH, plA, raceScore, hasDetail, hasPlayer };
+    return { H, A, scH:Number(sc[0]), scA:Number(sc[1]), plH, plA, raceScore, hasDetail };
   }
 
   // The stats shown, top to bottom. `higher` = a higher number is better.
@@ -315,67 +348,6 @@
     }
     function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
     function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
-
-    // ===== LINE-UP MODE: recompute the same comparison on the chosen 6-v-6 players =====
-    if(lineupMode && lineupA.length && lineupB.length){
-      const player = window.getPlayerStats ? window.getPlayerStats() : {};
-      const setFor = tag => new Set(tag===tagA ? lineupA : lineupB);
-
-      // Line-up average score = total points of the chosen players / their total matches.
-      function lineupAvg(tag){
-        const names = tag===tagA ? lineupA : lineupB, ps = player[tag]||{};
-        let tot=0, cnt=0;
-        names.forEach(n=>{ const s=ps[n]; if(s){ tot+=s.total; cnt+=s.count; } });
-        return cnt>0 ? tot/cnt : null;
-      }
-      // Line-up clutch = average of the chosen players' clutch values.
-      function lineupClutch(tag){
-        const names = tag===tagA ? lineupA : lineupB, c = adv.clutch||{};
-        const vals=[]; names.forEach(n=>{ const v=c[tag+'|'+n]; if(v!=null) vals.push(v); });
-        return vals.length ? vals.reduce((s,v)=>s+v,0)/vals.length : null;
-      }
-      // Line-up race win % = across every race a chosen player took part in, how often
-      // their team won that race (team's combined race total vs the opponent's). A race
-      // is counted once even if several chosen players played it.
-      function lineupRacePct(tag){
-        const names = setFor(tag);
-        let won=0, total=0;
-        matches.forEach(m=>{
-          if(!m.hasDetail) return;
-          let mine, opp;
-          if(m.H===tag && m.hasPlayer(m.plH, names)){ mine=m.plH; opp=m.plA; }
-          else if(m.A===tag && m.hasPlayer(m.plA, names)){ mine=m.plA; opp=m.plH; }
-          else return;
-          for(let r=0;r<12;r++){
-            // only count races where at least one chosen player actually raced
-            const raced = mine.some(p=> p && p.n && names.has(p.n) && p.races && p.races[r]!=='' && p.races[r]!=null);
-            if(!raced) continue;
-            const a=m.raceScore(mine,r), b=m.raceScore(opp,r);
-            if(a==null||b==null||a===b) continue;
-            total++; if(a>b) won++;
-          }
-        });
-        return total ? (won/total)*100 : null;
-      }
-
-      const lang2 = (window.MKWC_LANG_OVERLAY) || 'en';
-      const LBL2 = {
-        en:{avg:'Avg. score', race:'Race win %', clu:'Late-match'},
-        fr:{avg:'Score moyen', race:'% Courses gagnées', clu:'Fin de match'},
-        es:{avg:'Puntuación media', race:'% Carreras ganadas', clu:'Final de partido'},
-        ja:{avg:'平均スコア', race:'レース勝率', clu:'終盤の伸び'},
-      };
-      const M2 = LBL2[lang2] || LBL2.en;
-      const signed2 = v => (v>0?'+':'') + v.toFixed(1);
-      const sharePts = (a,b)=>{ const p=v=>Math.max(0.02,Math.min(1,(v-252)/(732-252))); return (p(a)/(p(a)+p(b)))*100; };
-      const posC = (lo,hi,v)=>Math.max(0,Math.min(1,(v-lo)/(hi-lo)));
-      const shareClu = (a,b)=>{ const pa=posC(-3,3,a), pb=posC(-3,3,b), s=pa+pb; return s>0?(pa/s)*100:50; };
-      return [
-        { label:M2.avg,  get:lineupAvg,     higher:true, fmt:v=>v==null?'—':String(Math.round(v)), share:sharePts },
-        { label:M2.race, get:lineupRacePct, higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
-        { label:M2.clu,  get:lineupClutch,  higher:true, fmt:v=>v==null?'—':signed2(v), share:shareClu },
-      ];
-    }
 
     // These two stats sit in a narrow band, so a raw proportion always reads ~50/50.
     // We map each value to its position within a fixed *realistically achievable* range
@@ -430,6 +402,50 @@
     ];
   }
 
+  // Per-player average score for a chosen line-up, plus the line-up's overall average.
+  // Player avg = their total points / matches played (same basis as the site).
+  function lineupData(tag, names){
+    const ps = (window.getPlayerStats ? window.getPlayerStats() : {})[tag] || {};
+    let tot=0, cnt=0;
+    const players = names.map(n=>{
+      const s = ps[n];
+      const avg = (s && s.count>0) ? s.total/s.count : null;
+      if(s){ tot+=s.total; cnt+=s.count; }
+      return { name:n, avg };
+    });
+    return { players, avg: cnt>0 ? tot/cnt : null };
+  }
+
+  const esc = s => String(s).replace(/</g,'&lt;');
+
+  // Two columns of players (name + avg score) with each line-up's overall average
+  // at the bottom. The team with the higher line-up average is highlighted.
+  function renderLineupTable(da, db){
+    const lang = (window.MKWC_LANG_OVERLAY) || 'en';
+    const T = ({en:'Line-up average',fr:'Moyenne de la line-up',es:'Media de la alineación',ja:'ラインアップ平均'})[lang]
+              || 'Line-up average';
+    const col = (d, side)=>{
+      const rows = d.players.map(p=>`
+        <div class="lu-player">
+          <span class="lu-name">${esc(p.name)}</span>
+          <span class="lu-avg">${p.avg==null?'—':Math.round(p.avg)}</span>
+        </div>`).join('');
+      return `<div class="lu-col ${side}">${rows}</div>`;
+    };
+    const aWin = da.avg!=null && db.avg!=null && da.avg>db.avg;
+    const bWin = da.avg!=null && db.avg!=null && db.avg>da.avg;
+    $('ovRows').innerHTML = `
+      <div class="lu-grid">
+        ${col(da,'a')}
+        ${col(db,'b')}
+      </div>
+      <div class="lu-total-row">
+        <div class="lu-total a ${aWin?'win':''}">${da.avg==null?'—':Math.round(da.avg)}</div>
+        <div class="lu-total-lbl">${T}</div>
+        <div class="lu-total b ${bWin?'win':''}">${db.avg==null?'—':Math.round(db.avg)}</div>
+      </div>`;
+  }
+
   let lastSig = null;
   function render(){
     if(!window.getTeamStats){ showMsg('Loading…'); return; }
@@ -439,22 +455,40 @@
     if(known.indexOf(tagA)===-1 || known.indexOf(tagB)===-1){
       showMsg('Unknown team tag. Use codes like FR, BRA, JPN…'); return;
     }
-    if(lineupMode && (!lineupA.length || !lineupB.length)){
-      showMsg('Pick players for both line-ups in the builder.'); return;
+
+    // Common header (flags + matchup title).
+    function setHeader(){
+      $('flagA').src = 'flags/'+tagA+'.png';
+      $('flagB').src = 'flags/'+tagB+'.png';
+      $('titleText').innerHTML = customTitle
+        ? esc(customTitle)
+        : (esc(name(tagA))+' <span class="vs">vs</span> '+esc(name(tagB)));
     }
 
+    // ---------- LINE-UP MODE: two columns of players + averages, no bars ----------
+    if(lineupMode){
+      if(!lineupA.length || !lineupB.length){
+        showMsg('Pick players for both line-ups in the builder.'); return;
+      }
+      const da = lineupData(tagA, lineupA), db = lineupData(tagB, lineupB);
+      const sig = 'L'+tagA+tagB+theme+lineupA.join(',')+lineupB.join(',')
+        + da.players.map(p=>p.avg==null?'-':Math.round(p.avg)).join('|')
+        + db.players.map(p=>p.avg==null?'-':Math.round(p.avg)).join('|');
+      if(sig === lastSig){ showContent(); return; }
+      lastSig = sig;
+      setHeader();
+      renderLineupTable(da, db);
+      showContent();
+      return;
+    }
+
+    // ---------- WHOLE-SQUAD MODE: the comparison bars ----------
     const rows = statRows();
     // Signature: only rebuild the DOM when a displayed value actually changed.
-    const sig = tagA+tagB+theme+lineupA.join(',')+lineupB.join(',')+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
+    const sig = tagA+tagB+theme+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
     if(sig === lastSig){ showContent(); return; }
     lastSig = sig;
-
-    $('flagA').src = 'flags/'+tagA+'.png';
-    $('flagB').src = 'flags/'+tagB+'.png';
-    const esc = s => String(s).replace(/</g,'&lt;');
-    $('titleText').innerHTML = customTitle
-      ? esc(customTitle)
-      : (esc(name(tagA))+' <span class="vs">vs</span> '+esc(name(tagB)));
+    setHeader();
 
     const html = rows.map(r=>{
       const va = r.get(tagA), vb = r.get(tagB);
