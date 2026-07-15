@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKWC 2026 — Stream Overlay Builder</title>
+<meta name="robots" content="index,follow">
+<meta name="description" content="Build a free OBS stats overlay for MKWC 2026 broadcasts: a live head-to-head comparison of any two teams. Copy the URL into an OBS browser source.">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    --orange-1:#F0942F; --orange-2:#C1591C; --orange-3:#8A3812;
+    --panel:#2A1608; --panel-2:#341C0C; --panel-3:#3E220E;
+    --line:rgba(255,235,210,0.14); --line-strong:rgba(255,235,210,0.28);
+    --cream:#FBEFDA; --dim:#D9B996; --gold:#FFCE54; --green:#3ECF6B; --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;overflow-x:hidden;}
+  body{
+    color:var(--cream);font-family:'Inter',sans-serif;min-height:100vh;
+    background:
+      radial-gradient(circle at 12% -10%, rgba(255,206,84,0.22), transparent 45%),
+      radial-gradient(circle at 100% 0%, rgba(255,255,255,0.08), transparent 35%),
+      linear-gradient(160deg, var(--orange-1) 0%, var(--orange-2) 45%, var(--orange-3) 100%);
+    background-attachment:fixed;
+  }
+  h1,h2,h3{font-family:'Rajdhani',sans-serif;font-weight:700;margin:0;}
+  a{color:var(--gold);}
+
+  header{max-width:900px;margin:0 auto;padding:26px 20px 6px;display:flex;align-items:center;gap:14px;}
+  header img{width:74px;height:auto;}
+  header .t1{font-size:24px;color:var(--cream);}
+  header .t1 span{color:var(--gold);}
+  header .t2{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:0.14em;}
+
+  main{max-width:900px;margin:0 auto;padding:12px 20px 60px;}
+  .lede{font-size:15px;color:var(--cream);opacity:0.95;line-height:1.6;margin:8px 0 22px;max-width:640px;}
+
+  .card{
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--line-strong);border-radius:var(--radius);
+    padding:20px;box-shadow:0 6px 18px rgba(0,0,0,0.25);margin-bottom:20px;
+  }
+  .card h2{font-size:16px;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:620px){ .grid2{grid-template-columns:1fr;} }
+
+  label{display:block;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+  select{
+    width:100%;padding:11px 12px;border-radius:9px;font-size:15px;font-family:'Inter',sans-serif;
+    background:var(--panel-3);color:var(--cream);border:1px solid var(--line-strong);cursor:pointer;
+  }
+  select:focus{outline:none;border-color:var(--gold);}
+
+  .seg{display:flex;gap:8px;flex-wrap:wrap;}
+  .seg button{
+    background:var(--panel-3);border:1px solid var(--line-strong);color:var(--dim);
+    padding:9px 14px;border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+    cursor:pointer;letter-spacing:0.04em;
+  }
+  .seg button.active{background:var(--gold);color:#3a2100;border-color:var(--gold);}
+
+  .url-box{
+    display:flex;gap:8px;align-items:stretch;margin-top:6px;
+  }
+  .url-box input{
+    flex:1;min-width:0;padding:11px 12px;border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+    background:#1c0f04;color:var(--gold);border:1px solid var(--line-strong);
+  }
+  .btn{
+    background:var(--gold);color:#3a2100;border:none;border-radius:9px;padding:0 16px;
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:0.04em;
+    cursor:pointer;white-space:nowrap;
+  }
+  .btn.copied{background:var(--green);color:#062;}
+
+  /* Preview: overlay on a checkerboard so the transparency reads clearly. */
+  .preview-wrap{
+    border-radius:10px;overflow:hidden;border:1px solid var(--line-strong);
+    background-color:#3a3f47;
+    background-image:
+      linear-gradient(45deg, #2c3037 25%, transparent 25%),
+      linear-gradient(-45deg, #2c3037 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #2c3037 75%),
+      linear-gradient(-45deg, transparent 75%, #2c3037 75%);
+    background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0;
+  }
+  .preview-wrap iframe{display:block;width:100%;height:320px;border:0;}
+
+  ol.steps{margin:10px 0 0;padding-left:20px;line-height:1.75;font-size:14px;color:var(--cream);}
+  ol.steps code{background:var(--panel-3);padding:1px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--gold);}
+  .hint{font-size:12.5px;color:var(--dim);margin-top:10px;line-height:1.6;}
+  footer{max-width:900px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--dim);text-align:center;}
+  footer a{text-decoration:underline;}
+</style>
+</head>
+<body>
+<header>
+  <img src="img/logo.png" alt="MKWC">
+  <div>
+    <div class="t1">MKWC <span>2026</span></div>
+    <div class="t2">Stream overlay builder</div>
+  </div>
+</header>
+
+<main>
+  <p class="lede">
+    A free stats overlay for your MKWC broadcast: a live head-to-head of any two teams
+    (win %, average, point difference, consistency), refreshed automatically as scores
+    come in. Pick the two teams, copy the URL, and drop it into an OBS browser source.
+  </p>
+
+  <div class="card">
+    <h2>1 · Configure</h2>
+    <div class="grid2">
+      <div>
+        <label for="selA">Team A (left)</label>
+        <select id="selA"></select>
+      </div>
+      <div>
+        <label for="selB">Team B (right)</label>
+        <select id="selB"></select>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:16px;">
+      <div>
+        <label>Theme</label>
+        <div class="seg" id="themeSeg">
+          <button data-theme="mkwc" class="active">MKWC (orange)</button>
+          <button data-theme="neutral">Neutral (dark)</button>
+        </div>
+      </div>
+      <div>
+        <label>Language</label>
+        <div class="seg" id="langSeg">
+          <button data-lang="en" class="active">EN</button>
+          <button data-lang="fr">FR</button>
+          <button data-lang="es">ES</button>
+          <button data-lang="ja">JA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Your overlay URL</h2>
+    <div class="url-box">
+      <input id="urlOut" readonly value="">
+      <button class="btn" id="copyBtn">Copy</button>
+    </div>
+    <p class="hint">This is a normal web page — you can also open it in a browser to check it.</p>
+  </div>
+
+  <div class="card">
+    <h2>3 · Live preview</h2>
+    <div class="preview-wrap"><iframe id="preview" title="Overlay preview"></iframe></div>
+    <p class="hint">Shown on a checkerboard so you can see the transparent background. In OBS it sits over your scene.</p>
+  </div>
+
+  <div class="card">
+    <h2>4 · Add it to OBS</h2>
+    <ol class="steps">
+      <li>In OBS, add a source → <b>Browser</b>.</li>
+      <li>Paste the URL above into the <code>URL</code> field.</li>
+      <li>Set width <code>720</code>, height <code>360</code> (adjust to taste).</li>
+      <li>Tick <b>Shutdown source when not visible</b> and <b>Refresh when active</b> if you like.</li>
+      <li>Position it on your scene — the background is transparent.</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  Community project, not affiliated with Nintendo · <a href="home.html">Back to the tracker</a>
+</footer>
+
+<script>window.MKWC_OVERLAY = true;</script>
+<script src="assets/data.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  let TAGS = [];
+  let theme = 'mkwc', lang = 'en';
+
+  function base(){ return location.href.replace(/overlay-config\.html.*/, 'overlay.html'); }
+  function buildUrl(){
+    const a = $('selA').value, b = $('selB').value;
+    const u = new URL(base());
+    if(a) u.searchParams.set('a', a);
+    if(b) u.searchParams.set('b', b);
+    u.searchParams.set('theme', theme);
+    u.searchParams.set('lang', lang);
+    return u.toString();
+  }
+  function refresh(){
+    const url = buildUrl();
+    $('urlOut').value = url;
+    if($('preview').src !== url) $('preview').src = url;
+  }
+
+  function fillTeams(){
+    const name = window.teamName || (x=>x);
+    // Sort alphabetically by display name for an easy-to-scan dropdown.
+    const opts = TAGS.slice().sort((x,y)=> (name(x)||x).localeCompare(name(y)||y));
+    const mk = (sel, chosen) => {
+      sel.innerHTML = opts.map(tag=>`<option value="${tag}" ${tag===chosen?'selected':''}>${name(tag)||tag} (${tag})</option>`).join('');
+    };
+    mk($('selA'), opts[0]);
+    mk($('selB'), opts[1] || opts[0]);
+  }
+
+  function wire(){
+    $('selA').onchange = refresh;
+    $('selB').onchange = refresh;
+    $('themeSeg').querySelectorAll('button').forEach(btn=>{
+      btn.onclick = ()=>{
+        theme = btn.dataset.theme;
+        $('themeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+        refresh();
+      };
+    });
+    $('langSeg').querySelectorAll('button').forEach(btn=>{
+      btn.onclick = ()=>{
+        lang = btn.dataset.lang;
+        $('langSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+        fillTeams(); // team names are localised
+        refresh();
+      };
+    });
+    $('copyBtn').onclick = async ()=>{
+      try{ await navigator.clipboard.writeText($('urlOut').value); }
+      catch(e){ $('urlOut').select(); document.execCommand('copy'); }
+      const b = $('copyBtn'); b.classList.add('copied'); b.textContent = 'Copied!';
+      setTimeout(()=>{ b.classList.remove('copied'); b.textContent = 'Copy'; }, 1600);
+    };
+  }
+
+  window.MKWC_ON_READY = function(){
+    TAGS = window.MKWC_TEAM_TAGS || [];
+    fillTeams();
+    wire();
+    refresh();
+  };
+})();
+</script>
+<script src="assets/app.js"></script>
+</body>
+</html>

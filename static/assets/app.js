@@ -51,6 +51,8 @@ const TEAMS = {
   AUT:{name:'Autriche',flag:{k:'h3',c:['#ED2939','#FFFFFF','#ED2939']}},
   LUX:{name:'Luxembourg',flag:{k:'h3',c:['#ED2939','#FFFFFF','#00A1DE']}},
 };
+// Exposed for the OBS overlay's config page, which needs to list every team tag.
+try{ window.MKWC_TEAM_TAGS = Object.keys(TEAMS); }catch(e){}
 
 /* =========================================================
    I18N — LANGUAGE
@@ -2815,6 +2817,19 @@ function applyHashRoute(){
   await loadState();
   __trace('après loadState');
   migrateAllPlayerData();
+  // Overlay/embed mode (e.g. the OBS stats overlay): we reuse this file only for its
+  // data loading and stat helpers — the site DOM (nav, views, lang switch) isn't
+  // present, so skip all rendering and just hand control back to the host page.
+  if(window.MKWC_OVERLAY){
+    await loadLangPref();
+    // Overlay may pin a language via ?lang= (falls back to the saved/default one).
+    try{
+      const ovLang = new URLSearchParams(location.search).get('lang');
+      if(ovLang && I18N[ovLang]) LANG = ovLang;
+    }catch(e){ /* keep current LANG */ }
+    if(typeof window.MKWC_ON_READY === 'function') window.MKWC_ON_READY();
+    return;
+  }
   await loadLangPref();
   applyStaticI18n();
   renderLangSwitch();
