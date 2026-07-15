@@ -194,12 +194,12 @@
   .tk-cell.b.win .tk-val{color:var(--team-b);}
   .tk-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);}
   .tk-more{
-    display:block;width:100%;margin:6px 0 2px;padding:8px;border-radius:7px;cursor:pointer;
+    width:100%;margin:3px 0;padding:8px;border-radius:7px;cursor:pointer;
     background:transparent;border:1px solid var(--edge);color:var(--label);
     font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
   }
   .tk-more:hover{color:var(--value);border-color:var(--accent);}
-  .tk-extra{margin-top:3px;}
+  .tk-hidden{display:none;}
 
   /* small brand mark */
   .ov-foot{
@@ -497,7 +497,7 @@
   // A per-track table: team A avg (× times played) | track name | team B avg (× played).
   // Tracks both teams played come first; those only one team played are hidden behind a
   // "Show more" toggle. The higher average on each track is highlighted.
-  function trackRowHTML(r){
+  function trackRowHTML(r, extraClass){
     const cell = (avg, n, side, win)=>{
       const val = avg==null ? '—' : Math.round(avg);
       const times = n>0 ? `<span class="tk-n">×${n}</span>` : '';
@@ -505,7 +505,7 @@
     };
     const aWin = r.aAvg!=null && r.bAvg!=null && r.aAvg>r.bAvg;
     const bWin = r.aAvg!=null && r.bAvg!=null && r.bAvg>r.aAvg;
-    return `<div class="tk-row">
+    return `<div class="tk-row ${extraClass||''}">
       ${cell(r.aAvg, r.aN, 'a', aWin)}
       <div class="tk-name">${esc(r.name)}</div>
       ${cell(r.bAvg, r.bN, 'b', bWin)}
@@ -522,23 +522,23 @@
       ja:{more:'もっと見る', less:'閉じる', empty:'共通のコースデータなし。'},
     })[lang] || {more:'Show more', less:'Show less', empty:'No shared track data yet.'};
 
-    const bothHtml = both.length ? both.map(trackRowHTML).join('') : `<div class="ov-msg">${L.empty}</div>`;
-    const oneHtml  = one.map(trackRowHTML).join('');
     const open = tracksExpanded; // remembered across auto-refreshes
+    const bothHtml = both.length ? both.map(trackRowHTML).join('') : `<div class="ov-msg">${L.empty}</div>`;
+    // Extra rows live in the SAME table; they're just toggled row-by-row so the table
+    // grows/shrinks in place instead of a second table appearing.
+    const oneHtml = one.map(r=>trackRowHTML(r, 'tk-extra-row'+(open?'':' tk-hidden'))).join('');
     const toggle = one.length
       ? `<button class="tk-more" id="tkMore" type="button">${(open?L.less:L.more)} (${one.length})</button>`
       : '';
-    $('ovRows').innerHTML = `
-      <div class="tk-table">${bothHtml}</div>
-      ${toggle}
-      <div class="tk-table tk-extra" id="tkExtra" style="display:${open?'':'none'};">${oneHtml}</div>`;
+    $('ovRows').innerHTML = `<div class="tk-table">${bothHtml}${toggle}${oneHtml}</div>`;
 
     const btn = $('tkMore');
     if(btn){
       btn.onclick = ()=>{
         tracksExpanded = !tracksExpanded;
-        const ex = $('tkExtra');
-        ex.style.display = tracksExpanded ? '' : 'none';
+        $('ovRows').querySelectorAll('.tk-extra-row').forEach(el=>{
+          el.classList.toggle('tk-hidden', !tracksExpanded);
+        });
         btn.textContent = (tracksExpanded ? L.less : L.more) + ' ('+one.length+')';
       };
     }
