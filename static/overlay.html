@@ -308,18 +308,36 @@
     function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
     function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
 
-    // Bar share when LOWER is better (consistency): the steadier team gets the bigger
-    // slice, so the bar still reads "more colour = better".
-    function shareLower(a, b){
-      const ia = 1/Math.max(a, 0.01), ib = 1/Math.max(b, 0.01);
-      return (ia/(ia+ib))*100;
+    // Dynamic min/max of a per-team stat across every team, so bars for stats without a
+    // fixed range (consistency, late-match) can be scaled to the real spread observed.
+    const ALL_TAGS = window.MKWC_TEAM_TAGS || [];
+    function statRange(fn){
+      let lo=Infinity, hi=-Infinity;
+      ALL_TAGS.forEach(t=>{ const v=fn(t); if(v!=null){ if(v<lo)lo=v; if(v>hi)hi=v; } });
+      return (lo===Infinity) ? null : {lo, hi};
     }
-    // Bar share for a signed stat (clutch): shift both by a common baseline so the bar
-    // reflects who is relatively more clutch, even when values are negative.
+    const consRange = statRange(consistency);
+    const cluRange  = statRange(clutch);
+    // Position of v within [lo,hi] → 0..1. Degenerate range (lo==hi) maps to 0.5.
+    function posIn(range, v){
+      if(!range) return 0.5;
+      const span = range.hi - range.lo;
+      return span>0 ? (v - range.lo)/span : 0.5;
+    }
+
+    // Bar share when LOWER is better (consistency): invert each team's position in the
+    // real range so the steadier team (lower value) gets the bigger, faithful slice.
+    function shareLower(a, b){
+      const pa = 1 - posIn(consRange, a), pb = 1 - posIn(consRange, b);
+      const sum = pa + pb;
+      return sum>0 ? (pa/sum)*100 : 50;
+    }
+    // Bar share for late-match (signed): position each team in the real [min,max] range
+    // across teams, so the split reflects the true spread even with negative values.
     function shareSigned(a, b){
-      const base = Math.min(a, b, 0) - 1;   // guarantees both shifted values are >0
-      const sa = a - base, sb = b - base;
-      return (sa/(sa+sb))*100;
+      const pa = posIn(cluRange, a), pb = posIn(cluRange, b);
+      const sum = pa + pb;
+      return sum>0 ? (pa/sum)*100 : 50;
     }
     const signed = v => (v>0?'+':'') + v.toFixed(1);
 
