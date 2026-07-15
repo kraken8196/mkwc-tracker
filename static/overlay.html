@@ -71,7 +71,7 @@
   /* Header row: team A | title | team B */
   .ov-head{
     display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
-    gap:16px;padding:14px 18px 12px;background:var(--head-bg);
+    gap:16px;padding:14px 16px 12px;background:var(--head-bg);
   }
   .ov-team{display:flex;align-items:center;justify-content:center;}
   .ov-team.a{justify-content:flex-start;}
@@ -82,19 +82,26 @@
     background:#222;
   }
   .ov-flag img{width:100%;height:100%;object-fit:cover;display:block;}
-  /* The matchup title carries the team names (only place they appear now). */
+  /* The matchup title carries the team names. Laid out as [name A | vs | name B] with
+     "vs" in a fixed centre column, so the "vs" sits exactly on the card's midline —
+     which is where the two content columns meet below. */
   .ov-title{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;column-gap:10px;
     font-family:'Rajdhani',sans-serif;font-weight:700;
-    font-size:30px;line-height:1.05;letter-spacing:0.01em;
-    color:var(--value);text-align:center;
-    text-shadow:0 2px 5px rgba(0,0,0,0.6);
-    overflow:hidden;
+    font-size:29px;line-height:1.05;letter-spacing:0.01em;
+    color:var(--value);text-shadow:0 2px 5px rgba(0,0,0,0.6);
   }
-  .ov-title #titleText{display:inline-block;max-width:100%;}
+  .ov-title .ttl-a{text-align:right;}
+  .ov-title .ttl-b{text-align:left;}
+  .ov-title .ttl-a,.ov-title .ttl-b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
   .ov-title .vs{
     color:var(--label);font-family:'JetBrains Mono',monospace;font-weight:700;
     font-size:16px;text-transform:uppercase;letter-spacing:0.1em;
-    padding:0 8px;vertical-align:middle;
+  }
+  /* A custom title lives in the centre cell and spans the row, centred. */
+  .ov-title .vs.custom{
+    grid-column:1 / -1;font-family:'Rajdhani',sans-serif;font-size:29px;
+    text-transform:none;letter-spacing:0.01em;color:var(--value);text-align:center;
   }
 
   /* Stat rows: a centred label, then value A · split bar · value B (football-card style). */
@@ -194,7 +201,11 @@
   <div class="hidden" id="ovContent">
     <div class="ov-head">
       <div class="ov-team a"><span class="ov-flag"><img id="flagA" alt=""></span></div>
-      <div class="ov-title"><span id="titleText">Head&nbsp;to&nbsp;Head</span></div>
+      <div class="ov-title">
+        <span class="ttl-a" id="ttlA"></span>
+        <span class="vs" id="ttlVs">vs</span>
+        <span class="ttl-b" id="ttlB"></span>
+      </div>
       <div class="ov-team b"><span class="ov-flag"><img id="flagB" alt=""></span></div>
     </div>
     <div class="ov-body" id="ovRows"></div>
@@ -402,28 +413,29 @@
     ];
   }
 
-  // Per-player average score for a chosen line-up, plus the line-up's overall average.
+  // Per-player average score for a chosen line-up, plus the SUM of those averages
+  // (the total the line-up would post if each player scored their own average).
   // Player avg = their total points / matches played (same basis as the site).
   function lineupData(tag, names){
     const ps = (window.getPlayerStats ? window.getPlayerStats() : {})[tag] || {};
-    let tot=0, cnt=0;
+    let sum=0, any=false;
     const players = names.map(n=>{
       const s = ps[n];
       const avg = (s && s.count>0) ? s.total/s.count : null;
-      if(s){ tot+=s.total; cnt+=s.count; }
+      if(avg!=null){ sum+=avg; any=true; }
       return { name:n, avg };
     });
-    return { players, avg: cnt>0 ? tot/cnt : null };
+    return { players, total: any ? sum : null };
   }
 
   const esc = s => String(s).replace(/</g,'&lt;');
 
-  // Two columns of players (name + avg score) with each line-up's overall average
-  // at the bottom. The team with the higher line-up average is highlighted.
+  // Two columns of players (name + avg score) with each line-up's TOTAL (sum of the
+  // player averages) at the bottom. The higher total is highlighted.
   function renderLineupTable(da, db){
     const lang = (window.MKWC_LANG_OVERLAY) || 'en';
-    const T = ({en:'Line-up average',fr:'Moyenne de la line-up',es:'Media de la alineación',ja:'ラインアップ平均'})[lang]
-              || 'Line-up average';
+    const T = ({en:'Line-up total',fr:'Total de la line-up',es:'Total de la alineación',ja:'ラインアップ合計'})[lang]
+              || 'Line-up total';
     const col = (d, side)=>{
       const rows = d.players.map(p=>`
         <div class="lu-player">
@@ -432,17 +444,17 @@
         </div>`).join('');
       return `<div class="lu-col ${side}">${rows}</div>`;
     };
-    const aWin = da.avg!=null && db.avg!=null && da.avg>db.avg;
-    const bWin = da.avg!=null && db.avg!=null && db.avg>da.avg;
+    const aWin = da.total!=null && db.total!=null && da.total>db.total;
+    const bWin = da.total!=null && db.total!=null && db.total>da.total;
     $('ovRows').innerHTML = `
       <div class="lu-grid">
         ${col(da,'a')}
         ${col(db,'b')}
       </div>
       <div class="lu-total-row">
-        <div class="lu-total a ${aWin?'win':''}">${da.avg==null?'—':Math.round(da.avg)}</div>
+        <div class="lu-total a ${aWin?'win':''}">${da.total==null?'—':Math.round(da.total)}</div>
         <div class="lu-total-lbl">${T}</div>
-        <div class="lu-total b ${bWin?'win':''}">${db.avg==null?'—':Math.round(db.avg)}</div>
+        <div class="lu-total b ${bWin?'win':''}">${db.total==null?'—':Math.round(db.total)}</div>
       </div>`;
   }
 
@@ -456,13 +468,22 @@
       showMsg('Unknown team tag. Use codes like FR, BRA, JPN…'); return;
     }
 
-    // Common header (flags + matchup title).
+    // Common header (flags + matchup title). Names go either side of the fixed "vs".
     function setHeader(){
       $('flagA').src = 'flags/'+tagA+'.png';
       $('flagB').src = 'flags/'+tagB+'.png';
-      $('titleText').innerHTML = customTitle
-        ? esc(customTitle)
-        : (esc(name(tagA))+' <span class="vs">vs</span> '+esc(name(tagB)));
+      if(customTitle){
+        // Custom title: centre it (put it in the middle cell, blank the sides).
+        $('ttlA').textContent = '';
+        $('ttlVs').textContent = customTitle;
+        $('ttlVs').classList.add('custom');
+        $('ttlB').textContent = '';
+      } else {
+        $('ttlVs').textContent = 'vs';
+        $('ttlVs').classList.remove('custom');
+        $('ttlA').textContent = name(tagA);
+        $('ttlB').textContent = name(tagB);
+      }
     }
 
     // ---------- LINE-UP MODE: two columns of players + averages, no bars ----------
