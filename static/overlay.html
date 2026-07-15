@@ -203,6 +203,19 @@
   .tk-more:hover{color:var(--value);border-color:var(--accent);}
   .tk-hidden{display:none;}
 
+  /* View tabs — the streamer clicks to switch between Teams / Line-up / Tracks live. */
+  .ov-tabs{
+    display:flex;gap:6px;justify-content:center;padding:2px 16px 10px;
+  }
+  .ov-tab{
+    flex:0 0 auto;padding:6px 14px;border-radius:999px;cursor:pointer;
+    background:var(--bar-track);border:1px solid var(--edge);color:var(--label);
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .ov-tab:hover{color:var(--value);}
+  .ov-tab.active{background:var(--accent);color:#20140a;border-color:var(--accent);}
+
   /* small brand mark */
   .ov-foot{
     display:flex;align-items:center;justify-content:center;gap:7px;
@@ -235,6 +248,7 @@
       </div>
       <div class="ov-team b"><span class="ov-flag"><img id="flagB" alt=""></span></div>
     </div>
+    <div class="ov-tabs" id="ovTabs"></div>
     <div class="ov-body" id="ovRows"></div>
     <div class="ov-foot"><b>MKWC 2026</b> · stats</div>
   </div>
@@ -245,11 +259,14 @@
 <script src="assets/data.js"></script>
 <script>
 /* =========================================================
-   OBS STATS OVERLAY — head-to-head team comparison.
+   OBS STATS OVERLAY — head-to-head team comparison, three views in one overlay
+   with clickable tabs (Teams / Line-up / Tracks) the streamer switches live.
    URL params:
      ?a=FR&b=BRA         the two team tags to compare (required)
      &theme=mkwc|neutral colour theme (default mkwc)
      &lang=fr|en|es|ja   language for labels/team names (default en)
+     &mode=team|lineup|tracks   which tab is shown first (default team)
+     &pa=Name1,Name2…&pb=…      6-v-6 line-ups; enables the Line-up tab
      &title=...          optional custom centre title
    Data comes from Supabase via the site's loadState(); it refreshes on a timer,
    and only touches the DOM when a value actually changed (no flicker on stream).
@@ -263,14 +280,15 @@
   const debug = params.has('debug');
   const langParam = (params.get('lang')||'en').toLowerCase();
   window.MKWC_LANG_OVERLAY = ['en','fr','es','ja'].includes(langParam) ? langParam : 'en';
-  // Comparison mode: 'lineup' (chosen 6-v-6 players), 'tracks' (per-track averages),
-  // or the default whole-squad bars.
-  const modeParam = params.get('mode');
-  const lineupMode = modeParam === 'lineup';
-  const tracksMode = modeParam === 'tracks';
   const decodeList = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean);
   const lineupA = decodeList(params.get('pa'));
   const lineupB = decodeList(params.get('pb'));
+  const hasLineup = lineupA.length>0 && lineupB.length>0;
+  // The three views live in one overlay; the streamer switches with the tabs. ?mode=
+  // sets the initial view (team | lineup | tracks); lineup is only offered if configured.
+  const VIEWS = ['team'].concat(hasLineup ? ['lineup'] : []).concat(['tracks']);
+  let currentView = params.get('mode');
+  if(VIEWS.indexOf(currentView) === -1) currentView = 'team';
   document.getElementById('ov').setAttribute('data-theme', theme);
 
   // Surface any uncaught error on screen (helps diagnose a stuck "Loading…").
@@ -550,6 +568,37 @@
   }
   let tracksExpanded = false;
 
+  // Build the view tabs (only the views that apply — line-up needs a configured line-up).
+  let tabsBuilt = false;
+  function renderTabs(){
+    const lang = (window.MKWC_LANG_OVERLAY) || 'en';
+    const LBL = ({
+      en:{team:'Teams', lineup:'Line-up', tracks:'Tracks'},
+      fr:{team:'Équipes', lineup:'Line-up', tracks:'Circuits'},
+      es:{team:'Equipos', lineup:'Alineación', tracks:'Circuitos'},
+      ja:{team:'チーム', lineup:'ラインアップ', tracks:'コース'},
+    })[lang] || {team:'Teams', lineup:'Line-up', tracks:'Tracks'};
+    const box = $('ovTabs');
+    // A single tab needs no tab bar.
+    if(VIEWS.length <= 1){ box.style.display='none'; return; }
+    if(!tabsBuilt){
+      box.innerHTML = VIEWS.map(v=>`<button class="ov-tab" data-view="${v}" type="button">${LBL[v]||v}</button>`).join('');
+      box.querySelectorAll('.ov-tab').forEach(btn=>{
+        btn.onclick = ()=>{
+          if(currentView === btn.dataset.view) return;
+          currentView = btn.dataset.view;
+          lastSig = null;          // force a redraw of the body
+          tracksExpanded = false;  // reset the tracks "show more" on view change
+          render();
+        };
+      });
+      tabsBuilt = true;
+    }
+    box.querySelectorAll('.ov-tab').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.view === currentView);
+    });
+  }
+
   let lastSig = null;
   function render(){
     if(!window.getTeamStats){ showMsg('Loading…'); return; }
@@ -577,45 +626,41 @@
         $('ttlB').textContent = name(tagB);
       }
     }
+    setHeader();
+    renderTabs();
 
-    // ---------- LINE-UP MODE: two columns of players + averages, no bars ----------
-    if(lineupMode){
-      if(!lineupA.length || !lineupB.length){
-        showMsg('Pick players for both line-ups in the builder.'); return;
-      }
+    // ---------- LINE-UP VIEW: two columns of players + averages, no bars ----------
+    if(currentView==='lineup'){
       const da = lineupData(tagA, lineupA), db = lineupData(tagB, lineupB);
       const sig = 'L'+tagA+tagB+theme+lineupA.join(',')+lineupB.join(',')
         + da.players.map(p=>p.avg==null?'-':Math.round(p.avg)).join('|')
         + db.players.map(p=>p.avg==null?'-':Math.round(p.avg)).join('|');
       if(sig === lastSig){ showContent(); return; }
       lastSig = sig;
-      setHeader();
       renderLineupTable(da, db);
       showContent();
       return;
     }
 
-    // ---------- TRACKS MODE: per-track average comparison ----------
-    if(tracksMode){
+    // ---------- TRACKS VIEW: per-track average comparison ----------
+    if(currentView==='tracks'){
       const rows = tracksData();
       const sig = 'T'+tagA+tagB+theme+rows.map(r=>
         (r.aAvg==null?'-':Math.round(r.aAvg))+'/'+r.aN+':'+(r.bAvg==null?'-':Math.round(r.bAvg))+'/'+r.bN
       ).join('|');
       if(sig === lastSig){ showContent(); return; }
       lastSig = sig;
-      setHeader();
       renderTracksTable(rows);
       showContent();
       return;
     }
 
-    // ---------- WHOLE-SQUAD MODE: the comparison bars ----------
+    // ---------- TEAM VIEW: the whole-squad comparison bars ----------
     const rows = statRows();
     // Signature: only rebuild the DOM when a displayed value actually changed.
-    const sig = tagA+tagB+theme+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
+    const sig = 'S'+tagA+tagB+theme+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
     if(sig === lastSig){ showContent(); return; }
     lastSig = sig;
-    setHeader();
 
     const html = rows.map(r=>{
       const va = r.get(tagA), vb = r.get(tagB);

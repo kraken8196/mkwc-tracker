@@ -143,22 +143,19 @@
     </div>
 
     <div style="margin-top:16px;">
-      <label>Comparison</label>
+      <label>Default view (streamers switch tabs live in the overlay)</label>
       <div class="seg" id="modeSeg">
-        <button data-mode="team" class="active">Whole squads</button>
-        <button data-mode="lineup">Pick 6-v-6 line-ups</button>
-        <button data-mode="tracks">Per-track averages</button>
+        <button data-mode="team" class="active">Teams</button>
+        <button data-mode="lineup">Line-up</button>
+        <button data-mode="tracks">Tracks</button>
       </div>
     </div>
 
-    <!-- Line-up pickers, shown only in line-up mode -->
-    <div class="grid2" id="lineupWrap" style="margin-top:16px;display:none;">
-      <div>
-        <label id="lblLineA">Team A line-up (pick 6)</label>
+    <!-- Optional line-up pickers: fill these to enable the Line-up tab in the overlay. -->
+    <div style="margin-top:18px;">
+      <label>Line-up tab (optional — pick up to 6 per team to enable it)</label>
+      <div class="grid2">
         <div class="lineup" id="lineupA"></div>
-      </div>
-      <div>
-        <label id="lblLineB">Team B line-up (pick 6)</label>
         <div class="lineup" id="lineupB"></div>
       </div>
     </div>
@@ -232,13 +229,16 @@
     if(b) u.searchParams.set('b', b);
     u.searchParams.set('theme', theme);
     u.searchParams.set('lang', lang);
-    if(mode === 'lineup'){
-      u.searchParams.set('mode', 'lineup');
-      u.searchParams.set('pa', chosen($('lineupA')).join(','));
-      u.searchParams.set('pb', chosen($('lineupB')).join(','));
-    } else if(mode === 'tracks'){
-      u.searchParams.set('mode', 'tracks');
-    }
+    // Line-ups are always carried (if picked) so the overlay's Line-up tab is available,
+    // whatever the default view is.
+    const pa = chosen($('lineupA')), pb = chosen($('lineupB'));
+    if(pa.length) u.searchParams.set('pa', pa.join(','));
+    if(pb.length) u.searchParams.set('pb', pb.join(','));
+    // Default view when the overlay loads; the streamer can switch tabs afterward.
+    // 'lineup' only makes sense as a default if a line-up is actually configured.
+    let m = mode;
+    if(m==='lineup' && !(pa.length && pb.length)) m = 'team';
+    if(m!=='team') u.searchParams.set('mode', m);
     return u.toString();
   }
   function refresh(){
@@ -285,14 +285,9 @@
     fillLineup($('lineupB'), $('selB').value);
   }
 
-  function applyModeUI(){
-    $('lineupWrap').style.display = (mode==='lineup') ? '' : 'none';
-    if(mode==='lineup') refillLineups();
-  }
-
   function wire(){
-    $('selA').onchange = ()=>{ if(mode==='lineup') fillLineup($('lineupA'), $('selA').value); refresh(); };
-    $('selB').onchange = ()=>{ if(mode==='lineup') fillLineup($('lineupB'), $('selB').value); refresh(); };
+    $('selA').onchange = ()=>{ fillLineup($('lineupA'), $('selA').value); refresh(); };
+    $('selB').onchange = ()=>{ fillLineup($('lineupB'), $('selB').value); refresh(); };
     $('themeSeg').querySelectorAll('button').forEach(btn=>{
       btn.onclick = ()=>{
         theme = btn.dataset.theme;
@@ -304,7 +299,6 @@
       btn.onclick = ()=>{
         mode = btn.dataset.mode;
         $('modeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
-        applyModeUI();
         refresh();
       };
     });
@@ -328,7 +322,7 @@
     TAGS = window.MKWC_TEAM_TAGS || [];
     fillTeams();
     wire();
-    applyModeUI();
+    refillLineups(); // line-up pickers are always available now
     refresh();
   };
 })();
