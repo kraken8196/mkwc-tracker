@@ -349,36 +349,21 @@
     }
     function wins(tag){ const s=ts(tag); return s.played ? s.w : null; }
 
-    // Team consistency = average of its players' race-score standard deviations
-    // (lower = steadier). Team clutch = average of its players' 2nd-half − 1st-half
-    // race differential (positive = finishes stronger). Both from getAdvancedStats().
-    const adv = window.getAdvancedStats ? window.getAdvancedStats() : {consistency:{},clutch:{}};
+    // Team clutch = average of its players' 2nd-half − 1st-half race differential
+    // (positive = finishes stronger), from getAdvancedStats().
+    const adv = window.getAdvancedStats ? window.getAdvancedStats() : {clutch:{}};
     function teamAvgOver(map, tag){
       const vals=[]; for(const k in map){ if(k.indexOf(tag+'|')===0) vals.push(map[k]); }
       return vals.length ? vals.reduce((s,v)=>s+v,0)/vals.length : null;
     }
-    function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
     function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
 
-    // These two stats sit in a narrow band, so a raw proportion always reads ~50/50.
-    // We map each value to its position within a fixed *realistically achievable* range
-    // for a team — not the theoretical extremes (consistency 0…7, late-match ±14), which
-    // a real 6-player team never reaches and which would flatten every bar to 50/50.
-    // Consistency (std-dev of race scores): a team realistically lands in ~[2.0, 5.5];
-    // lower = steadier.
-    const CONS_MIN = 2.0, CONS_MAX = 5.5;
-    // Late-match (2nd half − 1st half): a team realistically lands in ~[-3, +3].
+    // Late-match sits in a narrow band, so a raw proportion reads ~50/50. Map each value
+    // to its position within a realistically achievable team range (not the ±14 extreme).
     const CLU_MIN = -3.0, CLU_MAX = 3.0;
     function posIn(lo, hi, v){
       return Math.max(0, Math.min(1, (v - lo)/(hi - lo)));
     }
-    // Consistency: LOWER is better, so invert the position (steadier → bigger slice).
-    function shareLower(a, b){
-      const pa = 1 - posIn(CONS_MIN, CONS_MAX, a), pb = 1 - posIn(CONS_MIN, CONS_MAX, b);
-      const sum = pa + pb;
-      return sum>0 ? (pa/sum)*100 : 50;
-    }
-    // Late-match: higher is better; position within the signed range.
     function shareSigned(a, b){
       const pa = posIn(CLU_MIN, CLU_MAX, a), pb = posIn(CLU_MIN, CLU_MAX, b);
       const sum = pa + pb;
@@ -398,18 +383,17 @@
 
     const lang = (window.MKWC_LANG_OVERLAY) || 'en';
     const LBL = {
-      en:{race:'Race win %', pf:'Points / match', w:'Matches won', cons:'Consistency', clu:'Late-match'},
-      fr:{race:'% Courses gagnées', pf:'Points / match', w:'Matchs gagnés', cons:'Régularité', clu:'Fin de match'},
-      es:{race:'% Carreras ganadas', pf:'Puntos / partido', w:'Partidos ganados', cons:'Regularidad', clu:'Final de partido'},
-      ja:{race:'レース勝率', pf:'ポイント/試合', w:'勝利数', cons:'安定性', clu:'終盤の伸び'},
+      en:{race:'Race win %', pf:'Points / match', w:'Matches won', clu:'Late-match'},
+      fr:{race:'% Courses gagnées', pf:'Points / match', w:'Matchs gagnés', clu:'Fin de match'},
+      es:{race:'% Carreras ganadas', pf:'Puntos / partido', w:'Partidos ganados', clu:'Final de partido'},
+      ja:{race:'レース勝率', pf:'ポイント/試合', w:'勝利数', clu:'終盤の伸び'},
     };
     const M = LBL[lang] || LBL.en;
     return [
-      { label:M.race, get:racePct,        higher:true,  fmt:v=>v==null?'—':Math.round(v)+'%' },
-      { label:M.pf,   get:pointsPerMatch, higher:true,  fmt:v=>v==null?'—':String(Math.round(v)), share:sharePoints },
-      { label:M.w,    get:wins,           higher:true,  fmt:v=>v==null?'—':String(v) },
-      { label:M.cons, get:consistency,    higher:false, fmt:v=>v==null?'—':v.toFixed(1), share:shareLower },
-      { label:M.clu,  get:clutch,         higher:true,  fmt:v=>v==null?'—':signed(v),   share:shareSigned },
+      { label:M.race, get:racePct,        higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
+      { label:M.pf,   get:pointsPerMatch, higher:true, fmt:v=>v==null?'—':String(Math.round(v)), share:sharePoints },
+      { label:M.w,    get:wins,           higher:true, fmt:v=>v==null?'—':String(v) },
+      { label:M.clu,  get:clutch,         higher:true, fmt:v=>v==null?'—':signed(v), share:shareSigned },
     ];
   }
 
