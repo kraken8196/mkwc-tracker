@@ -190,6 +190,12 @@
   const debug = params.has('debug');
   const langParam = (params.get('lang')||'en').toLowerCase();
   window.MKWC_LANG_OVERLAY = ['en','fr','es','ja'].includes(langParam) ? langParam : 'en';
+  // Line-up mode: compare two chosen 6-player line-ups instead of the whole squads.
+  // pa / pb are comma-separated player names for team A / team B.
+  const lineupMode = params.get('mode') === 'lineup';
+  const decodeList = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const lineupA = decodeList(params.get('pa'));
+  const lineupB = decodeList(params.get('pb'));
   document.getElementById('ov').setAttribute('data-theme', theme);
 
   // Surface any uncaught error on screen (helps diagnose a stuck "Loading…").
@@ -258,7 +264,9 @@
     // exactly what a forfeit (150–0, entered as a bare score) lacks.
     let hasDetail=false;
     for(let r=0;r<12;r++){ if(raceScore(plH,r)!=null && raceScore(plA,r)!=null){ hasDetail=true; break; } }
-    return { H, A, scH:Number(sc[0]), scA:Number(sc[1]), plH, plA, raceScore, hasDetail };
+    // Does a named player appear in this match's line-up for a given side?
+    const hasPlayer = (arr, nameSet)=> arr.some(p=> p && p.n && nameSet.has(p.n));
+    return { H, A, scH:Number(sc[0]), scA:Number(sc[1]), plH, plA, raceScore, hasDetail, hasPlayer };
   }
 
   // The stats shown, top to bottom. `higher` = a higher number is better.
@@ -307,6 +315,67 @@
     }
     function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
     function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
+
+    // ===== LINE-UP MODE: recompute the same comparison on the chosen 6-v-6 players =====
+    if(lineupMode && lineupA.length && lineupB.length){
+      const player = window.getPlayerStats ? window.getPlayerStats() : {};
+      const setFor = tag => new Set(tag===tagA ? lineupA : lineupB);
+
+      // Line-up average score = total points of the chosen players / their total matches.
+      function lineupAvg(tag){
+        const names = tag===tagA ? lineupA : lineupB, ps = player[tag]||{};
+        let tot=0, cnt=0;
+        names.forEach(n=>{ const s=ps[n]; if(s){ tot+=s.total; cnt+=s.count; } });
+        return cnt>0 ? tot/cnt : null;
+      }
+      // Line-up clutch = average of the chosen players' clutch values.
+      function lineupClutch(tag){
+        const names = tag===tagA ? lineupA : lineupB, c = adv.clutch||{};
+        const vals=[]; names.forEach(n=>{ const v=c[tag+'|'+n]; if(v!=null) vals.push(v); });
+        return vals.length ? vals.reduce((s,v)=>s+v,0)/vals.length : null;
+      }
+      // Line-up race win % = across every race a chosen player took part in, how often
+      // their team won that race (team's combined race total vs the opponent's). A race
+      // is counted once even if several chosen players played it.
+      function lineupRacePct(tag){
+        const names = setFor(tag);
+        let won=0, total=0;
+        matches.forEach(m=>{
+          if(!m.hasDetail) return;
+          let mine, opp;
+          if(m.H===tag && m.hasPlayer(m.plH, names)){ mine=m.plH; opp=m.plA; }
+          else if(m.A===tag && m.hasPlayer(m.plA, names)){ mine=m.plA; opp=m.plH; }
+          else return;
+          for(let r=0;r<12;r++){
+            // only count races where at least one chosen player actually raced
+            const raced = mine.some(p=> p && p.n && names.has(p.n) && p.races && p.races[r]!=='' && p.races[r]!=null);
+            if(!raced) continue;
+            const a=m.raceScore(mine,r), b=m.raceScore(opp,r);
+            if(a==null||b==null||a===b) continue;
+            total++; if(a>b) won++;
+          }
+        });
+        return total ? (won/total)*100 : null;
+      }
+
+      const lang2 = (window.MKWC_LANG_OVERLAY) || 'en';
+      const LBL2 = {
+        en:{avg:'Avg. score', race:'Race win %', clu:'Late-match'},
+        fr:{avg:'Score moyen', race:'% Courses gagnées', clu:'Fin de match'},
+        es:{avg:'Puntuación media', race:'% Carreras ganadas', clu:'Final de partido'},
+        ja:{avg:'平均スコア', race:'レース勝率', clu:'終盤の伸び'},
+      };
+      const M2 = LBL2[lang2] || LBL2.en;
+      const signed2 = v => (v>0?'+':'') + v.toFixed(1);
+      const sharePts = (a,b)=>{ const p=v=>Math.max(0.02,Math.min(1,(v-252)/(732-252))); return (p(a)/(p(a)+p(b)))*100; };
+      const posC = (lo,hi,v)=>Math.max(0,Math.min(1,(v-lo)/(hi-lo)));
+      const shareClu = (a,b)=>{ const pa=posC(-3,3,a), pb=posC(-3,3,b), s=pa+pb; return s>0?(pa/s)*100:50; };
+      return [
+        { label:M2.avg,  get:lineupAvg,     higher:true, fmt:v=>v==null?'—':String(Math.round(v)), share:sharePts },
+        { label:M2.race, get:lineupRacePct, higher:true, fmt:v=>v==null?'—':Math.round(v)+'%' },
+        { label:M2.clu,  get:lineupClutch,  higher:true, fmt:v=>v==null?'—':signed2(v), share:shareClu },
+      ];
+    }
 
     // These two stats sit in a narrow band, so a raw proportion always reads ~50/50.
     // We map each value to its position within a fixed *realistically achievable* range
@@ -370,10 +439,13 @@
     if(known.indexOf(tagA)===-1 || known.indexOf(tagB)===-1){
       showMsg('Unknown team tag. Use codes like FR, BRA, JPN…'); return;
     }
+    if(lineupMode && (!lineupA.length || !lineupB.length)){
+      showMsg('Pick players for both line-ups in the builder.'); return;
+    }
 
     const rows = statRows();
     // Signature: only rebuild the DOM when a displayed value actually changed.
-    const sig = tagA+tagB+theme+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
+    const sig = tagA+tagB+theme+lineupA.join(',')+lineupB.join(',')+rows.map(r=>r.fmt(r.get(tagA))+'/'+r.fmt(r.get(tagB))).join('|');
     if(sig === lastSig){ showContent(); return; }
     lastSig = sig;
 

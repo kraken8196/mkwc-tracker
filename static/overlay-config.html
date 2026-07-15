@@ -64,6 +64,21 @@
   }
   .seg button.active{background:var(--gold);color:#3a2100;border-color:var(--gold);}
 
+  /* Line-up picker: a scrollable list of player chips with checkboxes. */
+  .lineup{
+    display:flex;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto;
+    background:var(--panel-3);border:1px solid var(--line-strong);border-radius:9px;padding:8px;
+  }
+  .lineup label{
+    display:flex;align-items:center;gap:9px;margin:0;padding:7px 8px;border-radius:7px;
+    font-family:'Inter',sans-serif;font-size:14px;text-transform:none;letter-spacing:0;color:var(--cream);
+    cursor:pointer;
+  }
+  .lineup label:hover{background:rgba(255,206,84,0.08);}
+  .lineup input[type=checkbox]{width:17px;height:17px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+  .lineup label.disabled{opacity:0.4;cursor:not-allowed;}
+  .lineup .empty{color:var(--dim);font-size:13px;padding:6px 8px;}
+
   .url-box{
     display:flex;gap:8px;align-items:stretch;margin-top:6px;
   }
@@ -126,6 +141,27 @@
         <select id="selB"></select>
       </div>
     </div>
+
+    <div style="margin-top:16px;">
+      <label>Comparison</label>
+      <div class="seg" id="modeSeg">
+        <button data-mode="team" class="active">Whole squads</button>
+        <button data-mode="lineup">Pick 6-v-6 line-ups</button>
+      </div>
+    </div>
+
+    <!-- Line-up pickers, shown only in line-up mode -->
+    <div class="grid2" id="lineupWrap" style="margin-top:16px;display:none;">
+      <div>
+        <label id="lblLineA">Team A line-up (pick 6)</label>
+        <div class="lineup" id="lineupA"></div>
+      </div>
+      <div>
+        <label id="lblLineB">Team B line-up (pick 6)</label>
+        <div class="lineup" id="lineupB"></div>
+      </div>
+    </div>
+
     <div class="grid2" style="margin-top:16px;">
       <div>
         <label>Theme</label>
@@ -182,10 +218,12 @@
 <script>
 (function(){
   const $ = id => document.getElementById(id);
+  const MAX = 6; // players per line-up
   let TAGS = [];
-  let theme = 'mkwc', lang = 'en';
+  let theme = 'mkwc', lang = 'en', mode = 'team';
 
   function base(){ return location.href.replace(/overlay-config\.html.*/, 'overlay.html'); }
+  function chosen(box){ return Array.from(box.querySelectorAll('input:checked')).map(i=>i.value); }
   function buildUrl(){
     const a = $('selA').value, b = $('selB').value;
     const u = new URL(base());
@@ -193,6 +231,11 @@
     if(b) u.searchParams.set('b', b);
     u.searchParams.set('theme', theme);
     u.searchParams.set('lang', lang);
+    if(mode === 'lineup'){
+      u.searchParams.set('mode', 'lineup');
+      u.searchParams.set('pa', chosen($('lineupA')).join(','));
+      u.searchParams.set('pb', chosen($('lineupB')).join(','));
+    }
     return u.toString();
   }
   function refresh(){
@@ -203,18 +246,50 @@
 
   function fillTeams(){
     const name = window.teamName || (x=>x);
-    // Sort alphabetically by display name for an easy-to-scan dropdown.
     const opts = TAGS.slice().sort((x,y)=> (name(x)||x).localeCompare(name(y)||y));
+    const prevA = $('selA').value, prevB = $('selB').value;
     const mk = (sel, chosen) => {
       sel.innerHTML = opts.map(tag=>`<option value="${tag}" ${tag===chosen?'selected':''}>${name(tag)||tag} (${tag})</option>`).join('');
     };
-    mk($('selA'), opts[0]);
-    mk($('selB'), opts[1] || opts[0]);
+    mk($('selA'), prevA || opts[0]);
+    mk($('selB'), prevB || opts[1] || opts[0]);
+  }
+
+  // Build a line-up checkbox list for one team; enforce a max of 6 selected.
+  function fillLineup(box, tag){
+    const players = (window.MKWC_TEAM_PLAYERS ? window.MKWC_TEAM_PLAYERS(tag) : []) || [];
+    if(!players.length){ box.innerHTML = '<div class="empty">No player data yet for this team.</div>'; return; }
+    box.innerHTML = players.map(n=>{
+      const v = n.replace(/"/g,'&quot;');
+      return `<label><input type="checkbox" value="${v}"><span>${n.replace(/</g,'&lt;')}</span></label>`;
+    }).join('');
+    box.querySelectorAll('input').forEach(inp=>{
+      inp.onchange = ()=>{ enforceMax(box); refresh(); };
+    });
+  }
+  function enforceMax(box){
+    const boxes = Array.from(box.querySelectorAll('input'));
+    const count = boxes.filter(b=>b.checked).length;
+    boxes.forEach(b=>{
+      const lab = b.closest('label');
+      const lock = !b.checked && count>=MAX;
+      b.disabled = lock;
+      lab.classList.toggle('disabled', lock);
+    });
+  }
+  function refillLineups(){
+    fillLineup($('lineupA'), $('selA').value);
+    fillLineup($('lineupB'), $('selB').value);
+  }
+
+  function applyModeUI(){
+    $('lineupWrap').style.display = (mode==='lineup') ? '' : 'none';
+    if(mode==='lineup') refillLineups();
   }
 
   function wire(){
-    $('selA').onchange = refresh;
-    $('selB').onchange = refresh;
+    $('selA').onchange = ()=>{ if(mode==='lineup') fillLineup($('lineupA'), $('selA').value); refresh(); };
+    $('selB').onchange = ()=>{ if(mode==='lineup') fillLineup($('lineupB'), $('selB').value); refresh(); };
     $('themeSeg').querySelectorAll('button').forEach(btn=>{
       btn.onclick = ()=>{
         theme = btn.dataset.theme;
@@ -222,11 +297,19 @@
         refresh();
       };
     });
+    $('modeSeg').querySelectorAll('button').forEach(btn=>{
+      btn.onclick = ()=>{
+        mode = btn.dataset.mode;
+        $('modeSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+        applyModeUI();
+        refresh();
+      };
+    });
     $('langSeg').querySelectorAll('button').forEach(btn=>{
       btn.onclick = ()=>{
         lang = btn.dataset.lang;
         $('langSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
-        fillTeams(); // team names are localised
+        fillTeams();
         refresh();
       };
     });
@@ -242,6 +325,7 @@
     TAGS = window.MKWC_TEAM_TAGS || [];
     fillTeams();
     wire();
+    applyModeUI();
     refresh();
   };
 })();

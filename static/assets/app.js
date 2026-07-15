@@ -2833,6 +2833,11 @@ function applyHashRoute(){
     // STATE is reassigned on every loadState(), so hand the overlay an accessor that
     // always returns the current reference rather than a stale snapshot.
     window.MKWC_STATE = () => STATE;
+    // Players who actually have stats for a team (name list), for the line-up picker.
+    window.MKWC_TEAM_PLAYERS = (tag) => {
+      const ps = getPlayerStats()[tag] || {};
+      return Object.keys(ps).sort((a,b)=> a.localeCompare(b));
+    };
     if(typeof window.MKWC_ON_READY === 'function') window.MKWC_ON_READY();
     return;
   }
