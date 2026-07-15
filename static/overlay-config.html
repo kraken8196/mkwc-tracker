@@ -147,6 +147,7 @@
       <div class="seg" id="modeSeg">
         <button data-mode="team" class="active">Whole squads</button>
         <button data-mode="lineup">Pick 6-v-6 line-ups</button>
+        <button data-mode="tracks">Per-track averages</button>
       </div>
     </div>
 
@@ -235,6 +236,8 @@
       u.searchParams.set('mode', 'lineup');
       u.searchParams.set('pa', chosen($('lineupA')).join(','));
       u.searchParams.set('pb', chosen($('lineupB')).join(','));
+    } else if(mode === 'tracks'){
+      u.searchParams.set('mode', 'tracks');
     }
     return u.toString();
   }

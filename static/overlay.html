@@ -176,6 +176,24 @@
     color:var(--label);text-align:center;white-space:nowrap;
   }
 
+  /* ---- Tracks mode: per-track average comparison ---- */
+  .tk-table{display:flex;flex-direction:column;gap:3px;max-height:70vh;overflow-y:auto;}
+  .tk-row{
+    display:grid;grid-template-columns:1fr minmax(0,1.4fr) 1fr;align-items:center;gap:8px;
+    padding:6px 6px;border-radius:7px;background:var(--bar-track);
+  }
+  .tk-name{
+    font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:var(--value);
+    text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  }
+  .tk-cell{display:flex;align-items:baseline;gap:6px;}
+  .tk-cell.a{justify-content:flex-end;}
+  .tk-cell.b{justify-content:flex-start;flex-direction:row-reverse;}
+  .tk-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:var(--value);}
+  .tk-cell.a.win .tk-val{color:var(--team-a);}
+  .tk-cell.b.win .tk-val{color:var(--team-b);}
+  .tk-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);}
+
   /* small brand mark */
   .ov-foot{
     display:flex;align-items:center;justify-content:center;gap:7px;
@@ -236,9 +254,11 @@
   const debug = params.has('debug');
   const langParam = (params.get('lang')||'en').toLowerCase();
   window.MKWC_LANG_OVERLAY = ['en','fr','es','ja'].includes(langParam) ? langParam : 'en';
-  // Line-up mode: compare two chosen 6-player line-ups instead of the whole squads.
-  // pa / pb are comma-separated player names for team A / team B.
-  const lineupMode = params.get('mode') === 'lineup';
+  // Comparison mode: 'lineup' (chosen 6-v-6 players), 'tracks' (per-track averages),
+  // or the default whole-squad bars.
+  const modeParam = params.get('mode');
+  const lineupMode = modeParam === 'lineup';
+  const tracksMode = modeParam === 'tracks';
   const decodeList = s => (s||'').split(',').map(x=>x.trim()).filter(Boolean);
   const lineupA = decodeList(params.get('pa'));
   const lineupB = decodeList(params.get('pb'));
@@ -414,6 +434,28 @@
     return { players, total: any ? sum : null };
   }
 
+  // Per-track comparison: for every track at least one of the two teams has played,
+  // each team's average team-score on that track and how many times they played it.
+  function tracksData(){
+    const rs = window.getRaceStats ? window.getRaceStats() : {teamTrackStats:{}};
+    const tName = window.trackName || (x=>x);
+    const A = (rs.teamTrackStats||{})[tagA] || {};
+    const B = (rs.teamTrackStats||{})[tagB] || {};
+    const ids = new Set([...Object.keys(A), ...Object.keys(B)]);
+    const rows = [];
+    ids.forEach(id=>{
+      const a = A[id], b = B[id];
+      rows.push({
+        id, name: tName(id) || id,
+        aAvg: a ? a.total/a.count : null, aN: a ? a.count : 0,
+        bAvg: b ? b.total/b.count : null, bN: b ? b.count : 0,
+      });
+    });
+    // Most-played first (combined), then by name.
+    rows.sort((x,y)=> (y.aN+y.bN) - (x.aN+x.bN) || String(x.name).localeCompare(String(y.name)));
+    return rows;
+  }
+
   const esc = s => String(s).replace(/</g,'&lt;');
 
   // Two columns of players (name + avg score) with each line-up's TOTAL (sum of the
@@ -442,6 +484,28 @@
         <div class="lu-total-lbl">${T}</div>
         <div class="lu-total b ${bWin?'win':''}">${db.total==null?'—':Math.round(db.total)}</div>
       </div>`;
+  }
+
+  // A per-track table: team A avg (× times played) | track name | team B avg (× played).
+  // The higher average on each track is highlighted in the team colour.
+  function renderTracksTable(rows){
+    const cell = (avg, n, side, win)=>{
+      const val = avg==null ? '—' : Math.round(avg);
+      const times = n>0 ? `<span class="tk-n">×${n}</span>` : '';
+      return `<div class="tk-cell ${side} ${win?'win':''}">
+        <span class="tk-val">${val}</span>${times}
+      </div>`;
+    };
+    const body = rows.map(r=>{
+      const aWin = r.aAvg!=null && r.bAvg!=null && r.aAvg>r.bAvg;
+      const bWin = r.aAvg!=null && r.bAvg!=null && r.bAvg>r.aAvg;
+      return `<div class="tk-row">
+        ${cell(r.aAvg, r.aN, 'a', aWin)}
+        <div class="tk-name">${esc(r.name)}</div>
+        ${cell(r.bAvg, r.bN, 'b', bWin)}
+      </div>`;
+    }).join('');
+    $('ovRows').innerHTML = `<div class="tk-table">${body || '<div class="ov-msg">No track data yet.</div>'}</div>`;
   }
 
   let lastSig = null;
@@ -485,6 +549,20 @@
       lastSig = sig;
       setHeader();
       renderLineupTable(da, db);
+      showContent();
+      return;
+    }
+
+    // ---------- TRACKS MODE: per-track average comparison ----------
+    if(tracksMode){
+      const rows = tracksData();
+      const sig = 'T'+tagA+tagB+theme+rows.map(r=>
+        (r.aAvg==null?'-':Math.round(r.aAvg))+'/'+r.aN+':'+(r.bAvg==null?'-':Math.round(r.bAvg))+'/'+r.bN
+      ).join('|');
+      if(sig === lastSig){ showContent(); return; }
+      lastSig = sig;
+      setHeader();
+      renderTracksTable(rows);
       showContent();
       return;
     }
