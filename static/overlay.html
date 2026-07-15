@@ -308,14 +308,15 @@
     function consistency(tag){ return teamAvgOver(adv.consistency||{}, tag); }
     function clutch(tag){ return teamAvgOver(adv.clutch||{}, tag); }
 
-    // These two stats live in a narrow band across the whole tournament, so a raw
-    // proportion always reads ~50/50. We map each value to its position within a fixed
-    // realistic range (measured from the actual data, with a little head-room), so two
-    // equal teams land at 50/50 and the spread between them shows honestly.
-    // Consistency (std-dev of race scores): teams observed ≈ 2.9–4.2, lower = steadier.
-    const CONS_MIN = 2.8, CONS_MAX = 4.4;
-    // Late-match (2nd half − 1st half): teams observed ≈ −0.74…+1.05.
-    const CLU_MIN = -1.0, CLU_MAX = 1.2;
+    // These two stats sit in a narrow band, so a raw proportion always reads ~50/50.
+    // We map each value to its position within a fixed *realistically achievable* range
+    // for a team — not the theoretical extremes (consistency 0…7, late-match ±14), which
+    // a real 6-player team never reaches and which would flatten every bar to 50/50.
+    // Consistency (std-dev of race scores): a team realistically lands in ~[2.0, 5.5];
+    // lower = steadier.
+    const CONS_MIN = 2.0, CONS_MAX = 5.5;
+    // Late-match (2nd half − 1st half): a team realistically lands in ~[-3, +3].
+    const CLU_MIN = -3.0, CLU_MAX = 3.0;
     function posIn(lo, hi, v){
       return Math.max(0, Math.min(1, (v - lo)/(hi - lo)));
     }
