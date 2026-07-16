@@ -55,6 +55,13 @@
     text-stroke:1.5px #4a1f04;
     text-shadow:0 3px 0 rgba(0,0,0,0.25);
   }
+  /* Japanese: drop the Latin-style outline stroke (it makes dense kanji/kana bleed
+     together); rely on a stronger shadow to keep the white titles legible. */
+  html[lang="ja"] .outline{
+    -webkit-text-stroke:0;
+    text-stroke:0;
+    text-shadow:0 2px 3px rgba(74,31,4,0.9), 0 1px 0 rgba(0,0,0,0.35);
+  }
 
   /* ---------- header ---------- */
   header{
@@ -4827,6 +4834,9 @@ window.addEventListener('hashchange', checkForSecretAdminAccess);
 
 function applyStaticI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  // Reflect the active language on <html> so Japanese-specific CSS (dropping the title
+  // outline stroke) can apply.
+  try{ document.documentElement.lang = LANG; }catch(e){}
 }
 function renderLangSwitch(){
   const el = document.getElementById('langSwitch');

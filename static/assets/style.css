@@ -46,6 +46,14 @@
     text-stroke:1.5px #4a1f04;
     text-shadow:0 3px 0 rgba(0,0,0,0.25);
   }
+  /* Japanese: the Latin-style outline stroke makes dense kanji/kana strokes bleed into
+     each other. Drop the stroke and lean on a stronger shadow to keep white titles
+     legible on the orange background. */
+  html[lang="ja"] .outline{
+    -webkit-text-stroke:0;
+    text-stroke:0;
+    text-shadow:0 2px 3px rgba(74,31,4,0.9), 0 1px 0 rgba(0,0,0,0.35);
+  }
 
   /* ---------- header ---------- */
   header{

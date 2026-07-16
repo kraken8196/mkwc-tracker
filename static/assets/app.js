@@ -2785,6 +2785,10 @@ if(__mainEl) __mainEl.addEventListener('click', (e)=>{
 
 function applyStaticI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  // Reflect the active language on <html> so language-specific CSS can apply — notably
+  // dropping the Latin-style text outline on Japanese titles, where the stroke makes
+  // dense kanji/kana strokes bleed together.
+  try{ document.documentElement.lang = LANG; }catch(e){}
 }
 function renderLangSwitch(){
   const el = document.getElementById('langSwitch');
