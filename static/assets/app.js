@@ -2035,18 +2035,27 @@ function backLabel(){
   }
 }
 function goBack(){
+  let restoredCalScroll = false;
   if(navHistory.length){
     const prev = navHistory.pop();
     selectedTeam = prev.selectedTeam;
     selectedMatch = prev.selectedMatch;
-    setView(prev.view);
+    // Returning to the calendar: restore the scroll position we left from.
+    if(prev.view==='calendar' && savedCalendarScrollY!=null){
+      restoringFromHistory = true;
+      setView(prev.view);
+      restoringFromHistory = false;
+      restoredCalScroll = true;
+    } else {
+      setView(prev.view);
+    }
     if(prev.view==='teams') renderTeamsView();
     else if(prev.view==='match') renderMatchDetail(selectedMatch);
   } else {
     selectedTeam = null; selectedMatch = null;
     setView('teams'); renderTeamsView();
   }
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(!restoredCalScroll) window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function renderTeamsView(){
@@ -2479,13 +2488,13 @@ const NUTSHELL_I18N = {
     hDyk:'Le saviez-vous ?',
     draw:'Sur l’ensemble de la phase, un seul match n’a pas trouvé de vainqueur : <b>{h}</b> et <b>{a}</b> se sont quittés dos à dos, incapables de se départager au terme des douze courses.',
     comeback:'<b>{winner}</b> signe{verb} aussi la plus belle remontée de la phase. Menée de <fig>{deficit}</fig> points contre <b>{loser}</b>, l’équipe a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé du Play-In.',
-    indiv:'Un nom revient plus que les autres : <b>{player}</b>. Il détient le meilleur total individuel de la phase avec <fig>{best}</fig> points sur un seul match, et a franchi la ligne en tête à <fig>{perfect}</fig> reprises — le plus grand nombre de courses gagnées par un joueur sur le Play-In.',
-    consistent:'Côté régularité, <b>{player}</b> se distingue comme le joueur le plus constant du plateau : ses scores restent au plus près de sa moyenne d’une course à l’autre.',
+    indiv:'Un nom revient plus que les autres : <b>{player}</b>, qui détient le meilleur total individuel de la phase avec <fig>{best}</fig> points sur un seul match, et a franchi la ligne en tête à <fig>{perfect}</fig> reprises — le plus grand nombre de courses gagnées par un·e joueur·euse sur le Play-In.',
+    consistent:'Côté régularité, <b>{player}</b> se distingue comme la personne la plus constante du plateau : ses scores restent au plus près de sa moyenne d’une course à l’autre.',
     undefeated:'{count} nations terminent le Play-In sans la moindre défaite : {list}.',
     offense:'<b>{team}</b> affiche{verb} la meilleure moyenne offensive, avec <fig>{avg}</fig> points marqués par match.',
     trackMost:'Parmi les trente circuits du jeu, un seul a été choisi plus souvent que les autres : <b>{track}</b>, sélectionné à <fig>{n}</fig> reprises par les équipes.',
-    trackSkill:'Mais tous les tracés ne se valent pas pour l’élite. En regardant le score moyen des meilleurs joueurs de la phase, circuit par circuit, deux profils se détachent nettement. C’est sur <b>{skill}</b> que le niveau s’exprime le plus : les joueurs du haut du classement y marquent en moyenne <fig>{skillAvg}</fig> points par course, bien au-dessus de leur moyenne générale. À l’inverse, <b>{leveller}</b> est le circuit où ils peinent le plus à se détacher, avec <fig>{levAvg}</fig> de moyenne : un tracé qui a tendance à rebattre les cartes.',
-    dyk1:'En tout, la phase de Play-In aura réuni <fig>{players}</fig> joueurs sur la piste, pour <fig>{matches}</fig> matchs et <fig>{races}</fig> courses disputées. Mises bout à bout, ces courses représentent <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
+    trackSkill:'Mais tous les tracés ne se valent pas pour l’élite. En regardant le score moyen des meilleur·e·s joueur·euse·s de la phase, circuit par circuit, deux profils se détachent nettement. C’est sur <b>{skill}</b> que le niveau s’exprime le plus : les joueur·euse·s du haut du classement y marquent en moyenne <fig>{skillAvg}</fig> points par course, bien au-dessus de leur moyenne générale. À l’inverse, <b>{leveller}</b> est le circuit où iels peinent le plus à se détacher, avec <fig>{levAvg}</fig> de moyenne : un tracé qui a tendance à rebattre les cartes.',
+    dyk1:'En tout, la phase de Play-In aura réuni <fig>{players}</fig> joueur·euse·s sur la piste, pour <fig>{matches}</fig> matchs et <fig>{races}</fig> courses disputées. Mises bout à bout, ces courses représentent <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
     dyk2:'Les équipes n’ont pas boudé la variété : les <fig>{tracks}</fig> circuits du jeu ont tous été sélectionnés au moins une fois au cours de la phase.'
   },
   en:{
