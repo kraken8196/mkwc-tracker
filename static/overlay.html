@@ -187,14 +187,19 @@
     text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
   }
   /* Mirror-symmetric: the score hugs the outer edge on each side (A left, B right),
-     the ×N sits just inside it. */
+     the ×N sits just inside it. The score has a fixed min-width so the columns of
+     numbers line up vertically and both sides mirror exactly. */
   .tk-cell{display:flex;align-items:baseline;gap:6px;}
   .tk-cell.a{justify-content:flex-start;}
   .tk-cell.b{justify-content:flex-end;flex-direction:row-reverse;}
-  .tk-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:var(--value);}
+  .tk-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;color:var(--value);min-width:2.4ch;}
+  .tk-cell.a .tk-val{text-align:left;}
+  .tk-cell.b .tk-val{text-align:right;}
   .tk-cell.a.win .tk-val{color:var(--team-a);}
   .tk-cell.b.win .tk-val{color:var(--team-b);}
-  .tk-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);}
+  .tk-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--label);min-width:2.2ch;}
+  .tk-cell.a .tk-n{text-align:left;}
+  .tk-cell.b .tk-n{text-align:right;}
   .tk-more{
     width:100%;margin:3px 0;padding:8px;border-radius:7px;cursor:pointer;
     background:transparent;border:1px solid var(--edge);color:var(--label);
