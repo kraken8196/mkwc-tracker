@@ -1897,13 +1897,13 @@ function trackBreakdownList(statsForKey, minReliable){
   return Object.keys(statsForKey).map(tid=>({
     trackId: tid, count: statsForKey[tid].count, avg: statsForKey[tid].total/statsForKey[tid].count
   }))
-  // Reliable tracks first (enough races), then by average — so the best track the
-  // team/player really performs on is at the top and single-race noise stays at the
-  // bottom instead of a lucky one-off jumping the ranking.
+  // Reliable tracks (enough races) come first, ranked by average — the best track the
+  // team/player really performs on tops the list. The low-sample ones follow, ranked by
+  // times played (most-played first) rather than by a noisy one-race average.
   .sort((a,b)=>{
     const ra = a.count>=min, rb = b.count>=min;
     if(ra!==rb) return ra ? -1 : 1;
-    return b.avg-a.avg || b.count-a.count;
+    return ra ? (b.avg-a.avg || b.count-a.count) : (b.count-a.count || b.avg-a.avg);
   });
 }
 // Minimum races on a track for its average to be treated as reliable. A team score is

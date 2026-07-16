@@ -3079,7 +3079,7 @@ function trackBreakdownList(statsForKey, minReliable){
   .sort((a,b)=>{
     const ra = a.count>=min, rb = b.count>=min;
     if(ra!==rb) return ra ? -1 : 1;
-    return b.avg-a.avg || b.count-a.count;
+    return ra ? (b.avg-a.avg || b.count-a.count) : (b.count-a.count || b.avg-a.avg);
   });
 }
 const TRACK_MIN_TEAM = 3;
