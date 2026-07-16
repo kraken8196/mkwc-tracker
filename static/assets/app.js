@@ -447,20 +447,50 @@ const SCHEDULED_TIMES = {
   'quali|Z|0-1':'2026-07-11T16:00:00+02:00',
   'quali|Z|0-2':'2026-07-11T17:00:00+02:00',
   'quali|Z|1-2':'2026-07-12T22:00:00+02:00',
-  // Group stage — Group A (FR, ESP, CAN, ITA) and Group B (JPN, USA, ENG, GER).
-  // Times are Belgium local (+02:00); the app renders each in the visitor's own zone.
-  'top|A|0-3':'2026-07-17T20:00:00+02:00',   // France vs Italy
-  'top|A|1-3':'2026-07-17T21:00:00+02:00',   // Spain vs Italy
-  'top|A|0-1':'2026-07-17T22:00:00+02:00',   // France vs Spain
-  'top|B|0-1':'2026-07-18T17:00:00+02:00',   // Japan vs USA
-  'top|A|1-2':'2026-07-18T19:00:00+02:00',   // Spain vs Canada
-  'top|A|2-3':'2026-07-18T20:00:00+02:00',   // Italy vs Canada
-  'top|B|1-3':'2026-07-18T22:00:00+02:00',   // USA vs Germany
-  'top|B|2-3':'2026-07-18T23:00:00+02:00',   // Germany vs England
-  'top|B|0-3':'2026-07-19T15:00:00+02:00',   // Japan vs Germany
-  'top|B|0-2':'2026-07-19T16:00:00+02:00',   // England vs Japan
-  'top|B|1-2':'2026-07-19T18:00:00+02:00',   // USA vs England
-  'top|A|0-2':'2026-07-19T20:00:00+02:00',   // Canada vs France
+  // Group stage — all kickoff times are UTC (+00:00); the app renders each in the
+  // visitor's own timezone and buckets it into their local calendar day.
+  // Preliminary Bracket Group 1 — FR, ESP, CAN, ITA
+  'top|A|0-3':'2026-07-17T18:00:00+00:00',   // France vs Italy
+  'top|A|1-3':'2026-07-17T19:00:00+00:00',   // Spain vs Italy
+  'top|A|0-1':'2026-07-17T20:00:00+00:00',   // France vs Spain
+  'top|A|1-2':'2026-07-18T17:00:00+00:00',   // Spain vs Canada
+  'top|A|2-3':'2026-07-18T18:00:00+00:00',   // Italy vs Canada
+  'top|A|0-2':'2026-07-19T18:00:00+00:00',   // Canada vs France
+  // Preliminary Bracket Group 2 — JPN, USA, ENG, GER
+  'top|B|0-1':'2026-07-18T15:00:00+00:00',   // Japan vs USA
+  'top|B|1-3':'2026-07-18T20:00:00+00:00',   // USA vs Germany
+  'top|B|2-3':'2026-07-18T21:00:00+00:00',   // Germany vs England
+  'top|B|0-3':'2026-07-19T13:00:00+00:00',   // Japan vs Germany
+  'top|B|0-2':'2026-07-19T14:00:00+00:00',   // England vs Japan
+  'top|B|1-2':'2026-07-19T16:00:00+00:00',   // USA vs England
+  // Group Stage Group 1 — KOR, MEX, PE, BRA
+  'mid|1|2-3':'2026-07-17T22:00:00+00:00',   // Brazil vs Peru
+  'mid|1|0-3':'2026-07-18T14:00:00+00:00',   // South Korea vs Brazil
+  'mid|1|1-3':'2026-07-18T20:00:00+00:00',   // Mexico vs Brazil
+  'mid|1|0-2':'2026-07-19T13:00:00+00:00',   // South Korea vs Peru
+  'mid|1|0-1':'2026-07-19T14:00:00+00:00',   // Mexico vs South Korea
+  'mid|1|1-2':'2026-07-19T16:00:00+00:00',   // Peru vs Mexico
+  // Group Stage Group 2 — BE, AUS, EEU, AUT
+  'mid|2|1-2':'2026-07-18T10:00:00+00:00',   // Eastern Europe vs Australia
+  'mid|2|0-2':'2026-07-18T12:00:00+00:00',   // Belgium vs Eastern Europe
+  'mid|2|0-1':'2026-07-18T13:00:00+00:00',   // Australia vs Belgium
+  'mid|2|2-3':'2026-07-18T18:00:00+00:00',   // Austria vs Eastern Europe
+  'mid|2|0-3':'2026-07-18T20:00:00+00:00',   // Belgium vs Austria
+  'mid|2|1-3':'2026-07-19T13:00:00+00:00',   // Australia vs Austria
+  // Group Stage Group 3 — IRE, CB, NL, MENA
+  'mid|3|0-3':'2026-07-16T19:00:00+00:00',   // Ireland vs MENA
+  'mid|3|1-3':'2026-07-17T21:00:00+00:00',   // Caledonbria vs MENA
+  'mid|3|0-2':'2026-07-18T19:00:00+00:00',   // Ireland vs Netherlands
+  'mid|3|0-1':'2026-07-18T20:00:00+00:00',   // Caledonbria vs Ireland
+  'mid|3|1-2':'2026-07-18T21:00:00+00:00',   // Netherlands vs Caledonbria
+  'mid|3|2-3':'2026-07-19T19:00:00+00:00',   // MENA vs Netherlands
+  // Group Stage Group 4 — ASIA, CL, HKT, VE
+  'mid|4|1-3':'2026-07-17T21:00:00+00:00',   // Chile vs Venezuela
+  'mid|4|0-3':'2026-07-17T23:00:00+00:00',   // Asia vs Venezuela
+  'mid|4|1-2':'2026-07-18T14:00:00+00:00',   // Chile vs Hong Kong-Taiwan
+  'mid|4|2-3':'2026-07-18T15:00:00+00:00',   // Venezuela vs Hong Kong-Taiwan
+  'mid|4|0-2':'2026-07-19T15:00:00+00:00',   // Hong Kong-Taiwan vs Asia
+  'mid|4|0-1':'2026-07-20T02:00:00+00:00',   // Asia vs Chile
 };
 function scheduledTimeFor(anchorPrefix, groupId, key){
   return SCHEDULED_TIMES[`${anchorPrefix}|${groupId}|${key}`] || null;
@@ -1598,17 +1628,10 @@ function renderCalendarView(){
   } else {
     items.sort((a,b)=> a.dateOrder-b.dateOrder);
     let currentDate = null;
-    let groupNoteShown = false;
-    const isGroupStage = it => /^g\|(mid|top)\|/.test(it.matchRef||'');
     items.forEach(it=>{
       if(it.dateKey !== currentDate){
         if(currentDate!==null) html += `</div>`;
         html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div>`;
-        // Provisional-dates note, shown once just under the first Group Stage day heading.
-        if(!groupNoteShown && isGroupStage(it)){
-          html += `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
-          groupNoteShown = true;
-        }
         html += `<div class="cal-list">`;
         currentDate = it.dateKey;
       }
