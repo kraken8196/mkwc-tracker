@@ -1891,11 +1891,20 @@ function getRaceStats(){
     playerTrackStats, teamTrackStats,
   };
 }
-function trackBreakdownList(statsForKey){
+function trackBreakdownList(statsForKey, minReliable){
   if(!statsForKey) return [];
+  const min = minReliable || 1;
   return Object.keys(statsForKey).map(tid=>({
     trackId: tid, count: statsForKey[tid].count, avg: statsForKey[tid].total/statsForKey[tid].count
-  })).sort((a,b)=> b.count-a.count || b.avg-a.avg);
+  }))
+  // Reliable tracks first (enough races), then by average — so the best track the
+  // team/player really performs on is at the top and single-race noise stays at the
+  // bottom instead of a lucky one-off jumping the ranking.
+  .sort((a,b)=>{
+    const ra = a.count>=min, rb = b.count>=min;
+    if(ra!==rb) return ra ? -1 : 1;
+    return b.avg-a.avg || b.count-a.count;
+  });
 }
 // Minimum races on a track for its average to be treated as reliable. A team score is
 // the sum of 6 players (already smoothed), so it needs fewer samples than a lone player.
@@ -2244,14 +2253,14 @@ function renderTeamDetail(tag){
         <table class="stats-table">
           <thead><tr>${th('colTrack')}${th('colRacesPlayed','tipRacesPlayed','num')}${th('colAvg','tipTrackAvgTeam','num')}</tr></thead>
           <tbody>
-            ${(()=>{ const teamBreakdown = trackBreakdownList(raceStats.teamTrackStats[tag]);
+            ${(()=>{ const teamBreakdown = trackBreakdownList(raceStats.teamTrackStats[tag], TRACK_MIN_TEAM);
               return teamBreakdown.length ? teamBreakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td>${trackAvgCellHTML(b, TRACK_MIN_TEAM)}</tr>`).join('')
                 : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`;
             })()}
           </tbody>
         </table>
       </div>
-      ${trackBreakdownList(raceStats.teamTrackStats[tag]).some(b=>b.count<TRACK_MIN_TEAM) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
+      ${trackBreakdownList(raceStats.teamTrackStats[tag], TRACK_MIN_TEAM).some(b=>b.count<TRACK_MIN_TEAM) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
     </div>
   `;
 }
@@ -2279,7 +2288,7 @@ function renderPlayerDetail(tag, name){
   const bestTid = raceStats.bestTrackForPlayer[pkey];
   const cons = advStats.consistency[pkey];
   const clu = advStats.clutch[pkey];
-  const breakdown = trackBreakdownList(raceStats.playerTrackStats[pkey]);
+  const breakdown = trackBreakdownList(raceStats.playerTrackStats[pkey], TRACK_MIN_PLAYER);
   const natEntry = roster(tag).find(p=>p.n===name);
 
   el.innerHTML = `
