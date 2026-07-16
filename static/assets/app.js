@@ -1627,11 +1627,18 @@ function renderCalendarView(){
     html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
     items.sort((a,b)=> a.dateOrder-b.dateOrder);
+    // The first not-yet-played match — we anchor the day heading it's under so opening
+    // the calendar can jump straight to it instead of the visitor scrolling past results.
+    const nextIdx = items.findIndex(it=>!isPlayed(it.sc));
+    const nextDateKey = nextIdx>=0 ? items[nextIdx].dateKey : null;
     let currentDate = null;
+    let nextAnchorPlaced = false;
     items.forEach(it=>{
       if(it.dateKey !== currentDate){
         if(currentDate!==null) html += `</div>`;
-        html += `<div class="stage-subhead" style="margin-top:22px;">${it.dayLabel}</div>`;
+        const isNextDay = !nextAnchorPlaced && it.dateKey===nextDateKey;
+        if(isNextDay) nextAnchorPlaced = true;
+        html += `<div class="stage-subhead"${isNextDay?' id="cal-next"':''} style="margin-top:22px;">${it.dayLabel}</div>`;
         html += `<div class="cal-list">`;
         currentDate = it.dateKey;
       }
@@ -1640,6 +1647,17 @@ function renderCalendarView(){
     html += `</div>`;
   }
   el.innerHTML = html;
+}
+// Scroll the calendar so the next upcoming match's day heading is at the top (under the
+// sticky header). Returns true if it scrolled, false if there's no upcoming match.
+function scrollToCalendarNext(){
+  const target = document.getElementById('cal-next');
+  if(!target) return false;
+  const header = document.querySelector('header');
+  const offset = (header ? header.offsetHeight : 0) + 12;
+  const y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo(0, Math.max(0, y));
+  return true;
 }
 
 /* =========================================================
@@ -2685,7 +2703,9 @@ function setView(view){
   document.getElementById(map[view]).classList.add('active');
   updateHero(view);
   ensureViewRendered(view);
-  window.scrollTo(0, 0); // each view starts fresh at the top, never inheriting another view's scroll position
+  // Each view starts fresh at the top — except the calendar, which jumps to the next
+  // upcoming match so the visitor isn't scrolling past all the played ones.
+  if(!(view==='calendar' && scrollToCalendarNext())) window.scrollTo(0, 0);
   pushBrowserHistory();
   console.log(`[perf] setView('${view}') total (jusqu'à la fin de la fonction) : ${(performance.now()-__setViewT0).toFixed(1)} ms`);
 }
@@ -2910,6 +2930,8 @@ function applyHashRoute(){
   __trace('après renderAll (premier rendu)');
   // A shared deep link (#teams/FR, #match/…, #player/…) opens straight to that view.
   applyHashRoute();
+  // Landing straight on the calendar page: jump to the next upcoming match too.
+  if(currentView==='calendar') scrollToCalendarNext();
   // Red dot on the tab icon while a match is live (updates every page, on its own timer).
   ensureLiveFaviconRefresh();
   const loadScreen = document.getElementById('loadScreen');
