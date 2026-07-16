@@ -170,7 +170,7 @@ const I18N = {
     tipClutch:'Moyenne de la 2e moitié du match (courses 7-12) moins la 1re moitié (courses 1-6). Positif = finit plus fort qu\'il n\'a commencé.',
     tipBalance:'Répartition des points entre les joueurs alignés sur un match, en moyenne sur les matchs de l\'équipe. Plus c\'est bas, plus les points sont partagés équitablement.',
     tipRacesPlayed:'Nombre de courses jouées par circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
-    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible', forfeitBadge:'Forfait', forfeitNote:'Match remporté par forfait (150–0), non joué.',
+    clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible', forfeitBadge:'Forfait', forfeitNote:'Match remporté par forfait (150–0), non joué.', forfeitNoteDouble:'Double forfait (0–0) : les deux équipes ont déclaré forfait, match non joué.',
     adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
@@ -240,7 +240,7 @@ const I18N = {
     tipClutch:'Average of the second half (races 7-12) minus the first half (races 1-6). Positive = finishes stronger than they started.',
     tipBalance:'How evenly the players fielded in a match share the points, averaged over the team\'s matches. Lower means more evenly shared.',
     tipRacesPlayed:'Number of races played per track.', tipGB:'Points scored by the team in the group.',
-    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available', forfeitBadge:'Forfeit', forfeitNote:'Won by forfeit (150–0), not played.',
+    clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available', forfeitBadge:'Forfeit', forfeitNote:'Won by forfeit (150–0), not played.', forfeitNoteDouble:'Double forfeit (0–0): both teams forfeited, match not played.',
     adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
@@ -310,7 +310,7 @@ const I18N = {
     tipClutch:'Media de la 2ª mitad (carreras 7-12) menos la 1ª mitad (carreras 1-6). Positivo = termina más fuerte de lo que empezó.',
     tipBalance:'Cómo reparten los puntos los jugadores alineados en un partido, en promedio sobre los partidos del equipo. Cuanto más bajo, más equilibrado.',
     tipRacesPlayed:'Número de carreras jugadas por circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
-    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible', forfeitBadge:'Abandono', forfeitNote:'Ganado por abandono (150–0), no jugado.',
+    clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible', forfeitBadge:'Abandono', forfeitNote:'Ganado por abandono (150–0), no jugado.', forfeitNoteDouble:'Doble abandono (0–0): ambos equipos abandonaron, partido no jugado.',
     adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
@@ -380,7 +380,7 @@ const I18N = {
     tipClutch:'後半（7〜12レース目）の平均から前半（1〜6レース目）の平均を引いた値。プラスなら尻上がり。',
     tipBalance:'各試合に出場した選手間のポイント配分の均等さ（チームの試合平均）。小さいほど均等。',
     tipRacesPlayed:'コースごとの走行レース数。', tipGB:'グループでチームが獲得したポイント。',
-    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません', forfeitBadge:'棄権', forfeitNote:'棄権により勝利（150–0）、試合は行われていません。',
+    clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません', forfeitBadge:'棄権', forfeitNote:'棄権により勝利（150–0）、試合は行われていません。', forfeitNoteDouble:'両チーム棄権（0–0）：試合は行われていません。',
     adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
@@ -1012,7 +1012,7 @@ function renderMatchDetail(ref){
       <div class="helptext" style="margin-bottom:18px;">
         <span class="${anchor?'stage-link':''}"${anchor?` data-anchor="${anchor}"`:''}>${stage}</span> · ${date}
       </div>
-      ${forfeitSideFor(ref) ? `<div class="forfeit-note">🏳️ ${t('forfeitNote')}</div>` : ''}
+      ${forfeitSideFor(ref) ? `<div class="forfeit-note">🏳️ ${t(forfeitSideFor(ref)==='B'?'forfeitNoteDouble':'forfeitNote')}</div>` : ''}
       <div class="match-detail-row ${played?'is-played':'is-upcoming'}">
         <div class="match-detail-team">
           ${h? teamLinkHTML(h,'lg') : `${tbdEl()}<span class="tbdname">${t('tbd')}</span>`}
@@ -1208,8 +1208,9 @@ function streamLinkFor(ref){
   const url = STATE.streams && STATE.streams[ref];
   return (typeof url === 'string' && url.trim() !== '') ? url.trim() : null;
 }
-// A forfeited match is stored in STATE.forfeits[matchRef] as the losing side ('H'|'A').
-function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A') ? v : null; }
+// A forfeited match is stored in STATE.forfeits[matchRef] as the losing side ('H'|'A'),
+// or 'B' for a double forfeit (both teams out, 0-0).
+function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A'||v==='B') ? v : null; }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a war/set is assumed to last about an hour
 function isCurrentlyLive(rawIso, sc){
