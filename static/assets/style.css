@@ -568,6 +568,10 @@
   .stats-table td.num.highlight{color:var(--cream);font-weight:700;}
   /* The ranking rating is always gold — it's the value the table is sorted on. */
   .stats-table td.num.rating{color:var(--gold);font-weight:700;}
+  /* A track played only once: dim the average and mark it, to flag the tiny sample. */
+  .stats-table td.num.low-sample{color:var(--dim);font-weight:400;cursor:help;}
+  .low-sample-mark{color:var(--dim);font-weight:700;}
+  .low-sample-legend{font-size:11.5px;color:var(--dim);margin-top:6px;font-style:italic;}
   .stats-table .lp{font-family:'JetBrains Mono',monospace;color:var(--dim);width:24px;text-align:center;}
   .stats-table .lp.top1{color:var(--gold);font-weight:700;}
   .stats-table .lname{font-weight:600;}
