@@ -2684,6 +2684,11 @@ function renderAll(){
 }
 
 let restoringFromHistory = false;
+// Scroll position of the calendar when the visitor last clicked into a match, so
+// returning restores it. null = no saved position (fall back to next-match/top).
+let savedCalendarScrollY = null;
+// We manage scroll ourselves (per view), so stop the browser from also restoring it.
+try{ if('scrollRestoration' in history) history.scrollRestoration = 'manual'; }catch(e){}
 function pushBrowserHistory(){
   if(restoringFromHistory) return; // don't re-push while we're the ones restoring a state
   const state = {view: currentView, selectedTeam, selectedMatch, selectedPlayer};
@@ -2704,9 +2709,16 @@ function setView(view){
   document.getElementById(map[view]).classList.add('active');
   updateHero(view);
   ensureViewRendered(view);
-  // Each view starts fresh at the top — except the calendar, which jumps to the next
-  // upcoming match so the visitor isn't scrolling past all the played ones.
-  if(!(view==='calendar' && scrollToCalendarNext())) window.scrollTo(0, 0);
+  // Calendar: when coming back from a match (browser back), restore the exact scroll
+  // position the visitor left from; otherwise jump to the next upcoming match. Every
+  // other view starts at the top.
+  if(view==='calendar' && restoringFromHistory && savedCalendarScrollY!=null){
+    const y = savedCalendarScrollY;
+    savedCalendarScrollY = null;
+    window.scrollTo(0, y);
+  } else if(!(view==='calendar' && scrollToCalendarNext())){
+    window.scrollTo(0, 0);
+  }
   pushBrowserHistory();
   console.log(`[perf] setView('${view}') total (jusqu'à la fin de la fonction) : ${(performance.now()-__setViewT0).toFixed(1)} ms`);
 }
@@ -2751,6 +2763,9 @@ if(__mainEl) __mainEl.addEventListener('click', (e)=>{
   }
   const matchCard = e.target.closest('.match-card');
   if(matchCard){
+    // Remember where the calendar was so going back restores that scroll position
+    // instead of snapping to the top / next match again.
+    if(currentView==='calendar') savedCalendarScrollY = window.scrollY;
     pushNavHistory();
     selectedMatch = matchCard.dataset.matchref;
     setView('match');
