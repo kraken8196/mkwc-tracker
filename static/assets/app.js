@@ -166,8 +166,8 @@ const I18N = {
     tipBestTrack:'Circuit sur lequel le meilleur score moyen a été obtenu.',
     tipTrackAvgTeam:'Score moyen de l\'équipe par circuit.',
     tipTrackAvgPlayer:'Score moyen du joueur par circuit.',
-    lowSampleHint:'Circuit joué une seule fois : moyenne peu représentative.',
-    lowSampleLegend:'* Circuit joué une seule fois : moyenne peu représentative.',
+    lowSampleHint:'Circuit joué moins de {n} fois : moyenne peu représentative.',
+    lowSampleLegend:'* Moyenne peu représentative (pas assez de courses sur ce circuit).',
     tipConsistency:'Écart-type des scores de course du joueur : à quel point il reste proche de sa moyenne. Plus c\'est bas, plus il est régulier.',
     tipClutch:'Moyenne de la 2e moitié du match (courses 7-12) moins la 1re moitié (courses 1-6). Positif = finit plus fort qu\'il n\'a commencé.',
     tipBalance:'Répartition des points entre les joueurs alignés sur un match, en moyenne sur les matchs de l\'équipe. Plus c\'est bas, plus les points sont partagés équitablement.',
@@ -238,8 +238,8 @@ const I18N = {
     tipBestTrack:'Track with the best average score.',
     tipTrackAvgTeam:'Team\'s average score per track.',
     tipTrackAvgPlayer:'Player\'s average score per track.',
-    lowSampleHint:'Track played only once: average not very reliable.',
-    lowSampleLegend:'* Track played only once: average not very reliable.',
+    lowSampleHint:'Track played fewer than {n} times: average not very reliable.',
+    lowSampleLegend:'* Average not very reliable (too few races on this track).',
     tipConsistency:'Standard deviation of the player\'s race scores: how close they stay to their average. Lower means steadier.',
     tipClutch:'Average of the second half (races 7-12) minus the first half (races 1-6). Positive = finishes stronger than they started.',
     tipBalance:'How evenly the players fielded in a match share the points, averaged over the team\'s matches. Lower means more evenly shared.',
@@ -310,8 +310,8 @@ const I18N = {
     tipBestTrack:'Circuito con la mejor puntuación media.',
     tipTrackAvgTeam:'Puntuación media del equipo por circuito.',
     tipTrackAvgPlayer:'Puntuación media del jugador por circuito.',
-    lowSampleHint:'Circuito jugado una sola vez: media poco fiable.',
-    lowSampleLegend:'* Circuito jugado una sola vez: media poco fiable.',
+    lowSampleHint:'Circuito jugado menos de {n} veces: media poco fiable.',
+    lowSampleLegend:'* Media poco fiable (pocas carreras en este circuito).',
     tipConsistency:'Desviación típica de las puntuaciones de carrera del jugador: lo cerca que se mantiene de su media. Cuanto más bajo, más regular.',
     tipClutch:'Media de la 2ª mitad (carreras 7-12) menos la 1ª mitad (carreras 1-6). Positivo = termina más fuerte de lo que empezó.',
     tipBalance:'Cómo reparten los puntos los jugadores alineados en un partido, en promedio sobre los partidos del equipo. Cuanto más bajo, más equilibrado.',
@@ -382,8 +382,8 @@ const I18N = {
     tipBestTrack:'平均スコアが最も高かったコース。',
     tipTrackAvgTeam:'コースごとのチームの平均スコア。',
     tipTrackAvgPlayer:'コースごとの選手の平均スコア。',
-    lowSampleHint:'このコースは1回のみ：平均の信頼性は低いです。',
-    lowSampleLegend:'* このコースは1回のみ：平均の信頼性は低いです。',
+    lowSampleHint:'このコースは{n}回未満：平均の信頼性は低いです。',
+    lowSampleLegend:'* 走行回数が少なく、平均の信頼性は低いです。',
     tipConsistency:'選手のレーススコアの標準偏差：平均からどれだけ離れないか。小さいほど安定。',
     tipClutch:'後半（7〜12レース目）の平均から前半（1〜6レース目）の平均を引いた値。プラスなら尻上がり。',
     tipBalance:'各試合に出場した選手間のポイント配分の均等さ（チームの試合平均）。小さいほど均等。',
@@ -1897,12 +1897,16 @@ function trackBreakdownList(statsForKey){
     trackId: tid, count: statsForKey[tid].count, avg: statsForKey[tid].total/statsForKey[tid].count
   })).sort((a,b)=> b.count-a.count || b.avg-a.avg);
 }
-// Average cell for a track-breakdown row. A track played only once is a single race —
-// far too small a sample to mean anything — so it's dimmed with an explanatory tooltip.
-function trackAvgCellHTML(b){
-  const low = b.count < 2;
+// Minimum races on a track for its average to be treated as reliable. A team score is
+// the sum of 6 players (already smoothed), so it needs fewer samples than a lone player.
+const TRACK_MIN_TEAM = 3;
+const TRACK_MIN_PLAYER = 5;
+// Average cell for a track-breakdown row. Below `minReliable` races the sample is too
+// small to be meaningful, so the average is dimmed, starred and given a tooltip.
+function trackAvgCellHTML(b, minReliable){
+  const low = b.count < minReliable;
   const cls = 'num highlight' + (low ? ' low-sample' : '');
-  const tip = low ? ` title="${t('lowSampleHint').replace(/"/g,'&quot;')}"` : '';
+  const tip = low ? ` title="${t('lowSampleHint').replace('{n}', minReliable).replace(/"/g,'&quot;')}"` : '';
   return `<td class="${cls}"${tip}>${b.avg.toFixed(1)}${low?' <span class="low-sample-mark">*</span>':''}</td>`;
 }
 function formatMatchCount(n){
@@ -2241,13 +2245,13 @@ function renderTeamDetail(tag){
           <thead><tr>${th('colTrack')}${th('colRacesPlayed','tipRacesPlayed','num')}${th('colAvg','tipTrackAvgTeam','num')}</tr></thead>
           <tbody>
             ${(()=>{ const teamBreakdown = trackBreakdownList(raceStats.teamTrackStats[tag]);
-              return teamBreakdown.length ? teamBreakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td>${trackAvgCellHTML(b)}</tr>`).join('')
+              return teamBreakdown.length ? teamBreakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td>${trackAvgCellHTML(b, TRACK_MIN_TEAM)}</tr>`).join('')
                 : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`;
             })()}
           </tbody>
         </table>
       </div>
-      ${trackBreakdownList(raceStats.teamTrackStats[tag]).some(b=>b.count<2) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
+      ${trackBreakdownList(raceStats.teamTrackStats[tag]).some(b=>b.count<TRACK_MIN_TEAM) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
     </div>
   `;
 }
@@ -2302,12 +2306,12 @@ function renderPlayerDetail(tag, name){
         <table class="stats-table">
           <thead><tr>${th('colTrack')}${th('colRacesPlayed','tipRacesPlayed','num')}${th('colAvg','tipTrackAvgPlayer','num')}</tr></thead>
           <tbody>
-            ${breakdown.length? breakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td>${trackAvgCellHTML(b)}</tr>`).join('')
+            ${breakdown.length? breakdown.map(b=>`<tr><td class="lteam">${trackName(b.trackId)}</td><td class="num">${b.count}</td>${trackAvgCellHTML(b, TRACK_MIN_PLAYER)}</tr>`).join('')
               : `<tr><td colspan="3" class="helptext">${t('playersEmpty')}</td></tr>`}
           </tbody>
         </table>
       </div>
-      ${breakdown.some(b=>b.count<2) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
+      ${breakdown.some(b=>b.count<TRACK_MIN_PLAYER) ? `<div class="low-sample-legend">${t('lowSampleLegend')}</div>` : ''}
     </div>
   `;
   document.getElementById('backToPlayerBtn').onclick = goBack;
