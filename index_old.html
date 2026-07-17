@@ -313,6 +313,12 @@
   }
   .num{font-family:'JetBrains Mono',monospace;text-align:center;}
   .teamname{white-space:nowrap;}
+  /* Long team names shrink with an ellipsis in the standings so the tables stay fixed
+     (no horizontal scroll on groups with "Europe de l'Est" / "Hong Kong - Taïwan"). */
+  table.standings td:nth-child(2){max-width:0;}
+  table.standings .teamcell{min-width:0;}
+  table.standings .team-link{flex:1;min-width:0;overflow:hidden;}
+  table.standings .teamname{overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .tbdname{color:var(--dim);font-style:italic;font-size:12px;}
 
   /* bracket */
