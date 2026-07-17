@@ -302,7 +302,13 @@
   .helptext a:hover{color:var(--cream);}
   .explore-card h3{margin-bottom:0;justify-content:flex-start;gap:8px;}
 
-  table.standings{width:100%;border-collapse:collapse;font-size:13px;}
+  /* Fixed layout so the table always fits its container: the position and numeric
+     columns take a fixed narrow width and the team column gets all the remaining space
+     (so most names show in full; only the very longest ellipsise on a narrow screen). */
+  table.standings{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
+  table.standings th:first-child{width:30px;}       /* position */
+  table.standings th.num{width:36px;}                /* P / W / D / L / Diff */
+  table.standings th.pts-col{width:42px;}            /* points */
   table.standings th{
     text-align:left;color:var(--dim);font-weight:600;font-size:11px;
     text-transform:uppercase;letter-spacing:0.05em;padding:4px 6px;border-bottom:1px solid var(--line);
@@ -326,12 +332,10 @@
   }
   .num{font-family:'JetBrains Mono',monospace;text-align:center;}
   .teamname{white-space:nowrap;}
-  /* In the standings, a long team name (e.g. "Europe de l'Est", "Hong Kong - Taïwan")
-     must shrink with an ellipsis instead of widening the table and making it scroll —
-     the other columns are fixed, so the tables stay uniform across all groups. */
-  table.standings td:nth-child(2){max-width:0;}
+  /* The team column takes the remaining space (table-layout:fixed). A name that's still
+     too long to fit ellipsises rather than widening the table; shorter names show fully. */
   table.standings .teamcell{min-width:0;}
-  table.standings .team-link{flex:1;min-width:0;overflow:hidden;}
+  table.standings .team-link{min-width:0;overflow:hidden;}
   table.standings .teamname{overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .tbdname{color:var(--dim);font-style:italic;font-size:12px;}
 

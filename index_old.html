@@ -289,7 +289,12 @@
   .helptext a:hover{color:var(--cream);}
   .explore-card h3{margin-bottom:0;justify-content:flex-start;gap:8px;}
 
-  table.standings{width:100%;border-collapse:collapse;font-size:13px;}
+  /* Fixed layout so the table always fits: numeric columns fixed-width, team column
+     takes the rest (most names show fully; only the longest ellipsise). */
+  table.standings{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
+  table.standings th:first-child{width:30px;}
+  table.standings th.num{width:36px;}
+  table.standings th.pts-col{width:42px;}
   table.standings th{
     text-align:left;color:var(--dim);font-weight:600;font-size:11px;
     text-transform:uppercase;letter-spacing:0.05em;padding:4px 6px;border-bottom:1px solid var(--line);
@@ -313,11 +318,9 @@
   }
   .num{font-family:'JetBrains Mono',monospace;text-align:center;}
   .teamname{white-space:nowrap;}
-  /* Long team names shrink with an ellipsis in the standings so the tables stay fixed
-     (no horizontal scroll on groups with "Europe de l'Est" / "Hong Kong - Taïwan"). */
-  table.standings td:nth-child(2){max-width:0;}
+  /* The team column takes the remaining space; a name too long to fit ellipsises. */
   table.standings .teamcell{min-width:0;}
-  table.standings .team-link{flex:1;min-width:0;overflow:hidden;}
+  table.standings .team-link{min-width:0;overflow:hidden;}
   table.standings .teamname{overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .tbdname{color:var(--dim);font-style:italic;font-size:12px;}
 
