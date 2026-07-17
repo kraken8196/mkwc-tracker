@@ -157,6 +157,9 @@
   }
 
   .groups-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+  /* Standings group tables are wider (8 columns + a full country name) so give them a
+     bigger minimum, letting every name — even "Europe de l'Est" — show in full. */
+  .standings-grid{grid-template-columns:repeat(auto-fit,minmax(400px,1fr));}
   .group-card{
     background:linear-gradient(180deg, var(--panel-2), var(--panel));
     border:1px solid var(--line-strong);border-radius:var(--radius);
@@ -687,7 +690,7 @@
 
     main{padding:14px;}
 
-    .groups-grid{grid-template-columns:1fr;}
+    .groups-grid, .standings-grid{grid-template-columns:1fr;}
     .flag-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;}
 
     /* Phones: two long names can't fit beside a centre score, so the fixture stacks —

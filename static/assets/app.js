@@ -1078,7 +1078,7 @@ function renderStandingsView(){
     <div class="stage-head"><h2 class="outline">${t('stageQuali')}</h2><span class="stage-date">${t('dateQualiFull')}</span></div>
     <div class="tier-badge">${t('tierQuali')}</div>
     <div class="stage-note">${t('noteQuali')}</div>
-    <div class="groups-grid">
+    <div class="groups-grid standings-grid">
       ${Object.entries(QUALI_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.quali[id], 2, null, 'group-quali-'+id)).join('')}
     </div>
   </div>`;
@@ -1088,13 +1088,13 @@ function renderStandingsView(){
     <div class="stage-subhead">${t('subhead14')}</div>
     <div class="tier-badge">${t('tier14')}</div>
     <div class="stage-note">${t('note14')}</div>
-    <div class="groups-grid">
+    <div class="groups-grid standings-grid">
       ${Object.entries(MID_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.mid[id], 2, null, 'group-mid-'+id)).join('')}
     </div>
     <div class="stage-subhead">${t('subheadAB')}</div>
     <div class="tier-badge">${t('tierAB')}</div>
     <div class="stage-note">${t('noteAB')}</div>
-    <div class="groups-grid">
+    <div class="groups-grid standings-grid">
       ${Object.entries(TOP_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.top[id], 4, null, 'group-top-'+id)).join('')}
     </div>
   </div>`;
