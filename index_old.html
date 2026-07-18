@@ -3060,25 +3060,20 @@ function getRaceStats(){
     for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
   }
 
-  function bestTrackFromStats(statsObj){
+  // "Best track" must match the top row of the track table (same trackBreakdownList
+  // ranking and same minReliable): reliable tracks first by average, low-sample after.
+  function bestTrackFromStats(statsObj, minReliable){
     const result = {};
     for(const key in statsObj){
-      let best=null, bestCount=-1, bestAvg=-1;
-      for(const tid in statsObj[key]){
-        const s = statsObj[key][tid];
-        const avg = s.total/s.count;
-        // Prefer the track played the most — a single lucky race shouldn't outrank a track
-        // actually mastered over several attempts. Average only breaks ties within the same count.
-        if(s.count>bestCount || (s.count===bestCount && avg>bestAvg)){ bestCount=s.count; bestAvg=avg; best=tid; }
-      }
-      result[key] = best;
+      const ranked = trackBreakdownList(statsObj[key], minReliable);
+      result[key] = ranked.length ? ranked[0].trackId : null;
     }
     return result;
   }
 
   return {
-    bestTrackForPlayer: bestTrackFromStats(playerTrackStats),
-    bestTrackForTeam: bestTrackFromStats(teamTrackStats),
+    bestTrackForPlayer: bestTrackFromStats(playerTrackStats, TRACK_MIN_PLAYER),
+    bestTrackForTeam: bestTrackFromStats(teamTrackStats, TRACK_MIN_TEAM),
     playerTrackStats, teamTrackStats,
   };
 }
