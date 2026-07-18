@@ -365,6 +365,15 @@
 
   /* calendar */
   .cal-list{display:flex;flex-direction:column;gap:12px;}
+  /* "Show past matches" toggle at the top of the calendar (older-than-a-week matches). */
+  .cal-past-toggle{
+    display:block;width:100%;margin:4px 0 2px;padding:10px 14px;border-radius:10px;cursor:pointer;
+    background:var(--panel-2);border:1px solid var(--line-strong);color:var(--dim);
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    transition:color .15s, border-color .15s, background .15s;
+  }
+  .cal-past-toggle:hover{color:var(--cream);border-color:var(--gold);}
+  .cal-past-toggle.open{color:var(--gold);}
   /* A match card is two stacked rows: a top meta row (stage + date) and a fixed,
      symmetric fixture row. Everything about the fixture row is column-based, so
      cards line up perfectly with each other and never wrap. */

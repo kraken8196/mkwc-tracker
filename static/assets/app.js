@@ -193,6 +193,7 @@ const I18N = {
     round16:'Round 1', quarterfinals:'Quarts de finale', semifinals:'Demi-finales', final:'Finale',
     dateQuali:'10–12 juil.', datePhase:'17–19 juil.', dateR16:'24 juillet', dateQF:'25 juillet', dateSF:'1 août', dateF:'2 août',
     calNoMatch:"Aucun match programmé pour l'instant — plusieurs groupes ont encore des équipes à définir.",
+    calShowPast:'▾ Voir les matchs passés ({n})', calHidePast:'▴ Masquer les matchs passés',
     calGroupProvisional:'⚠️ Les dates du 17 au 19 juillet pour la phase de groupes sont provisoires : certains matchs pourront se dérouler en dehors de ces dates.',
     upcoming:'à venir', vs:'vs',
     teamsIntro:"Clique sur un drapeau pour voir la fiche de l'équipe (joueurs, statistiques...).",
@@ -265,6 +266,7 @@ const I18N = {
     round16:'Round 1', quarterfinals:'Quarterfinals', semifinals:'Semifinals', final:'Final',
     dateQuali:'Jul 10–12', datePhase:'Jul 17–19', dateR16:'July 24', dateQF:'July 25', dateSF:'Aug 1', dateF:'Aug 2',
     calNoMatch:'No matches scheduled yet — several groups still have teams to be determined.',
+    calShowPast:'▾ Show past matches ({n})', calHidePast:'▴ Hide past matches',
     calGroupProvisional:'⚠️ The July 17–19 dates for the Group Stage are provisional: some matches may take place outside those dates.',
     upcoming:'upcoming', vs:'vs',
     teamsIntro:"Click on a flag to see the team's page (players, stats...).",
@@ -337,6 +339,7 @@ const I18N = {
     round16:'Ronda 1', quarterfinals:'Cuartos de final', semifinals:'Semifinales', final:'Final',
     dateQuali:'10–12 jul.', datePhase:'17–19 jul.', dateR16:'24 de julio', dateQF:'25 de julio', dateSF:'1 de agosto', dateF:'2 de agosto',
     calNoMatch:'Todavía no hay partidos programados — varios grupos aún tienen equipos por determinar.',
+    calShowPast:'▾ Ver partidos pasados ({n})', calHidePast:'▴ Ocultar partidos pasados',
     calGroupProvisional:'⚠️ Las fechas del 17 al 19 de julio para la fase de grupos son provisionales: algunos partidos podrían disputarse fuera de esas fechas.',
     upcoming:'por jugar', vs:'vs',
     teamsIntro:'Haz clic en una bandera para ver la ficha del equipo (jugadores, estadísticas...).',
@@ -409,6 +412,7 @@ const I18N = {
     round16:'ラウンド1', quarterfinals:'準々決勝', semifinals:'準決勝', final:'決勝',
     dateQuali:'7月10〜12日', datePhase:'7月17〜19日', dateR16:'7月24日', dateQF:'7月25日', dateSF:'8月1日', dateF:'8月2日',
     calNoMatch:'まだ試合は組まれていません — いくつかのグループはチームが未確定です。',
+    calShowPast:'▾ 過去の試合を表示 ({n})', calHidePast:'▴ 過去の試合を隠す',
     calGroupProvisional:'⚠️ グループステージの7月17〜19日の日程は暫定です。一部の試合はこの期間外に行われる可能性があります。',
     upcoming:'試合前', vs:'vs',
     teamsIntro:'旗をクリックするとチームページ（選手、成績など）が表示されます。',
@@ -1640,22 +1644,53 @@ function renderCalendarView(){
     // the calendar can jump straight to it instead of the visitor scrolling past results.
     const nextIdx = items.findIndex(it=>!isPlayed(it.sc));
     const nextDateKey = nextIdx>=0 ? items[nextIdx].dateKey : null;
-    let currentDate = null;
-    let nextAnchorPlaced = false;
+
+    // Days older than a week are folded away behind a "show older" button so the calendar
+    // opens on the recent/upcoming matches. A day is "old" only if it has a real date and
+    // it's more than 7 days before now; undated fixtures are never treated as old.
+    const weekAgo = Date.now() - 7*24*60*60*1000;
+    const isOldItem = it => it.rawIso && new Date(it.rawIso).getTime() < weekAgo;
+    // Bucket items by day, remembering each day's order, label, and whether it's old.
+    const dayOrder = [];
+    const days = {};
     items.forEach(it=>{
-      if(it.dateKey !== currentDate){
-        if(currentDate!==null) html += `</div>`;
-        const isNextDay = !nextAnchorPlaced && it.dateKey===nextDateKey;
-        if(isNextDay) nextAnchorPlaced = true;
-        html += `<div class="stage-subhead"${isNextDay?' id="cal-next"':''} style="margin-top:22px;">${it.dayLabel}</div>`;
-        html += `<div class="cal-list">`;
-        currentDate = it.dateKey;
+      if(!days[it.dateKey]){
+        days[it.dateKey] = { label: it.dayLabel, old: true, items: [] };
+        dayOrder.push(it.dateKey);
       }
-      html += matchCardHTML(it);
+      days[it.dateKey].items.push(it);
+      if(!isOldItem(it)) days[it.dateKey].old = false; // a day is old only if ALL its matches are
     });
-    html += `</div>`;
+    const oldKeys = dayOrder.filter(k=>days[k].old);
+    const recentKeys = dayOrder.filter(k=>!days[k].old);
+
+    function renderDay(key, anchor){
+      const d = days[key];
+      let out = `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div><div class="cal-list">`;
+      out += d.items.map(matchCardHTML).join('');
+      return out + `</div>`;
+    }
+
+    if(oldKeys.length){
+      const n = oldKeys.reduce((s,k)=>s+days[k].items.length, 0);
+      html += `<button class="cal-past-toggle" id="calPastToggle" type="button">${t('calShowPast').replace('{n}', n)}</button>`;
+      html += `<div class="cal-past" id="calPast" style="display:none;">${oldKeys.map(k=>renderDay(k)).join('')}</div>`;
+    }
+    // Recent + upcoming days, with the next-match anchor on its day.
+    html += recentKeys.map(k=>renderDay(k, k===nextDateKey)).join('');
   }
   el.innerHTML = html;
+  const pastBtn = document.getElementById('calPastToggle');
+  if(pastBtn){
+    pastBtn.onclick = ()=>{
+      const box = document.getElementById('calPast');
+      const open = box.style.display !== 'none';
+      box.style.display = open ? 'none' : '';
+      pastBtn.classList.toggle('open', !open);
+      pastBtn.textContent = open ? pastBtn.dataset.showLabel : t('calHidePast');
+    };
+    pastBtn.dataset.showLabel = pastBtn.textContent;
+  }
 }
 // Scroll the calendar so the next upcoming match's day heading is at the top (under the
 // sticky header). Returns true if it scrolled, false if there's no upcoming match.
