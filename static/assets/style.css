@@ -145,6 +145,12 @@
   .stage-head h2{font-size:24px;}
   .stage-head .stage-date{font-size:12px;color:#3a2100;background:var(--gold);padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:700;}
   .stage-note{font-size:13px;color:var(--dim);margin-bottom:16px;}
+  /* Placeholder shown in a match's detail until race-by-race scores are entered. */
+  .track-stats-pending{
+    margin-top:20px;padding:16px 18px;border-radius:10px;text-align:center;
+    background:var(--panel-2);border:1px dashed var(--line-strong);
+    color:var(--dim);font-size:13.5px;line-height:1.5;
+  }
   .cal-provisional-note{
     font-size:13px;line-height:1.5;color:var(--dim);
     margin:4px 0 10px;
