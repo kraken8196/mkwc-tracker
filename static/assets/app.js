@@ -610,7 +610,7 @@ function defaultState(){
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
   return s;
 }
-function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill('')})); }
+function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill(''), subs:[]})); }
 function playerTotal(p){ return (p.races||[]).reduce((sum,v)=> sum + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
 function playerRacesFilled(p){ return (p.races||[]).some(v=>v!=='' && v!=null); }
 // A player's score can be entered two ways: either the 12 individual races, or just a
@@ -623,36 +623,48 @@ function effectivePlayerTotal(p){
   return playerHasTypedTotal(p) ? Number(p.total) : 0;
 }
 function playerHasScore(p){ return playerRacesFilled(p) || playerHasTypedTotal(p); }
-// A player can be substituted for part of a match (e.g. connection issue). subFromRace and
-// subToRace are 1-indexed and inclusive: races in [from, to] belong to p.subName, the rest to
-// p.n. subToRace is optional and defaults to 12 (sub plays until the end) for older data.
-function subRange(p){
-  if(!p || !p.subName || !p.subFromRace) return null;
-  const from = Math.max(1, Math.min(12, Number(p.subFromRace)));
-  const to = p.subToRace ? Math.max(from, Math.min(12, Number(p.subToRace))) : 12;
-  return {from, to};
+// A player can be substituted for parts of a match (e.g. connection issue). Substitutes
+// live in p.subs = [{name, from, to}, …] (up to two), with from/to 1-indexed and inclusive
+// and non-overlapping ranges. The titular player p.n plays every race not covered by a sub.
+// Reads the legacy single-substitute fields as a fallback if the slot wasn't migrated yet.
+function subRanges(p){
+  if(!p) return [];
+  let list = Array.isArray(p.subs) ? p.subs : null;
+  if(!list){
+    list = (p.subName && p.subFromRace) ? [{ name:p.subName, from:p.subFromRace, to:p.subToRace }] : [];
+  }
+  return list
+    .filter(s => s && s.name && s.from)
+    .map(s => {
+      const from = Math.max(1, Math.min(12, Number(s.from)));
+      const to = s.to ? Math.max(from, Math.min(12, Number(s.to))) : 12;
+      return { name:s.name, from, to };
+    });
 }
 function raceOwnerName(p, raceIdx){
-  const r = subRange(p);
-  if(r && (raceIdx+1) >= r.from && (raceIdx+1) <= r.to) return p.subName;
-  return p.n;
+  const race = raceIdx + 1;
+  for(const r of subRanges(p)){ if(race >= r.from && race <= r.to) return r.name; }
+  return p ? p.n : '';
 }
-// Splits a slot into segments (original player, and substitute for their range if any), each
-// with their own name and the subset of the 12 races that belongs to them. Used everywhere
-// stats need to credit the right person instead of assuming one name covers the whole match.
+// Splits a slot into segments (the titular player, plus each substitute over their range),
+// each with their own name and the subset of the 12 races that belongs to them. Used
+// everywhere stats need to credit the right person instead of assuming one name per match.
 function playerSegments(p){
   if(!p || !p.n) return [];
   const races = p.races || Array(12).fill('');
-  const r = subRange(p);
-  if(!r){
+  const ranges = subRanges(p);
+  if(!ranges.length){
     return [{ name: p.n, races, raceIndices: races.map((_,i)=>i) }];
   }
-  const mainIdx = [], subIdx = [];
-  races.forEach((_,i)=>{ const race = i+1; (race>=r.from && race<=r.to ? subIdx : mainIdx).push(i); });
-  const segs = [];
-  if(mainIdx.length) segs.push({ name: p.n, races: mainIdx.map(i=>races[i]), raceIndices: mainIdx });
-  if(subIdx.length) segs.push({ name: p.subName, races: subIdx.map(i=>races[i]), raceIndices: subIdx });
-  return segs;
+  // Bucket each race index by its owner name (titular or a sub), preserving race order.
+  const byName = new Map();
+  const order = [];
+  races.forEach((_,i)=>{
+    const name = raceOwnerName(p, i);
+    if(!byName.has(name)){ byName.set(name, []); order.push(name); }
+    byName.get(name).push(i);
+  });
+  return order.map(name => ({ name, raceIndices: byName.get(name), races: byName.get(name).map(i=>races[i]) }));
 }
 
 const TRACKS = [
@@ -691,10 +703,22 @@ const TRACKS = [
 function trackName(id){ if(!id) return ''; const tr = TRACKS.find(t=>t.id===id); return tr ? tr[LANG] : id; }
 function emptyMatchPlayers(){ return {h:emptyPlayerSlots(), a:emptyPlayerSlots(), tracks: Array(12).fill('')}; }
 function migratePlayerSlot(slot){
+  if(!slot) return slot;
+  // A slot now carries up to two substitutes in `slot.subs` = [{name, from, to}, …].
+  // Migrate the old single-substitute fields (subName/subFromRace/subToRace) into it,
+  // non-destructively (the legacy fields are left in place so nothing is lost).
+  if(!Array.isArray(slot.subs)){
+    slot.subs = [];
+    if(slot.subName && slot.subFromRace){
+      const from = Math.max(1, Math.min(12, Number(slot.subFromRace)));
+      const to = slot.subToRace ? Math.max(from, Math.min(12, Number(slot.subToRace))) : 12;
+      slot.subs.push({ name: slot.subName, from, to });
+    }
+  }
   // Older matches encoded before the 12-race system only stored a single total score
   // ({n, s}) per player. Give any such slot a proper races array so the admin form can
   // safely write into it — the old total is kept as race 1 rather than being discarded.
-  if(!slot || Array.isArray(slot.races)) return slot;
+  if(Array.isArray(slot.races)) return slot;
   const legacyScore = slot.s;
   slot.races = Array(12).fill('');
   if(legacyScore !== undefined && legacyScore !== '' && legacyScore != null) slot.races[0] = legacyScore;
@@ -984,10 +1008,10 @@ function playerListHTML(entries, teamTag){
   if(!filled.length) return '';
   const rows = [];
   filled.forEach(p=>{
-    playerSegments(p).forEach((seg, idx)=>{
+    playerSegments(p).forEach(seg=>{
       const segScore = seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0);
       const hasData = seg.races.some(v=>v!=='' && v!=null);
-      rows.push({ name: seg.name, score: segScore, hasData, isSub: idx>0 });
+      rows.push({ name: seg.name, score: segScore, hasData, isSub: seg.name !== p.n });
     });
   });
   rows.sort((a,b)=> b.score-a.score);

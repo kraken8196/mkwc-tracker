@@ -1454,7 +1454,7 @@ function defaultState(){
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
   return s;
 }
-function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill('')})); }
+function emptyPlayerSlots(){ return [0,1,2,3,4,5].map(()=>({n:'', races: Array(12).fill(''), subs:[]})); }
 // The live-stream link is stored flat in STATE.streams, keyed by matchRef
 // ('g|<section>|<group>|<i>|<j>' for groups, 'b|<round>|<index>' for bracket).
 function streamRefFor(section, groupOrRound, keyOrIndex){
@@ -1524,36 +1524,45 @@ function effectivePlayerTotal(p){
   return playerHasTypedTotal(p) ? Number(p.total) : 0;
 }
 function playerHasScore(p){ return playerRacesFilled(p) || playerHasTypedTotal(p); }
-// A player can be substituted for part of a match (e.g. connection issue). subFromRace and
-// subToRace are 1-indexed and inclusive: races in [from, to] belong to p.subName, the rest to
-// p.n. subToRace is optional and defaults to 12 (sub plays until the end) for older data.
-function subRange(p){
-  if(!p || !p.subName || !p.subFromRace) return null;
-  const from = Math.max(1, Math.min(12, Number(p.subFromRace)));
-  const to = p.subToRace ? Math.max(from, Math.min(12, Number(p.subToRace))) : 12;
-  return {from, to};
+// Substitutes live in p.subs = [{name, from, to}, …] (up to two), from/to 1-indexed and
+// inclusive, non-overlapping. The titular player p.n plays every race no sub covers.
+// Falls back to the legacy single-substitute fields if the slot wasn't migrated yet.
+function subRanges(p){
+  if(!p) return [];
+  let list = Array.isArray(p.subs) ? p.subs : null;
+  if(!list){
+    list = (p.subName && p.subFromRace) ? [{ name:p.subName, from:p.subFromRace, to:p.subToRace }] : [];
+  }
+  return list
+    .filter(s => s && s.name && s.from)
+    .map(s => {
+      const from = Math.max(1, Math.min(12, Number(s.from)));
+      const to = s.to ? Math.max(from, Math.min(12, Number(s.to))) : 12;
+      return { name:s.name, from, to };
+    });
 }
 function raceOwnerName(p, raceIdx){
-  const r = subRange(p);
-  if(r && (raceIdx+1) >= r.from && (raceIdx+1) <= r.to) return p.subName;
-  return p.n;
+  const race = raceIdx + 1;
+  for(const r of subRanges(p)){ if(race >= r.from && race <= r.to) return r.name; }
+  return p ? p.n : '';
 }
-// Splits a slot into segments (original player, and substitute for their range if any), each
-// with their own name and the subset of the 12 races that belongs to them. Used everywhere
-// stats need to credit the right person instead of assuming one name covers the whole match.
+// Splits a slot into segments (titular player + each substitute over their range), each with
+// their own name and the subset of the 12 races that belongs to them.
 function playerSegments(p){
   if(!p || !p.n) return [];
   const races = p.races || Array(12).fill('');
-  const r = subRange(p);
-  if(!r){
+  const ranges = subRanges(p);
+  if(!ranges.length){
     return [{ name: p.n, races, raceIndices: races.map((_,i)=>i) }];
   }
-  const mainIdx = [], subIdx = [];
-  races.forEach((_,i)=>{ const race = i+1; (race>=r.from && race<=r.to ? subIdx : mainIdx).push(i); });
-  const segs = [];
-  if(mainIdx.length) segs.push({ name: p.n, races: mainIdx.map(i=>races[i]), raceIndices: mainIdx });
-  if(subIdx.length) segs.push({ name: p.subName, races: subIdx.map(i=>races[i]), raceIndices: subIdx });
-  return segs;
+  const byName = new Map();
+  const order = [];
+  races.forEach((_,i)=>{
+    const name = raceOwnerName(p, i);
+    if(!byName.has(name)){ byName.set(name, []); order.push(name); }
+    byName.get(name).push(i);
+  });
+  return order.map(name => ({ name, raceIndices: byName.get(name), races: byName.get(name).map(i=>races[i]) }));
 }
 
 const TRACKS = [
@@ -1592,15 +1601,37 @@ const TRACKS = [
 function trackName(id){ if(!id) return ''; const tr = TRACKS.find(t=>t.id===id); return tr ? tr[LANG] : id; }
 function emptyMatchPlayers(){ return {h:emptyPlayerSlots(), a:emptyPlayerSlots(), tracks: Array(12).fill('')}; }
 function migratePlayerSlot(slot){
+  if(!slot) return slot;
+  // Up to two substitutes now live in slot.subs = [{name, from, to}, …]. Migrate the old
+  // single-substitute fields into it non-destructively (legacy fields are left in place).
+  if(!Array.isArray(slot.subs)){
+    slot.subs = [];
+    if(slot.subName && slot.subFromRace){
+      const from = Math.max(1, Math.min(12, Number(slot.subFromRace)));
+      const to = slot.subToRace ? Math.max(from, Math.min(12, Number(slot.subToRace))) : 12;
+      slot.subs.push({ name: slot.subName, from, to });
+    }
+  }
   // Older matches encoded before the 12-race system only stored a single total score
   // ({n, s}) per player. Give any such slot a proper races array so the admin form can
   // safely write into it — the old total is kept as race 1 rather than being discarded.
-  if(!slot || Array.isArray(slot.races)) return slot;
+  if(Array.isArray(slot.races)) return slot;
   const legacyScore = slot.s;
   slot.races = Array(12).fill('');
   if(legacyScore !== undefined && legacyScore !== '' && legacyScore != null) slot.races[0] = legacyScore;
   delete slot.s;
   return slot;
+}
+// Write one substitute field (name/from/to) into slot.subs[si] at its fixed index. Empty
+// entries are compacted away later, at save time, by compactSubs().
+function setSubField(slot, si, field, value){
+  if(!Array.isArray(slot.subs)) slot.subs = [];
+  while(slot.subs.length <= si) slot.subs.push({});
+  slot.subs[si][field] = value;
+}
+// Drop substitutes with no name so we never persist blank entries (keeps order otherwise).
+function compactSubs(slot){
+  if(Array.isArray(slot.subs)) slot.subs = slot.subs.filter(s => s && s.name);
 }
 function migrateMatchPlayers(pl){
   if(!pl) return pl;
@@ -1728,7 +1759,15 @@ async function loadState(){
   }catch(e){ STATE = defaultState(); }
 }
 async function saveState(){
+  compactAllSubs(STATE); // drop any blank substitute entries before persisting
   await SB_STORAGE.set('mkwc_state', JSON.stringify(STATE)); // let errors propagate — callers decide how to surface them
+}
+// Remove empty substitutes from every match slot (both group stage and bracket).
+function compactAllSubs(state){
+  const doMatch = pl => { if(!pl) return; (pl.h||[]).forEach(compactSubs); (pl.a||[]).forEach(compactSubs); };
+  ['quali','mid','top'].forEach(st=>{ const groups = state[st]||{}; for(const id in groups){ const g=groups[id]; if(g && g.players) for(const k in g.players) doMatch(g.players[k]); } });
+  const bp = (state.bracket && state.bracket.players) || {};
+  for(const rk in bp){ for(const m in bp[rk]) doMatch(bp[rk][m]); }
 }
 
 /* =========================================================
@@ -2213,10 +2252,10 @@ function playerListHTML(entries, teamTag){
   if(!filled.length) return '';
   const rows = [];
   filled.forEach(p=>{
-    playerSegments(p).forEach((seg, idx)=>{
+    playerSegments(p).forEach(seg=>{
       const segScore = seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0);
       const hasData = seg.races.some(v=>v!=='' && v!=null);
-      rows.push({ name: seg.name, score: segScore, hasData, isSub: idx>0 });
+      rows.push({ name: seg.name, score: segScore, hasData, isSub: seg.name !== p.n });
     });
   });
   rows.sort((a,b)=> b.score-a.score);
@@ -4151,7 +4190,10 @@ function raceTableHTML(key, side, players, teamTag, disabled, dataAttr){
         <th class="amr-race-name">${teamTag?teamName(teamTag):'—'}</th>
         ${cols.map(r=>`<th>R${r+1}</th>`).join('')}
         <th>${t('adminTotalLabel')}</th>
-        <th class="amr-race-name">${t('adminSubLabel')}</th>
+        <th class="amr-race-name">${t('adminSubLabel')} 1</th>
+        <th>${t('adminSubFromLabel')}</th>
+        <th>${t('adminSubToLabel')}</th>
+        <th class="amr-race-name">${t('adminSubLabel')} 2</th>
         <th>${t('adminSubFromLabel')}</th>
         <th>${t('adminSubToLabel')}</th>
       </tr></thead>
@@ -4159,13 +4201,19 @@ function raceTableHTML(key, side, players, teamTag, disabled, dataAttr){
         ${players.map((p,pi)=>{
           const racesFilled = playerRacesFilled(p);
           const totalVal = racesFilled ? playerTotal(p) : (playerHasTypedTotal(p) ? Number(p.total) : '');
+          const subs = Array.isArray(p.subs) ? p.subs : [];
+          const subCells = (si)=>{
+            const s = subs[si] || {};
+            return `<td class="amr-race-name"><select data-${dataAttr}-sub="${key}" data-pside="${side}" data-pidx="${pi}" data-subidx="${si}" ${disabled}>${playerOptions(teamTag, s.name||'', true)}</select></td>
+            <td><input type="number" min="1" max="12" class="sub-from-input" data-${dataAttr}-subfrom="${key}" data-pside="${side}" data-pidx="${pi}" data-subidx="${si}" value="${s.from||''}" placeholder="—" ${disabled}></td>
+            <td><input type="number" min="1" max="12" class="sub-from-input" data-${dataAttr}-subto="${key}" data-pside="${side}" data-pidx="${pi}" data-subidx="${si}" value="${s.to||''}" placeholder="fin" ${disabled}></td>`;
+          };
           return `<tr>
           <td class="amr-race-name"><select data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-field="name" ${disabled}>${playerOptions(teamTag, p.n)}</select></td>
           ${cols.map(r=>`<td><input type="number" class="race-input" data-${dataAttr}="${key}" data-pside="${side}" data-pidx="${pi}" data-race="${r}" value="${p.races?p.races[r]:''}" ${disabled}></td>`).join('')}
           <td><input type="number" class="race-total-input ${racesFilled?'is-auto':''}" data-${dataAttr}-total="${key}" data-pside="${side}" data-pidx="${pi}" value="${totalVal}" title="${racesFilled?'Total calculé depuis les 12 courses':'Total du match (saisis-le, ou remplis les courses)'}" ${racesFilled?'readonly':''} ${disabled}></td>
-          <td class="amr-race-name"><select data-${dataAttr}-sub="${key}" data-pside="${side}" data-pidx="${pi}" ${disabled}>${playerOptions(teamTag, p.subName, true)}</select></td>
-          <td><input type="number" min="1" max="12" class="sub-from-input" data-${dataAttr}-subfrom="${key}" data-pside="${side}" data-pidx="${pi}" value="${p.subFromRace||''}" placeholder="—" ${disabled}></td>
-          <td><input type="number" min="1" max="12" class="sub-from-input" data-${dataAttr}-subto="${key}" data-pside="${side}" data-pidx="${pi}" value="${p.subToRace||''}" placeholder="fin" ${disabled}></td>
+          ${subCells(0)}
+          ${subCells(1)}
         </tr>`;}).join('')}
       </tbody>
     </table>
@@ -4459,22 +4507,22 @@ function renderAdminView(){
         slot[pidx].total = playerRacesFilled(slot[pidx]) ? '' : field.value;
       });
       el.querySelectorAll('[data-pmatch-sub]').forEach(field=>{
-        const key = field.dataset.pmatchSub, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const key = field.dataset.pmatchSub, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
         const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
-        slot[pidx].subName = field.value;
+        setSubField(slot[pidx], si, 'name', field.value);
       });
       el.querySelectorAll('[data-pmatch-subfrom]').forEach(field=>{
-        const key = field.dataset.pmatchSubfrom, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const key = field.dataset.pmatchSubfrom, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
         const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
-        slot[pidx].subFromRace = field.value;
+        setSubField(slot[pidx], si, 'from', field.value);
       });
       el.querySelectorAll('[data-pmatch-subto]').forEach(field=>{
-        const key = field.dataset.pmatchSubto, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const key = field.dataset.pmatchSubto, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();
         const slot = side===0 ? stateGroup.players[key].h : stateGroup.players[key].a;
-        slot[pidx].subToRace = field.value;
+        setSubField(slot[pidx], si, 'to', field.value);
       });
       el.querySelectorAll('[data-pmatch-track]').forEach(field=>{
         const key = field.dataset.pmatchTrack;
@@ -4516,24 +4564,24 @@ function renderAdminView(){
       });
       el.querySelectorAll('[data-bpmatch-sub]').forEach(field=>{
         const [r,m] = field.dataset.bpmatchSub.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
         const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        slot[pidx].subName = field.value;
+        setSubField(slot[pidx], si, 'name', field.value);
       });
       el.querySelectorAll('[data-bpmatch-subfrom]').forEach(field=>{
         const [r,m] = field.dataset.bpmatchSubfrom.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
         const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        slot[pidx].subFromRace = field.value;
+        setSubField(slot[pidx], si, 'from', field.value);
       });
       el.querySelectorAll('[data-bpmatch-subto]').forEach(field=>{
         const [r,m] = field.dataset.bpmatchSubto.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
         if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
         const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        slot[pidx].subToRace = field.value;
+        setSubField(slot[pidx], si, 'to', field.value);
       });
       el.querySelectorAll('[data-bpmatch-track]').forEach(field=>{
         const [r,m] = field.dataset.bpmatchTrack.split('-');
