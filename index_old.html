@@ -2812,7 +2812,7 @@ function getGroupStageRecap(){
         const key=i+'-'+j, sc=g.scores[key];
         if(!isPlayed(sc) || g.slots[i]==null || g.slots[j]==null) return;
         matches.push({ H:g.slots[i], A:g.slots[j], scH:Number(sc[0]), scA:Number(sc[1]),
-          tracks:(g.players[key]||{}).tracks||[], pl:g.players[key]||{h:[],a:[]}, tier });
+          tracks:(g.players[key]||{}).tracks||[], pl:g.players[key]||{h:[],a:[]}, tier, gid:id });
       });
     }
   });
@@ -2896,16 +2896,22 @@ function getGroupStageRecap(){
       comeback={ deficit:worst, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA) };
     }
   });
-  // closest finish (non-forfeit, not a draw)
-  let closest=null;
+  // Closest finish(es) (non-forfeit, not a draw). Several matches can tie on the
+  // smallest margin, so collect them all — deterministically ordered by tier then group.
+  const tierRank = {top:0, mid:1};
+  let minMargin = Infinity;
+  const closestCandidates = [];
   matches.forEach(m=>{
     if(isForfeit(m) || m.scH===m.scA) return;
     const margin=Math.abs(m.scH-m.scA);
-    if(closest===null || margin<closest.margin){
-      const winH=m.scH>m.scA;
-      closest={ margin, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA) };
-    }
+    if(margin<minMargin) minMargin=margin;
+    const winH=m.scH>m.scA;
+    closestCandidates.push({ margin, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA), tier:m.tier, gid:m.gid });
   });
+  const closestAll = closestCandidates
+    .filter(c=>c.margin===minMargin)
+    .sort((a,b)=> (tierRank[a.tier]-tierRank[b.tier]) || String(a.gid).localeCompare(String(b.gid)));
+  const closest = closestAll[0] || null;
   // a tie (draw) — a rarity worth calling out
   let draw=null;
   matches.forEach(m=>{
@@ -3017,7 +3023,7 @@ function getGroupStageRecap(){
   return {
     matchesCount: matches.length, racesPlayed, totalPoints,
     playersPlayed: distinctPlayers.size, distinctTracks: distinctTracks.size,
-    comeback, closest, draw, dramaMatch,
+    comeback, closest, closestAll, draw, dramaMatch,
     bestMatch, secondBestMatch, mostPerfect, topScorer, streak,
     undefeated, bestOffenseByTier, bestDiff, groupRace, ptsOverDiff, survivors,
     mostPlayedTrack, decisiveTracks, equaliserTrack, playerTeam, p15
@@ -3250,7 +3256,7 @@ function renderCalendarView(){
   const el = document.getElementById('view-calendar');
   const items = getAllMatchItems();
 
-  let html = `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
+  let html = '';
   if(items.length===0){
     html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
@@ -3274,7 +3280,8 @@ function renderCalendarView(){
 
     function renderDay(key, anchor){
       const d = days[key];
-      let out = `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div><div class="cal-list">`;
+      const note = key==='bracket-0' ? `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>` : '';
+      let out = note + `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div><div class="cal-list">`;
       out += d.items.map(matchCardHTML).join('');
       return out + `</div>`;
     }
@@ -5162,6 +5169,7 @@ const NUTSHELL_GS_I18N = {
     hDyk:'Le saviez-vous ?',
     comeback:'<b>{winner}</b> signe la plus belle remontée de la phase. Menée de <fig>{deficit}</fig> points contre <b>{loser}</b>, l’équipe a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé de la phase de groupes.',
     closest:'À l’autre bout du spectre, le match le plus serré n’a tenu qu’à <fig>{margin}</fig> points : <b>{winner}</b> s’impose <b>{scW}–{scL}</b> face {loserAt} au terme des douze courses.',
+    closestTwo:'À l’autre bout du spectre, deux rencontres se partagent le titre du match le plus serré, décidées à <fig>{margin}</fig> points près : <b>{w1}</b> s’impose <b>{scW1}–{scL1}</b> face {loserAt1}, et <b>{w2}</b> <b>{scW2}–{scL2}</b> face {loserAt2}. Impossible de les départager.',
     draw:'Pour la deuxième fois dans ce tournoi, un match n’a pas pu être départagé : <b>{h}</b> et <b>{a}</b> se sont quittés dos à dos sur un <b>{sc}–{sc}</b> parfait, incapables de se séparer après douze courses.',
     indivBest:'Côté joueur·euse·s, <b>{player}</b> ({team}) a réussi le plus gros match de la phase — <fig>{best}</fig> points, dont <fig>{streak}</fig> courses gagnées d’affilée, la plus longue série de la phase — en devançant <b>{p2}</b> d’un seul petit point ({best2}).',
     indivBestSolo:'Côté joueur·euse·s, <b>{player}</b> ({team}) a réussi le plus gros match de la phase : <fig>{best}</fig> points, dont <fig>{streak}</fig> courses gagnées d’affilée — la plus longue série de la phase de groupes.',
@@ -5189,6 +5197,7 @@ const NUTSHELL_GS_I18N = {
     hDyk:'Did you know?',
     comeback:'<b>{winner}</b> pulled off the biggest comeback of the stage. Down by <fig>{deficit}</fig> points against <b>{loser}</b>, they turned it around to win <b>{scW}–{scL}</b> — the largest deficit overturned in the Group Stage.',
     closest:'At the other end, the closest match came down to just <fig>{margin}</fig> points: <b>{winner}</b> edged <b>{loser}</b> <b>{scW}–{scL}</b> after twelve races.',
+    closestTwo:'At the other end, two matches share the title of closest of the stage, both decided by just <fig>{margin}</fig> points: <b>{w1}</b> edged <b>{l1}</b> <b>{scW1}–{scL1}</b>, and <b>{w2}</b> beat <b>{l2}</b> <b>{scW2}–{scL2}</b>. Impossible to separate.',
     draw:'For the second time in this tournament, a match couldn’t be separated: <b>{h}</b> and <b>{a}</b> finished dead level at <b>{sc}–{sc}</b>, unable to break the tie after twelve races.',
     indivBest:'Among the players, <b>{player}</b> ({team}) posted the biggest single match of the stage — <fig>{best}</fig> points on their own, including <fig>{streak}</fig> race wins in a row, the longest streak of the stage — edging <b>{p2}</b> by a single point ({best2}).',
     indivBestSolo:'Among the players, <b>{player}</b> ({team}) posted the biggest single match of the stage: <fig>{best}</fig> points on their own, including <fig>{streak}</fig> race wins in a row — the longest streak of the Group Stage.',
@@ -5216,6 +5225,7 @@ const NUTSHELL_GS_I18N = {
     hDyk:'¿Sabías que…?',
     comeback:'<b>{winner}</b> firmó la mayor remontada de la fase. Con <fig>{deficit}</fig> puntos de desventaja ante <b>{loser}</b>, dieron la vuelta al marcador para ganar <b>{scW}–{scL}</b>, la mayor desventaja remontada de la fase de grupos.',
     closest:'En el otro extremo, el partido más ajustado se decidió por solo <fig>{margin}</fig> puntos: <b>{winner}</b> superó a <b>{loser}</b> por <b>{scW}–{scL}</b> tras doce carreras.',
+    closestTwo:'En el otro extremo, dos partidos comparten el título del más ajustado de la fase, decididos ambos por solo <fig>{margin}</fig> puntos: <b>{w1}</b> superó a <b>{l1}</b> por <b>{scW1}–{scL1}</b>, y <b>{w2}</b> a <b>{l2}</b> por <b>{scW2}–{scL2}</b>. Imposible separarlos.',
     draw:'Por segunda vez en este torneo, un partido no pudo desempatarse: <b>{h}</b> y <b>{a}</b> acabaron igualados a <b>{sc}–{sc}</b>, incapaces de romper el empate tras doce carreras.',
     indivBest:'Entre los jugadores, <b>{player}</b> ({team}) firmó el mejor partido individual de la fase — <fig>{best}</fig> puntos él solo, con <fig>{streak}</fig> victorias de carrera seguidas, la racha más larga de la fase — superando a <b>{p2}</b> por un solo punto ({best2}).',
     indivBestSolo:'Entre los jugadores, <b>{player}</b> ({team}) firmó el mejor partido individual de la fase: <fig>{best}</fig> puntos él solo, con <fig>{streak}</fig> victorias de carrera seguidas, la racha más larga de la fase de grupos.',
@@ -5243,6 +5253,7 @@ const NUTSHELL_GS_I18N = {
     hDyk:'ご存じですか？',
     comeback:'<b>{winner}</b>がステージ最大の逆転劇を演じました。<b>{loser}</b>に<fig>{deficit}</fig>点差をつけられながら試合をひっくり返し、<b>{scW}–{scL}</b>で勝利——グループステージ最大の逆転差です。',
     closest:'一方、最も僅差だった試合はわずか<fig>{margin}</fig>点差。<b>{winner}</b>が12レースの末に<b>{loser}</b>を<b>{scW}–{scL}</b>で振り切りました。',
+    closestTwo:'一方、最も僅差の試合は2つ。いずれもわずか<fig>{margin}</fig>点差でした。<b>{w1}</b>が<b>{l1}</b>を<b>{scW1}–{scL1}</b>で、<b>{w2}</b>が<b>{l2}</b>を<b>{scW2}–{scL2}</b>で振り切り、優劣つけがたい接戦となりました。',
     draw:'この大会で2度目、決着がつかなかった試合がありました。<b>{h}</b>と<b>{a}</b>は12レースを終えても<b>{sc}–{sc}</b>の互角で、引き分けに終わりました。',
     indivBest:'選手では<b>{player}</b>（{team}）がステージ最高の個人得点を記録。1試合で<fig>{best}</fig>点を挙げ、うち<fig>{streak}</fig>連続でレースを制覇——ステージ最長の連勝——<b>{p2}</b>をわずか1点（{best2}）で上回りました。',
     indivBestSolo:'選手では<b>{player}</b>（{team}）がステージ最高の個人得点を記録。1試合で<fig>{best}</fig>点を挙げ、うち<fig>{streak}</fig>連続でレースを制覇——グループステージ最長の連勝です。',
@@ -5368,10 +5379,21 @@ function renderGroupNutshellView(){
   if(r.comeback){
     paras.push(`<p>${ntg('comeback',{winner:teamWithArticle(r.comeback.winner,true), verb:frVerbEnding(r.comeback.winner), loser:teamWithArticle(r.comeback.loser,false), deficit:Math.abs(r.comeback.deficit), scW:r.comeback.scW, scL:r.comeback.scL})}</p>`);
   }
-  if(r.closest){
+  const scoreBox = c => `<div class="np-score"><span class="t">${teamName(c.winner)}</span><span class="n">${c.scW}</span><span class="d">–</span><span class="n">${c.scL}</span><span class="t">${teamName(c.loser)}</span></div>`;
+  const tied = r.closestAll || (r.closest ? [r.closest] : []);
+  if(tied.length>=2){
+    const c1 = tied[0], c2 = tied[1];
+    paras.push(`<p>${ntg('closestTwo',{
+      margin:c1.margin,
+      w1:teamWithArticle(c1.winner,false), l1:teamWithArticle(c1.loser,false), loserAt1:teamAfterPrep(c1.loser,'à'), scW1:c1.scW, scL1:c1.scL,
+      w2:teamWithArticle(c2.winner,false), l2:teamWithArticle(c2.loser,false), loserAt2:teamAfterPrep(c2.loser,'à'), scW2:c2.scW, scL2:c2.scL
+    })}</p>`);
+    paras.push(scoreBox(c1));
+    paras.push(scoreBox(c2));
+  } else if(r.closest){
     // {loser} = plain article name (EN/ES/JA); {loserAt} = FR "à"-contracted form (au/aux/à l').
     paras.push(`<p>${ntg('closest',{winner:teamWithArticle(r.closest.winner,false), loser:teamWithArticle(r.closest.loser,false), loserAt:teamAfterPrep(r.closest.loser,'à'), margin:r.closest.margin, scW:r.closest.scW, scL:r.closest.scL})}</p>`);
-    paras.push(`<div class="np-score"><span class="t">${teamName(r.closest.winner)}</span><span class="n">${r.closest.scW}</span><span class="d">–</span><span class="n">${r.closest.scL}</span><span class="t">${teamName(r.closest.loser)}</span></div>`);
+    paras.push(scoreBox(r.closest));
   }
   if(r.draw){
     // {h} follows a colon mid-sentence in FR, so the article stays lowercase.
