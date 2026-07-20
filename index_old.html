@@ -464,6 +464,15 @@
   .match-detail-mid .md-vs{text-transform:uppercase;font-size:20px;}
   .match-detail-mid .md-upcoming-date{font-size:16px;color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;margin-top:6px;text-transform:none;}
   .match-detail-players-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
+  .round-bo{opacity:.7;font-weight:600;font-size:10.5px;letter-spacing:0.06em;}
+  .series-game{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);}
+  .series-game:first-of-type{border-top:none;padding-top:0;}
+  .series-game-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:2px;}
+  .series-game-label{font-size:14px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;text-transform:uppercase;letter-spacing:0.05em;}
+  .series-game-score{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;}
+  .series-game-score .sg-dash{opacity:.5;margin:0 7px;}
+  .series-game-tag{font-size:11px;font-weight:700;color:var(--gold);background:rgba(255,206,84,0.12);border-radius:6px;padding:2px 8px;margin-right:8px;text-transform:uppercase;letter-spacing:0.04em;}
+  .admin-series{margin-bottom:20px;padding-bottom:8px;border-bottom:1px dashed var(--line);}
   .race-chart-wrap{margin-top:28px;}
   .race-chart-title{font-size:15px;color:var(--gold);margin-bottom:10px;}
   .race-chart-legend{display:flex;gap:18px;margin-top:8px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
@@ -1039,7 +1048,7 @@ const I18N = {
     stageQuali:'Phase de Play-In', tierQuali:'Équipes les moins bien classées', noteQuali:'Les 2 premiers de chaque groupe avancent en phase de groupes.',
     stagePhaseGroupes:'Phase de groupes', subheadAB:'Groupes A & B', tierAB:'Équipes les mieux classées', noteAB:'Les 4 équipes de chaque groupe avancent en bracket.',
     subhead14:'Groupes 1 à 4', tier14:'Équipes moyennement classées', note14:'Les 2 premiers de chaque groupe avancent en bracket.',
-    stageBracket:'Phase de Bracket', noteBracket:'Élimination directe à 16 équipes.',
+    stageBracket:'Phase de Bracket', noteBracket:'Élimination directe à 16 équipes — chaque tour au meilleur des 3 manches, la finale au meilleur des 5.', gameLabel:'Manche {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Groupe', colTeam:'Équipe', colP:'J', colW:'V', colL:'D', colD:'N', colF:'PP', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts', tbd:'à définir',
     tipP:'Nombre de matchs joués.', tipF:'Points marqués (total sur tous les matchs).', tipA:'Points encaissés (total sur tous les matchs).', tipPts:'Points de classement : 3 par victoire, 1 par nul, 0 par défaite.',
     round16:'Round 1', quarterfinals:'Quarts de finale', semifinals:'Demi-finales', final:'Finale',
@@ -1112,7 +1121,7 @@ const I18N = {
     stageQuali:'Play-In Stage', tierQuali:'Lower-projected teams', noteQuali:'The top 2 of each group advance to the group stage.',
     stagePhaseGroupes:'Group Stage', subheadAB:'Groups A & B', tierAB:'Higher-projected teams', noteAB:'All 4 teams of each group advance to the bracket.',
     subhead14:'Groups 1 to 4', tier14:'Middle-projected teams', note14:'The top 2 of each group advance to the bracket.',
-    stageBracket:'Bracket Stage', noteBracket:'16-team single elimination.',
+    stageBracket:'Bracket Stage', noteBracket:'16-team single elimination — every round is best-of-3, the final best-of-5.', gameLabel:'Game {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Group', colTeam:'Team', colP:'P', colW:'W', colL:'L', colD:'D', colF:'F', colA:'A', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'TBD',
     tipP:'Matches played.', tipF:'Points for (total scored across all matches).', tipA:'Points against (total conceded across all matches).', tipPts:'Standings points: 3 per win, 1 per draw, 0 per loss.',
     round16:'Round 1', quarterfinals:'Quarterfinals', semifinals:'Semifinals', final:'Final',
@@ -1185,7 +1194,7 @@ const I18N = {
     stageQuali:'Fase de Play-In', tierQuali:'Equipos con proyección más baja', noteQuali:'Los 2 primeros de cada grupo avanzan a la fase de grupos.',
     stagePhaseGroupes:'Fase de grupos', subheadAB:'Grupos A y B', tierAB:'Equipos con proyección más alta', noteAB:'Los 4 equipos de cada grupo avanzan al cuadro final.',
     subhead14:'Grupos 1 a 4', tier14:'Equipos con proyección media', note14:'Los 2 primeros de cada grupo avanzan al cuadro final.',
-    stageBracket:'Fase de Bracket', noteBracket:'Eliminación directa a 16 equipos.',
+    stageBracket:'Fase de Bracket', noteBracket:'Eliminación directa a 16 equipos — cada ronda al mejor de 3 mangas, la final al mejor de 5.', gameLabel:'Manga {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Grupo', colTeam:'Equipo', colP:'PJ', colW:'G', colL:'P', colD:'E', colF:'PF', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'por determinar',
     tipP:'Partidos jugados.', tipF:'Puntos a favor (total anotado en todos los partidos).', tipA:'Puntos en contra (total recibido en todos los partidos).', tipPts:'Puntos de clasificación: 3 por victoria, 1 por empate, 0 por derrota.',
     round16:'Ronda 1', quarterfinals:'Cuartos de final', semifinals:'Semifinales', final:'Final',
@@ -1258,7 +1267,7 @@ const I18N = {
     stageQuali:'プレイインステージ', tierQuali:'下位予想チーム', noteQuali:'各組上位2チームがグループステージに進出。',
     stagePhaseGroupes:'グループステージ', subheadAB:'グループA・B', tierAB:'上位予想チーム', noteAB:'各グループの4チーム全てが決勝トーナメントに進出。',
     subhead14:'グループ1〜4', tier14:'中位予想チーム', note14:'各グループの上位2チームが決勝トーナメントに進出。',
-    stageBracket:'ブラケットステージ', noteBracket:'16チームによるノックアウト方式。',
+    stageBracket:'ブラケットステージ', noteBracket:'16チームによるノックアウト方式 — 各ラウンドは3本勝負、決勝は5本勝負。', gameLabel:'第{n}マッチ', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'グループ', colTeam:'チーム', colP:'試合', colW:'勝', colL:'負', colD:'分', colF:'得点', colA:'失点', colGB:'GB', colDiff:'+/-', colPts:'勝点', tbd:'未定',
     tipP:'試合数。', tipF:'総得点（全試合の合計）。', tipA:'総失点（全試合の合計）。', tipPts:'順位ポイント：勝ち3、引き分け1、負け0。',
     round16:'ラウンド1', quarterfinals:'準々決勝', semifinals:'準決勝', final:'決勝',
@@ -1499,6 +1508,25 @@ function applyForfeitToScore(ref, side){
     scores = STATE.bracket.scores[rk]; players = STATE.bracket.players[rk]; key = parts[2];
   }
   if(!scores) return;
+  const isBracket = parts[0]==='b';
+  if(isBracket){
+    // A bracket cell is a SERIES: a forfeit clinches it for the other side in the
+    // minimum number of games (BO3 → 2 games, BO5 → 3). Cleared → empty single game.
+    const round = Number(parts[1]);
+    const need = (typeof winsNeededFor==='function') ? winsNeededFor(round) : (round>=3?3:2);
+    let gameSc = null;
+    if(side==='H') gameSc = ['0','150'];
+    else if(side==='A') gameSc = ['150','0'];
+    else if(side==='B') gameSc = ['0','0'];
+    if(gameSc){
+      scores[key] = Array.from({length:need}, ()=> gameSc.slice());
+    } else {
+      scores[key] = [['','']]; // forfeit cleared: a later save re-derives from games
+      return;
+    }
+    if(players) delete players[key];
+    return;
+  }
   if(side==='H') scores[key] = ['0','150'];
   else if(side==='A') scores[key] = ['150','0'];
   else if(side==='B') scores[key] = ['0','0']; // double forfeit: both teams out
@@ -2135,16 +2163,71 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
   </div>`;
 }
 
+/* =========================================================
+   BRACKET SERIES (best-of-N)
+   Rounds 0-2 (R16 / QF / SF) are best-of-3 → first to 2 game wins.
+   Round 3 (Final) is best-of-5 → first to 3 game wins.
+   A bracket cell stores a SERIES of games:
+     scores.r{round}[idx]  = [[scH,scA], [scH,scA], …]   (one pair per game)
+     players.r{round}[idx] = [{h,a,tracks}, {h,a,tracks}, …]
+   Legacy single-game cells (scores = [scH,scA], players = {h,a,tracks}) are
+   read as a one-game series so old data and code keep working.
+========================================================= */
+function winsNeededFor(round){ return round>=3 ? 3 : 2; }
+function maxGamesFor(round){ return winsNeededFor(round)*2 - 1; } // 3 for BO3, 5 for BO5
+// A stored score cell is "legacy single" when it's a flat [h,a] pair (its first
+// element is a string/number/empty), vs the new form which is an array of pairs.
+function isSeriesScores(sc){ return Array.isArray(sc) && (sc.length===0 || Array.isArray(sc[0])); }
+// Normalize a bracket cell into arrays of game scores and game players.
+function bracketGames(round, idx){
+  const rawSc = (STATE.bracket.scores['r'+round]||{})[idx];
+  const rawPl = (STATE.bracket.players['r'+round]||{})[idx];
+  let gameScores, gamePlayers;
+  if(isSeriesScores(rawSc)){
+    gameScores = rawSc.map(s=>s || ['','']);
+    gamePlayers = Array.isArray(rawPl) ? rawPl : [];
+  } else {
+    // legacy single game (or empty)
+    gameScores = [rawSc || ['','']];
+    gamePlayers = [rawPl || emptyMatchPlayers()];
+  }
+  return { gameScores, gamePlayers };
+}
+// The list of per-game {h,a,tracks} objects for a cell (each is a match for stats).
+function bracketGamePlayersList(round, idx){
+  const rawPl = (STATE.bracket.players['r'+round]||{})[idx];
+  if(Array.isArray(rawPl)) return rawPl.filter(Boolean);
+  return rawPl ? [rawPl] : [];
+}
+// Series standing from a list of game score pairs.
+function seriesResult(round, gameScores){
+  const need = winsNeededFor(round);
+  let gamesH=0, gamesA=0, playedAny=false;
+  for(const s of gameScores){
+    if(!isPlayed(s)) continue;
+    playedAny = true;
+    const h=Number(s[0]), a=Number(s[1]);
+    if(h>a) gamesH++; else if(a>h) gamesA++;
+    // a drawn game counts for neither side toward the series
+  }
+  const decided = gamesH>=need || gamesA>=need;
+  const winnerSide = gamesH>gamesA ? 'H' : (gamesA>gamesH ? 'A' : null);
+  return { gamesH, gamesA, need, decided, playedAny, winnerSide };
+}
+
 function deriveBracketRounds(){
   const rounds = [STATE.bracket.slots.slice()];
   const roundScores = [STATE.bracket.scores.r0, STATE.bracket.scores.r1, STATE.bracket.scores.r2, STATE.bracket.scores.r3];
   for(let r=0;r<3;r++){
     const prev = rounds[r]; const next=[];
     for(let m=0;m<prev.length/2;m++){
-      const h=prev[m*2], a=prev[m*2+1]; const sc=roundScores[r][m];
+      const h=prev[m*2], a=prev[m*2+1];
       let winner=null;
-      if(sc && h!=null && a!=null && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null){
-        winner = Number(sc[0])>Number(sc[1]) ? h : (Number(sc[1])>Number(sc[0]) ? a : null);
+      if(h!=null && a!=null){
+        const { gameScores } = bracketGames(r, m);
+        const res = seriesResult(r, gameScores);
+        // The series winner advances only once one side has clinched the needed games.
+        if(res.decided) winner = res.winnerSide==='H' ? h : a;
       }
       next.push(winner);
     }
@@ -2175,13 +2258,16 @@ function parseMatchRef(ref){
     return {h, a, sc, players:pl, stage:`${stageLabel} · Gr. ${id}`, date:dateStr, anchor:`group-${anchorPrefix}-${id}`, rawIso: iso||null};
   } else if(parts[0]==='b'){
     const round = Number(parts[1]), idx = Number(parts[2]);
-    const {rounds, roundScores} = deriveBracketRounds();
+    const {rounds} = deriveBracketRounds();
     const slots = rounds[round];
     if(!slots) return null;
     const h = slots[idx*2], a = slots[idx*2+1];
-    const sc = roundScores[round][idx] || ['',''];
-    const pl = (STATE.bracket.players['r'+round]||{})[idx] || emptyMatchPlayers();
-    return {h, a, sc, players:pl, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null, rawIso:null};
+    const { gameScores, gamePlayers } = bracketGames(round, idx);
+    const res = seriesResult(round, gameScores);
+    const sc = res.playedAny ? [String(res.gamesH), String(res.gamesA)] : ['',''];
+    const games = gameScores.map((s,gi)=>({ sc:s, players: gamePlayers[gi] || emptyMatchPlayers() }));
+    const pl = (games[0] && games[0].players) || emptyMatchPlayers();
+    return {h, a, sc, players:pl, series:{ round, games, res }, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null, rawIso:null};
   }
   return null;
 }
@@ -2292,12 +2378,12 @@ function renderMatchDetail(ref){
     wireMatchDetailEvents();
     return;
   }
-  const {h, a, sc, players, stage, date, anchor, rawIso} = md;
+  const {h, a, sc, players, series, stage, date, anchor, rawIso} = md;
   const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
-  // A draw counts as a win for both teams, so both names show in gold.
-  const draw = played && Number(sc[0])===Number(sc[1]);
-  const hWin = played && (draw || Number(sc[0])>Number(sc[1]));
-  const aWin = played && (draw || Number(sc[1])>Number(sc[0]));
+  // For a bracket series the top score is games won; winner is whoever clinched.
+  const draw = played && !series && Number(sc[0])===Number(sc[1]);
+  const hWin = played && (series ? series.res.winnerSide==='H' : (draw || Number(sc[0])>Number(sc[1])));
+  const aWin = played && (series ? series.res.winnerSide==='A' : (draw || Number(sc[1])>Number(sc[0])));
   const isLiveNow = isCurrentlyLive(rawIso, sc);
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
@@ -2320,17 +2406,40 @@ function renderMatchDetail(ref){
           ${played? `<span class="mdt-score ${aWin?'score-win':'score-lose'}">${sc[1]}</span>` : ''}
         </div>
       </div>
-      ${(players.h.some(p=>p.n) || players.a.some(p=>p.n)) ? `<div class="match-detail-players-row">
+      ${series ? seriesGamesDetailHTML(series, h, a) : oneMatchDetailHTML(players, h, a)}
+    </div>
+  `;
+  wireMatchDetailEvents();
+}
+function oneMatchDetailHTML(players, h, a){
+  if(!(players.h.some(p=>p.n) || players.a.some(p=>p.n))) return '';
+  return `<div class="match-detail-players-row">
         <div class="mdp-col">${playerListHTML(players.h, h)}</div>
         <div class="mdp-col">${playerListHTML(players.a, a)}</div>
       </div>
       ${raceProgressChartHTML(players.h, players.a, h, a)}
       ${anyRaceEntered(players.h, players.a)
         ? raceDetailTableHTML(players.h, players.a, h, a, players.tracks)
-        : `<div class="track-stats-pending">${t('trackStatsPending')}</div>`}` : ''}
-    </div>
-  `;
-  wireMatchDetailEvents();
+        : `<div class="track-stats-pending">${t('trackStatsPending')}</div>`}`;
+}
+function seriesGamesDetailHTML(series, h, a){
+  const out = [];
+  series.games.forEach((g, gi)=>{
+    const pl = g.players || emptyMatchPlayers();
+    const gameOn = isPlayed(g.sc) || pl.h.some(p=>p.n) || pl.a.some(p=>p.n);
+    if(!gameOn) return;
+    const gh = Number(g.sc[0]), ga = Number(g.sc[1]);
+    const scored = isPlayed(g.sc);
+    const gHwin = scored && gh>ga, gAwin = scored && ga>gh;
+    out.push(`<div class="series-game">
+      <div class="series-game-head">
+        <span class="series-game-label">${t('gameLabel').replace('{n}', gi+1)}</span>
+        ${scored ? `<span class="series-game-score"><span class="${gHwin?'score-win':'score-lose'}">${g.sc[0]}</span><span class="sg-dash">–</span><span class="${gAwin?'score-win':'score-lose'}">${g.sc[1]}</span></span>` : ''}
+      </div>
+      ${oneMatchDetailHTML(pl, h, a)}
+    </div>`);
+  });
+  return out.join('');
 }
 function wireMatchDetailEvents(){
   const btn = document.getElementById('backToCalBtn');
@@ -2338,20 +2447,24 @@ function wireMatchDetailEvents(){
 }
 
 function renderBracket(){
-  const {rounds, roundScores} = deriveBracketRounds();
+  const {rounds} = deriveBracketRounds();
   let html = `<div class="bracket-wrap"><div class="bracket">`;
   for(let r=0;r<4;r++){
-    html += `<div class="round"><div class="round-title">${ROUND_NAMES_F()[r]}</div>`;
+    const bo = t(r>=3 ? 'seriesBo5' : 'seriesBo3');
+    html += `<div class="round"><div class="round-title">${ROUND_NAMES_F()[r]} <span class="round-bo">${bo}</span></div>`;
     const slots = rounds[r];
     const nMatches = slots.length/2;
     for(let m=0;m<nMatches;m++){
       const h = slots[m*2], a = slots[m*2+1];
-      const sc = roundScores[r][m] || ['',''];
-      const hWin = sc[0]!==''&&sc[1]!==''&&Number(sc[0])>Number(sc[1]);
-      const aWin = sc[0]!==''&&sc[1]!==''&&Number(sc[1])>Number(sc[0]);
+      const { gameScores } = bracketGames(r, m);
+      const res = seriesResult(r, gameScores);
+      const hWin = res.winnerSide==='H' && res.decided;
+      const aWin = res.winnerSide==='A' && res.decided;
+      const hCell = res.playedAny ? String(res.gamesH) : '—';
+      const aCell = res.playedAny ? String(res.gamesA) : '—';
       html += `<div class="match${(h&&a)?' match-card':''}"${(h&&a)?` data-matchref="b|${r}|${m}"`:''}>
-        <div class="mrow ${hWin?'winner':''}"><span>${h? teamPlainHTML(h):tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</span><span class="score">${sc[0]!==''&&sc[0]!=null?sc[0]:'—'}</span></div>
-        <div class="mrow ${aWin?'winner':''}"><span>${a? teamPlainHTML(a):tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</span><span class="score">${sc[1]!==''&&sc[1]!=null?sc[1]:'—'}</span></div>
+        <div class="mrow ${hWin?'winner':''}"><span>${h? teamPlainHTML(h):tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</span><span class="score">${hCell}</span></div>
+        <div class="mrow ${aWin?'winner':''}"><span>${a? teamPlainHTML(a):tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</span><span class="score">${aCell}</span></div>
       </div>`;
     }
     html += `</div>`;
@@ -2442,14 +2555,16 @@ function getAllMatchItems(){
   pushGroupMatches(STATE.mid, t('stagePhaseGroupes'), t('datePhase'), 'mid', ['1','2','3','4'], 'groupstage', 1);
   pushGroupMatches(STATE.top, t('stagePhaseGroupes'), t('datePhase'), 'top', ['A','B'], 'groupstage', 1);
 
-  const {rounds, roundScores} = deriveBracketRounds();
+  const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
     for(let m=0;m<slots.length/2;m++){
       const h=slots[m*2], a=slots[m*2+1];
       if(h==null||a==null) continue;
+      const res = seriesResult(r, bracketGames(r, m).gameScores);
+      const sc = res.playedAny ? [String(res.gamesH), String(res.gamesA)] : ['',''];
       items.push({
-        stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], dayLabel:ROUND_DATES_F()[r], h, a, sc:roundScores[r][m],
+        stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], dayLabel:ROUND_DATES_F()[r], h, a, sc, isSeries:true, seriesWinner:res.winnerSide,
         matchRef:`b|${r}|${m}`, anchor:null,
         dateKey:`bracket-${r}`, dateOrder: (2+r) * 1e10
       });
@@ -2462,9 +2577,15 @@ function matchCardHTML(it){
   const played = isPlayed(it.sc);
   let scoreHTML = '';
   if(played){
-    const draw = Number(it.sc[0])===Number(it.sc[1]);
-    const hWin = draw || Number(it.sc[0])>Number(it.sc[1]);
-    const aWin = draw || Number(it.sc[1])>Number(it.sc[0]);
+    let hWin, aWin;
+    if(it.isSeries){
+      hWin = it.seriesWinner==='H';
+      aWin = it.seriesWinner==='A';
+    } else {
+      const draw = Number(it.sc[0])===Number(it.sc[1]);
+      hWin = draw || Number(it.sc[0])>Number(it.sc[1]);
+      aWin = draw || Number(it.sc[1])>Number(it.sc[0]);
+    }
     scoreHTML = `<span class="sc-h ${hWin?'score-win':'score-lose'}">${it.sc[0]}</span><span class="sc-d">–</span><span class="sc-a ${aWin?'score-win':'score-lose'}">${it.sc[1]}</span>`;
   }
   const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
@@ -3219,20 +3340,20 @@ function getTeamStats(tag){
   scan(STATE.top, t('stagePhaseGroupes'), 'top', true);
   scan(STATE.mid, t('stagePhaseGroupes'), 'mid', true);
   // bracket
-  const {rounds, roundScores} = deriveBracketRounds();
+  const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
     const idx = slots.indexOf(tag);
     if(idx===-1) continue;
     const m = Math.floor(idx/2);
-    const sc = roundScores[r][m];
     appearances.push({label:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, pos:null, total:null, anchor:null});
-    if(sc && sc[0]!==''&&sc[1]!==''&&sc[0]!=null&&sc[1]!=null){
-      const meIsHome = idx%2===0;
+    const meIsHome = idx%2===0;
+    bracketGames(r, m).gameScores.forEach(sc=>{
+      if(!(sc && sc[0]!==''&&sc[1]!==''&&sc[0]!=null&&sc[1]!=null)) return;
       const my = Number(meIsHome?sc[0]:sc[1]), opp = Number(meIsHome?sc[1]:sc[0]);
       played++; playedMain++; pf+=my; pa+=opp;
       if(my>opp) w++; else if(opp>my) l++; else d++;
-    }
+    });
   }
   return {w,l,d,pf,pa,played,playedMain,diff:pf-pa,appearances};
 }
@@ -3291,8 +3412,10 @@ function getAdvancedStats(){
   const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
-    const pls = STATE.bracket.players['r'+r] || {};
-    for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
+    const nMatches = slots.length/2;
+    for(let m=0;m<nMatches;m++){
+      bracketGamePlayersList(r, m).forEach(gp=> scanMatch(gp, slots[m*2], slots[m*2+1]));
+    }
   }
 
   // Consistency: standard deviation of a player's individual race scores — smaller means
@@ -3384,8 +3507,10 @@ function getRaceStats(){
   const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
-    const pls = STATE.bracket.players['r'+r] || {};
-    for(const m in pls) scanMatch(pls[m], slots[m*2], slots[m*2+1]);
+    const nMatches = slots.length/2;
+    for(let m=0;m<nMatches;m++){
+      bracketGamePlayersList(r, m).forEach(gp=> scanMatch(gp, slots[m*2], slots[m*2+1]));
+    }
   }
 
   // "Best track" must match the top row of the track table (same trackBreakdownList
@@ -3481,16 +3606,19 @@ function getPlayerStats(){
     }
   }
   scan(STATE.quali); scan(STATE.top); scan(STATE.mid);
-  const {rounds, roundScores} = deriveBracketRounds();
+  const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
-    const pls = STATE.bracket.players['r'+r] || {};
-    for(const m in pls){
-      const pl = pls[m];
+    const nMatches = slots.length/2;
+    for(let m=0;m<nMatches;m++){
       const h = slots[m*2], a = slots[m*2+1];
-      const [hRes,aRes] = resultsFor(roundScores[r][m]);
-      creditSlots(pl.h, h, hRes);
-      creditSlots(pl.a, a, aRes);
+      const { gameScores, gamePlayers } = bracketGames(r, m);
+      gameScores.forEach((sc, gi)=>{
+        const pl = gamePlayers[gi]; if(!pl) return;
+        const [hRes,aRes] = resultsFor(sc);
+        creditSlots(pl.h, h, hRes);
+        creditSlots(pl.a, a, aRes);
+      });
     }
   }
   // compute averages
@@ -3655,7 +3783,7 @@ function getAllTeamMatches(tag){
   scan(STATE.quali, t('stageQuali'), t('dateQuali'), 'quali', 0);
   scan(STATE.top, t('stagePhaseGroupes'), t('datePhase'), 'top', 1);
   scan(STATE.mid, t('stagePhaseGroupes'), t('datePhase'), 'mid', 1);
-  const {rounds, roundScores} = deriveBracketRounds();
+  const {rounds} = deriveBracketRounds();
   for(let r=0;r<4;r++){
     const slots = rounds[r];
     const idx = slots.indexOf(tag);
@@ -3663,10 +3791,12 @@ function getAllTeamMatches(tag){
     const m = Math.floor(idx/2);
     const opp = slots[idx%2===0?idx+1:idx-1];
     if(opp==null) continue;
-    const sc = roundScores[r][m];
-    const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
-    const mySc = played ? (idx%2===0 ? sc : [sc[1],sc[0]]) : null;
-    items.push({stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], opp, sc:mySc, played, dateOrder:(2+r)*1e10, matchRef:`b|${r}|${m}`});
+    const res = seriesResult(r, bracketGames(r, m).gameScores);
+    const played = res.playedAny;
+    const meIsHome = idx%2===0;
+    const mySc = played ? (meIsHome ? [String(res.gamesH),String(res.gamesA)] : [String(res.gamesA),String(res.gamesH)]) : null;
+    const seriesWinner = meIsHome ? res.winnerSide : (res.winnerSide==='H'?'A':res.winnerSide==='A'?'H':null);
+    items.push({stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], opp, sc:mySc, played, isSeries:true, seriesWinner, dateOrder:(2+r)*1e10, matchRef:`b|${r}|${m}`});
   }
   items.sort((a,b)=> a.dateOrder-b.dateOrder);
   return items;
@@ -3711,9 +3841,9 @@ function renderTeamDetail(tag){
       ${stats.appearances.length? `<div class="helptext" style="margin:10px 0;">${stats.appearances.map(a=>a.anchor?`<span class="stage-link" data-anchor="${a.anchor}">${a.label}</span>`:a.label).join(' · ')}</div>` : ''}
       <h3 style="margin:18px 0 10px;font-size:16px;color:var(--gold);">${t('homeRecent')}</h3>
       ${recent.length? `<div class="cal-list" style="margin-bottom:8px;">${recent.map(u=>{
-          const draw = Number(u.sc[0])===Number(u.sc[1]);
-          const won = draw || Number(u.sc[0])>Number(u.sc[1]);
-          const lost = draw || Number(u.sc[0])<Number(u.sc[1]);
+          const draw = !u.isSeries && Number(u.sc[0])===Number(u.sc[1]);
+          const won = u.isSeries ? u.seriesWinner==='H' : (draw || Number(u.sc[0])>Number(u.sc[1]));
+          const lost = u.isSeries ? u.seriesWinner==='A' : (draw || Number(u.sc[0])<Number(u.sc[1]));
           const ff = forfeitSideFor(u.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
           return `<div class="cal-item match-card is-played" data-matchref="${u.matchRef}">
           <div class="mg-top">
@@ -4595,31 +4725,56 @@ function renderAdminView(){
     }
     html += `</div>`;
 
-    const {rounds, roundScores} = deriveBracketRounds();
+    const {rounds} = deriveBracketRounds();
     for(let r=0;r<4;r++){
-      html += `<div class="helptext" style="margin-top:10px;"><strong style="color:var(--cream)">${ROUND_NAMES_F()[r]}</strong></div>`;
+      const bo = r>=3 ? 'BO5 — premier à 3 manches' : 'BO3 — premier à 2 manches';
+      html += `<div class="helptext" style="margin-top:10px;"><strong style="color:var(--cream)">${ROUND_NAMES_F()[r]}</strong> · ${bo}</div>`;
       const slots = rounds[r];
       for(let m=0;m<slots.length/2;m++){
         const h=slots[m*2], a=slots[m*2+1];
-        const pl = (STATE.bracket.players['r'+r]||{})[m] || emptyMatchPlayers();
         const disabled = (h==null||a==null)?'disabled':'';
-        const bkey = `${r}-${m}`;
-        const totalH = pl.h.reduce((sum,p)=> sum + playerTotal(p), 0);
-        const totalA = pl.a.reduce((sum,p)=> sum + playerTotal(p), 0);
-        html += `<div class="admin-match-full">
-          <div class="amr-header">
+        const games = bracketGamePlayersList(r, m);
+        const scoresArr = bracketGames(r, m).gameScores;
+        const res = seriesResult(r, scoresArr);
+        const maxG = maxGamesFor(r);
+        // Always show at least one game to edit; keep already-entered games; allow adding
+        // more up to the series max, and stop offering "add" once the series is decided.
+        const shownCount = Math.max(1, games.length);
+        // Series header with the current games-won tally.
+        html += `<div class="admin-series" data-series="${r}-${m}">
+          <div class="amr-header" style="border-bottom:1px solid var(--gold);padding-bottom:6px;margin-bottom:8px;">
             <span class="team-select">${h?teamName(h):'—'}</span>
-            <span class="amr-total" id="btotal-${bkey}-0">${totalH}</span>
-            <span class="vs">vs</span>
-            <span class="amr-total" id="btotal-${bkey}-1">${totalA}</span>
+            <span class="amr-total">${res.playedAny?res.gamesH:0}</span>
+            <span class="vs" style="color:var(--gold);font-weight:700;">manches</span>
+            <span class="amr-total">${res.playedAny?res.gamesA:0}</span>
             <span class="team-select" style="text-align:right;">${a?teamName(a):'—'}</span>
           </div>
           ${streamInputRowHTML(streamRefFor('bracket', r, m), disabled)}
-          ${forfeitRowHTML(streamRefFor('bracket', r, m), h, a, disabled)}
-          ${trackSelectorRowHTML(bkey, pl.tracks, disabled, 'bpmatch')}
-          ${raceTableHTML(bkey, 0, pl.h, h, disabled, 'bpmatch')}
-          ${raceTableHTML(bkey, 1, pl.a, a, disabled, 'bpmatch')}
-        </div>`;
+          ${forfeitRowHTML(streamRefFor('bracket', r, m), h, a, disabled)}`;
+        for(let gi=0; gi<shownCount; gi++){
+          const pl = games[gi] || emptyMatchPlayers();
+          const bkey = `${r}-${m}-${gi}`;
+          const totalH = pl.h.reduce((sum,p)=> sum + playerTotal(p), 0);
+          const totalA = pl.a.reduce((sum,p)=> sum + playerTotal(p), 0);
+          html += `<div class="admin-match-full" style="margin-top:8px;">
+            <div class="amr-header">
+              <span class="series-game-tag">Manche ${gi+1}</span>
+              <span class="team-select">${h?teamName(h):'—'}</span>
+              <span class="amr-total" id="btotal-${bkey}-0">${totalH}</span>
+              <span class="vs">vs</span>
+              <span class="amr-total" id="btotal-${bkey}-1">${totalA}</span>
+              <span class="team-select" style="text-align:right;">${a?teamName(a):'—'}</span>
+            </div>
+            ${trackSelectorRowHTML(bkey, pl.tracks, disabled, 'bpmatch')}
+            ${raceTableHTML(bkey, 0, pl.h, h, disabled, 'bpmatch')}
+            ${raceTableHTML(bkey, 1, pl.a, a, disabled, 'bpmatch')}
+          </div>`;
+        }
+        // "Add a game" — only while the series isn't decided and there's room left.
+        if(!disabled && !res.decided && shownCount < maxG){
+          html += `<div style="margin-top:8px;"><button type="button" class="ghost admin-add-game" data-add-game="${r}-${m}">+ Ajouter une manche</button></div>`;
+        }
+        html += `</div>`;
       }
     }
   }
@@ -4630,6 +4785,25 @@ function renderAdminView(){
   el.innerHTML = html;
 
   el.querySelectorAll('[data-sec]').forEach(b=> b.onclick = ()=>{ adminSection=b.dataset.sec; renderAdminView(); });
+  // "Add a game" to a bracket series: save what's typed first (so nothing is lost on the
+  // re-render), then append an empty game to that series' player array and re-render.
+  el.querySelectorAll('[data-add-game]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const [r,m] = btn.dataset.addGame.split('-');
+      const rk = 'r'+r;
+      const saveBtn = document.getElementById('saveBtn');
+      if(saveBtn) await saveBtn.onclick();   // persist current inputs before re-rendering
+      if(!STATE.bracket.players[rk]) STATE.bracket.players[rk] = {};
+      let games = STATE.bracket.players[rk][m];
+      if(!Array.isArray(games)) games = games ? [games] : [];
+      games.push(emptyMatchPlayers());
+      STATE.bracket.players[rk][m] = games;
+      if(!STATE.bracket.scores[rk]) STATE.bracket.scores[rk] = {};
+      if(!Array.isArray(STATE.bracket.scores[rk][m])) STATE.bracket.scores[rk][m] = games.map(()=>['','']);
+      else STATE.bracket.scores[rk][m].push(['','']);
+      renderAdminView();
+    };
+  });
   // Forfeit buttons: update STATE.forfeits + the match score right away, then save.
   el.querySelectorAll('.admin-forfeit-row').forEach(rowEl=>{
     const ref = rowEl.dataset.forfeitRef;
@@ -4798,61 +4972,73 @@ function renderAdminView(){
       });
     }
     if(adminSection==='bracket'){
+      // A bracket cell now stores a SERIES: players[rk][m] is an array of {h,a,tracks}
+      // game objects (one per game). This helper returns game gi, growing the array and
+      // migrating any legacy single-game object into game 0 as needed.
+      const bGame = (r, m, gi)=>{
+        const rk = 'r'+r;
+        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = [];
+        let arr = STATE.bracket.players[rk][m];
+        if(!Array.isArray(arr)){ arr = [arr]; STATE.bracket.players[rk][m] = arr; } // legacy single → series
+        while(arr.length <= gi) arr.push(emptyMatchPlayers());
+        return arr[gi];
+      };
       el.querySelectorAll('[data-bpmatch]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatch.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        if(!Array.isArray(slot[pidx].races)) migratePlayerSlot(slot[pidx]); // safety net for any old-shaped data we haven't seen yet
+        const [r,m,gi] = field.dataset.bpmatch.split('-');
+        const side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const game = bGame(r, m, Number(gi));
+        const slot = side===0 ? game.h : game.a;
+        if(!Array.isArray(slot[pidx].races)) migratePlayerSlot(slot[pidx]);
         if(field.tagName==='SELECT') slot[pidx].n = field.value;
         else slot[pidx].races[Number(field.dataset.race)] = field.value;
       });
       el.querySelectorAll('[data-bpmatch-total]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatchTotal.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
+        const [r,m,gi] = field.dataset.bpmatchTotal.split('-');
+        const side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
+        const game = bGame(r, m, Number(gi));
+        const slot = side===0 ? game.h : game.a;
         slot[pidx].total = playerRacesFilled(slot[pidx]) ? '' : field.value;
       });
       el.querySelectorAll('[data-bpmatch-sub]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatchSub.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        setSubField(slot[pidx], si, 'name', field.value);
+        const [r,m,gi] = field.dataset.bpmatchSub.split('-');
+        const side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
+        const game = bGame(r, m, Number(gi));
+        setSubField((side===0?game.h:game.a)[pidx], si, 'name', field.value);
       });
       el.querySelectorAll('[data-bpmatch-subfrom]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatchSubfrom.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        setSubField(slot[pidx], si, 'from', field.value);
+        const [r,m,gi] = field.dataset.bpmatchSubfrom.split('-');
+        const side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
+        const game = bGame(r, m, Number(gi));
+        setSubField((side===0?game.h:game.a)[pidx], si, 'from', field.value);
       });
       el.querySelectorAll('[data-bpmatch-subto]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatchSubto.split('-');
-        const rk = 'r'+r, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        const slot = side===0 ? STATE.bracket.players[rk][m].h : STATE.bracket.players[rk][m].a;
-        setSubField(slot[pidx], si, 'to', field.value);
+        const [r,m,gi] = field.dataset.bpmatchSubto.split('-');
+        const side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx), si = Number(field.dataset.subidx);
+        const game = bGame(r, m, Number(gi));
+        setSubField((side===0?game.h:game.a)[pidx], si, 'to', field.value);
       });
       el.querySelectorAll('[data-bpmatch-track]').forEach(field=>{
-        const [r,m] = field.dataset.bpmatchTrack.split('-');
-        const rk = 'r'+r;
-        if(!STATE.bracket.players[rk][m]) STATE.bracket.players[rk][m] = emptyMatchPlayers();
-        if(!STATE.bracket.players[rk][m].tracks) STATE.bracket.players[rk][m].tracks = Array(12).fill('');
-        STATE.bracket.players[rk][m].tracks[Number(field.dataset.race)] = field.value;
+        const [r,m,gi] = field.dataset.bpmatchTrack.split('-');
+        const game = bGame(r, m, Number(gi));
+        if(!game.tracks) game.tracks = Array(12).fill('');
+        game.tracks[Number(field.dataset.race)] = field.value;
       });
+      // Rebuild the series score array: one [totalH,totalA] per game (or a forfeit score).
       for(let r=0;r<4;r++){
         const rk = 'r'+r;
         Object.keys(STATE.bracket.players[rk]||{}).forEach(m=>{
+          let games = STATE.bracket.players[rk][m];
+          if(!Array.isArray(games)) games = [games];
           const ref = streamRefFor('bracket', r, m);
           const ffSide = forfeitSideFor(ref);
-          if(ffSide){ STATE.bracket.scores[rk][m] = ffSide==='B' ? ['0','0'] : (ffSide==='H' ? ['0','150'] : ['150','0']); return; }
-          const pl = STATE.bracket.players[rk][m];
-          const totalH = pl.h.reduce((sum,p)=> sum + (p.n ? effectivePlayerTotal(p) : 0), 0);
-          const totalA = pl.a.reduce((sum,p)=> sum + (p.n ? effectivePlayerTotal(p) : 0), 0);
-          const anyFilled = pl.h.some(p=>p.n && playerHasScore(p)) || pl.a.some(p=>p.n && playerHasScore(p));
-          STATE.bracket.scores[rk][m] = anyFilled ? [String(totalH), String(totalA)] : ['',''];
+          const ffScore = ffSide==='B' ? ['0','0'] : (ffSide==='H' ? ['0','150'] : (ffSide==='A' ? ['150','0'] : null));
+          STATE.bracket.scores[rk][m] = games.map(pl=>{
+            if(ffScore) return ffScore.slice();
+            const totalH = pl.h.reduce((sum,p)=> sum + (p.n ? effectivePlayerTotal(p) : 0), 0);
+            const totalA = pl.a.reduce((sum,p)=> sum + (p.n ? effectivePlayerTotal(p) : 0), 0);
+            const anyFilled = pl.h.some(p=>p.n && playerHasScore(p)) || pl.a.some(p=>p.n && playerHasScore(p));
+            return anyFilled ? [String(totalH), String(totalA)] : ['',''];
+          });
         });
       }
     }

@@ -494,6 +494,14 @@
   .match-detail-mid .md-vs{text-transform:uppercase;font-size:20px;}
   .match-detail-mid .md-upcoming-date{font-size:16px;color:var(--gold);font-weight:700;font-family:'Inter',sans-serif;margin-top:6px;text-transform:none;}
   .match-detail-players-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
+  /* Bracket best-of-N series: each game gets its own card with a header + score. */
+  .round-bo{opacity:.7;font-weight:600;font-size:10.5px;letter-spacing:0.06em;}
+  .series-game{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);}
+  .series-game:first-of-type{border-top:none;padding-top:0;}
+  .series-game-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:2px;}
+  .series-game-label{font-size:14px;font-weight:700;color:var(--gold);font-family:'Rajdhani',sans-serif;text-transform:uppercase;letter-spacing:0.05em;}
+  .series-game-score{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;}
+  .series-game-score .sg-dash{opacity:.5;margin:0 7px;}
   .race-chart-wrap{margin-top:28px;}
   .race-chart-title{font-size:15px;color:var(--gold);margin-bottom:10px;}
   .race-chart-legend{display:flex;gap:18px;margin-top:8px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
