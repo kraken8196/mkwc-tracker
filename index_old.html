@@ -1046,7 +1046,7 @@ const I18N = {
     dateQuali:'10–12 juil.', datePhase:'17–19 juil.', dateR16:'24 juillet', dateQF:'25 juillet', dateSF:'1 août', dateF:'2 août',
     calNoMatch:"Aucun match programmé pour l'instant — plusieurs groupes ont encore des équipes à définir.",
     calShowPast:'▾ Voir les matchs passés ({n})', calHidePast:'▴ Masquer les matchs passés',
-    calGroupProvisional:'⚠️ Les dates du 17 au 19 juillet pour la phase de groupes sont provisoires : certains matchs pourront se dérouler en dehors de ces dates.',
+    calGroupProvisional:'⚠️ Les dates de la phase de bracket (24 juillet – 2 août) sont provisoires et n’ont pas encore été officialisées.',
     upcoming:'à venir', vs:'vs',
     teamsIntro:"Clique sur un drapeau pour voir la fiche de l'équipe (joueurs, statistiques...).",
     backToTeams:'← Retour aux équipes', backToCalendar:'← Retour au calendrier', backGeneric:'Retour', statMatches:'Matchs', statW:'V', statL:'D', statDiff:'Diff', statPlayers:'Joueurs',
@@ -1119,7 +1119,7 @@ const I18N = {
     dateQuali:'Jul 10–12', datePhase:'Jul 17–19', dateR16:'July 24', dateQF:'July 25', dateSF:'Aug 1', dateF:'Aug 2',
     calNoMatch:'No matches scheduled yet — several groups still have teams to be determined.',
     calShowPast:'▾ Show past matches ({n})', calHidePast:'▴ Hide past matches',
-    calGroupProvisional:'⚠️ The July 17–19 dates for the Group Stage are provisional: some matches may take place outside those dates.',
+    calGroupProvisional:'⚠️ The bracket-stage dates (July 24 – August 2) are provisional and not yet official.',
     upcoming:'upcoming', vs:'vs',
     teamsIntro:"Click on a flag to see the team's page (players, stats...).",
     backToTeams:'← Back to teams', backToCalendar:'← Back to calendar', backGeneric:'Back', statMatches:'Matches', statW:'W', statL:'L', statDiff:'Diff', statPlayers:'Players',
@@ -1192,7 +1192,7 @@ const I18N = {
     dateQuali:'10–12 jul.', datePhase:'17–19 jul.', dateR16:'24 de julio', dateQF:'25 de julio', dateSF:'1 de agosto', dateF:'2 de agosto',
     calNoMatch:'Todavía no hay partidos programados — varios grupos aún tienen equipos por determinar.',
     calShowPast:'▾ Ver partidos pasados ({n})', calHidePast:'▴ Ocultar partidos pasados',
-    calGroupProvisional:'⚠️ Las fechas del 17 al 19 de julio para la fase de grupos son provisionales: algunos partidos podrían disputarse fuera de esas fechas.',
+    calGroupProvisional:'⚠️ Las fechas de la fase de bracket (24 de julio – 2 de agosto) son provisionales y aún no son oficiales.',
     upcoming:'por jugar', vs:'vs',
     teamsIntro:'Haz clic en una bandera para ver la ficha del equipo (jugadores, estadísticas...).',
     backToTeams:'← Volver a equipos', backToCalendar:'← Volver al calendario', backGeneric:'Volver', statMatches:'Partidos', statW:'G', statL:'P', statDiff:'Dif', statPlayers:'Jugadores',
@@ -1265,7 +1265,7 @@ const I18N = {
     dateQuali:'7月10〜12日', datePhase:'7月17〜19日', dateR16:'7月24日', dateQF:'7月25日', dateSF:'8月1日', dateF:'8月2日',
     calNoMatch:'まだ試合は組まれていません — いくつかのグループはチームが未確定です。',
     calShowPast:'▾ 過去の試合を表示 ({n})', calHidePast:'▴ 過去の試合を隠す',
-    calGroupProvisional:'⚠️ グループステージの7月17〜19日の日程は暫定です。一部の試合はこの期間外に行われる可能性があります。',
+    calGroupProvisional:'⚠️ ブラケットの日程（7月24日〜8月2日）は暫定であり、まだ正式には確定していません。',
     upcoming:'試合前', vs:'vs',
     teamsIntro:'旗をクリックするとチームページ（選手、成績など）が表示されます。',
     backToTeams:'← チーム一覧に戻る', backToCalendar:'← カレンダーに戻る', backGeneric:'戻る', statMatches:'試合数', statW:'勝', statL:'負', statDiff:'得失点差', statPlayers:'選手数',
@@ -2341,7 +2341,7 @@ function renderBracket(){
   const {rounds, roundScores} = deriveBracketRounds();
   let html = `<div class="bracket-wrap"><div class="bracket">`;
   for(let r=0;r<4;r++){
-    html += `<div class="round"><div class="round-title">${ROUND_NAMES_F()[r]}<br><span>${ROUND_DATES_F()[r]}</span></div>`;
+    html += `<div class="round"><div class="round-title">${ROUND_NAMES_F()[r]}</div>`;
     const slots = rounds[r];
     const nMatches = slots.length/2;
     for(let m=0;m<nMatches;m++){
@@ -3129,7 +3129,7 @@ function renderCalendarView(){
   const el = document.getElementById('view-calendar');
   const items = getAllMatchItems();
 
-  let html = '';
+  let html = `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>`;
   if(items.length===0){
     html += `<div class="cal-item">${t('calNoMatch')}</div>`;
   } else {
