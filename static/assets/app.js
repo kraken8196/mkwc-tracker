@@ -151,7 +151,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -224,7 +224,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -297,7 +297,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -370,7 +370,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -1450,6 +1450,229 @@ function getPlayInRecap(){
     undefeated, bestOffense, mostPlayedTrack, skillTrack, levellerTrack
   };
 }
+// Same idea as getPlayInRecap, but for the Group Stage (top A/B + mid 1-4). Where it
+// helps the story, facts are split by tier: the elite groups A/B vs groups 1-4.
+function getGroupStageRecap(){
+  const matches = []; // {H,A,scH,scA,tracks,pl,tier}
+  ['top','mid'].forEach(tier=>{
+    const groups = STATE[tier] || {};
+    for(const id in groups){
+      const g = groups[id]; if(!g) continue;
+      pairsFor(g.slots.length).forEach(([i,j])=>{
+        const key=i+'-'+j, sc=g.scores[key];
+        if(!isPlayed(sc) || g.slots[i]==null || g.slots[j]==null) return;
+        matches.push({ H:g.slots[i], A:g.slots[j], scH:Number(sc[0]), scA:Number(sc[1]),
+          tracks:(g.players[key]||{}).tracks||[], pl:g.players[key]||{h:[],a:[]}, tier });
+      });
+    }
+  });
+  const isForfeit = m => {
+    const p = m.scH+'-'+m.scA;
+    return p==='150-0' || p==='0-150' || p==='0-0';
+  };
+
+  const praces={}, p15={}, pmatchTotal={}, pcumul={}, trackUses={}, trackMargins={};
+  const teamPts={}, teamGames={}, teamRec={}, teamDiff={}, teamTierOf={};
+  const distinctPlayers=new Set(), distinctTracks=new Set();
+  const playerTeam={};
+  let racesPlayed=0, totalPoints=0;
+  let bestStreak={name:'', n:0};
+  const bump=(o,k,by)=>{ o[k]=(o[k]||0)+by; };
+
+  matches.forEach(m=>{
+    teamTierOf[m.H]=m.tier; teamTierOf[m.A]=m.tier;
+    bump(teamPts,m.H,m.scH); bump(teamPts,m.A,m.scA);
+    bump(teamGames,m.H,1); bump(teamGames,m.A,1);
+    bump(teamDiff,m.H,m.scH-m.scA); bump(teamDiff,m.A,m.scA-m.scH);
+    teamRec[m.H]=teamRec[m.H]||[0,0,0]; teamRec[m.A]=teamRec[m.A]||[0,0,0];
+    if(m.scH>m.scA){ teamRec[m.H][0]++; teamRec[m.A][2]++; }
+    else if(m.scA>m.scH){ teamRec[m.A][0]++; teamRec[m.H][2]++; }
+    else { teamRec[m.H][1]++; teamRec[m.A][1]++; }
+    (m.tracks||[]).forEach(tid=>{ if(tid){ bump(trackUses,tid,1); distinctTracks.add(tid); } });
+    // Per-race team totals → margin on the track played that race (an "impact" signal).
+    const rh=Array(12).fill(0), ra=Array(12).fill(0), rHas=Array(12).fill(false);
+    (m.pl.h||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null){ rh[i]+=Number(v); rHas[i]=true; } }));
+    (m.pl.a||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null){ ra[i]+=Number(v); rHas[i]=true; } }));
+    for(let i=0;i<12;i++){
+      const tid=(m.tracks||[])[i];
+      if(tid && rHas[i]){ (trackMargins[tid]=trackMargins[tid]||[]).push(Math.abs(rh[i]-ra[i])); }
+    }
+    const seen=new Set();
+    [['h',m.H],['a',m.A]].forEach(([side,team])=>{
+      (m.pl[side]||[]).forEach(p=>{
+        if(!p||!p.n) return;
+        (p.races||[]).forEach((v,i)=>{
+          if(v===''||v==null) return;
+          const val=Number(v)||0, owner=raceOwnerName(p,i);
+          praces[owner]=praces[owner]||[]; praces[owner].push(val);
+          if(val===15) bump(p15,owner,1);
+          distinctPlayers.add(team+'|'+owner);
+          playerTeam[owner]=team;
+          seen.add(i); totalPoints+=val;
+        });
+      });
+    });
+    racesPlayed+=seen.size;
+    [['h'],['a']].forEach(([side])=>{
+      (m.pl[side]||[]).forEach(p=>{
+        playerSegments(p).forEach(seg=>{
+          const tot=seg.races.reduce((s,v)=> s + (v!=='' && v!=null ? Number(v) : 0), 0);
+          if(seg.races.some(v=>v!=='' && v!=null)) pmatchTotal[seg.name]=Math.max(pmatchTotal[seg.name]||0, tot);
+          bump(pcumul, seg.name, tot);
+          // longest run of consecutive wins (15s) inside this match, per player
+          let run=0;
+          seg.races.forEach(v=>{ if(v!=='' && v!=null && Number(v)===15){ run++; if(run>bestStreak.n) bestStreak={name:seg.name, n:run}; } else run=0; });
+        });
+      });
+    });
+  });
+
+  // --- Match highlights ---
+  function cum(m){
+    const h=Array(12).fill(0), a=Array(12).fill(0);
+    (m.pl.h||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null) h[i]+=Number(v); }));
+    (m.pl.a||[]).forEach(p=>(p.races||[]).forEach((v,i)=>{ if(v!=='' && v!=null) a[i]+=Number(v); }));
+    let sh=0,sa=0; const ch=[],ca=[];
+    for(let i=0;i<12;i++){ sh+=h[i]; sa+=a[i]; ch.push(sh); ca.push(sa); }
+    return [ch,ca];
+  }
+  let comeback=null;
+  matches.forEach(m=>{
+    if(isForfeit(m) || m.scH===m.scA || !(m.pl.h||[]).some(p=>p.n)) return;
+    const [ch,ca]=cum(m), winH=m.scH>m.scA;
+    let worst=Infinity;
+    for(let i=0;i<12;i++){ const d = winH ? (ch[i]-ca[i]) : (ca[i]-ch[i]); if(d<worst) worst=d; }
+    if(worst<0 && (comeback===null || worst<comeback.deficit)){
+      comeback={ deficit:worst, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA) };
+    }
+  });
+  // closest finish (non-forfeit, not a draw)
+  let closest=null;
+  matches.forEach(m=>{
+    if(isForfeit(m) || m.scH===m.scA) return;
+    const margin=Math.abs(m.scH-m.scA);
+    if(closest===null || margin<closest.margin){
+      const winH=m.scH>m.scA;
+      closest={ margin, winner:winH?m.H:m.A, loser:winH?m.A:m.H, scW:Math.max(m.scH,m.scA), scL:Math.min(m.scH,m.scA) };
+    }
+  });
+  // a tie (draw) — a rarity worth calling out
+  let draw=null;
+  matches.forEach(m=>{
+    if(isForfeit(m) || m.scH!==m.scA) return;
+    if(draw===null) draw={ H:m.H, A:m.A, sc:m.scH };
+  });
+  // "drama": the match whose lead changed hands the most, and how the elite groups compare
+  const leadChanges=m=>{
+    if(isForfeit(m)) return 0;
+    const [ch,ca]=cum(m); let lead=0, changes=0;
+    for(let i=0;i<12;i++){ const cur = ch[i]>ca[i]?1:(ca[i]>ch[i]?-1:0); if(cur!==0 && lead!==0 && cur!==lead) changes++; if(cur!==0) lead=cur; }
+    return changes;
+  };
+  let dramaMatch=null;
+  matches.forEach(m=>{
+    if(isForfeit(m) || m.scH===m.scA) return;
+    const c=leadChanges(m);
+    if(dramaMatch===null || c>dramaMatch.changes){
+      const winH=m.scH>m.scA;
+      dramaMatch={ changes:c, winner:winH?m.H:m.A, loser:winH?m.A:m.H, tier:m.tier };
+    }
+  });
+
+  // --- Individual bests ---
+  const bestMatchList = Object.entries(pmatchTotal).sort((a,b)=>b[1]-a[1]);
+  const bestMatch = bestMatchList[0] || null;
+  const secondBestMatch = bestMatchList[1] || null;   // for the "duel" fact
+  const mostPerfect = Object.entries(p15).sort((a,b)=>b[1]-a[1])[0] || null;
+  const topScorer = Object.entries(pcumul).sort((a,b)=>b[1]-a[1])[0] || null; // most points over the whole stage
+  const streak = (bestStreak.n>=2) ? [bestStreak.name, bestStreak.n] : null;
+
+  // --- Teams (with tier split where it tells a story) ---
+  const undefeated = Object.keys(teamRec).filter(t=>teamRec[t][2]===0);
+  const bestOffenseByTier = {};
+  ['top','mid'].forEach(tier=>{
+    const arr = Object.keys(teamPts).filter(t=>teamTierOf[t]===tier)
+      .map(t=>[t, teamPts[t]/teamGames[t]]).sort((a,b)=>b[1]-a[1]);
+    bestOffenseByTier[tier] = arr[0] || null;
+  });
+  const bestDiff = Object.entries(teamDiff).sort((a,b)=>b[1]-a[1])[0] || null;
+
+  // --- Standings drama & storylines ---
+  // Group tables ranked the MKWC way: standings points (3 per win, 1 per draw), then
+  // point differential, then points-for. Each row is [tag, {pts, diff, pf}].
+  function groupTables(){
+    const out=[];
+    ['top','mid'].forEach(tier=>{
+      const groups=STATE[tier]||{};
+      for(const id in groups){
+        const g=groups[id]; if(!g) continue;
+        const rec={};
+        const add=(t)=>{ if(t!=null && !rec[t]) rec[t]={w:0,d:0,diff:0,pf:0}; };
+        g.slots.forEach(add);
+        pairsFor(g.slots.length).forEach(([i,j])=>{
+          const sc=g.scores[i+'-'+j]; if(!isPlayed(sc)) return;
+          const H=g.slots[i], A=g.slots[j]; if(H==null||A==null) return;
+          const h=Number(sc[0]), a=Number(sc[1]);
+          rec[H].diff+=h-a; rec[A].diff+=a-h; rec[H].pf+=h; rec[A].pf+=a;
+          if(h>a){ rec[H].w++; } else if(a>h){ rec[A].w++; } else { rec[H].d++; rec[A].d++; }
+        });
+        const table=Object.entries(rec)
+          .map(([t,r])=>[t, {pts:r.w*3+r.d, diff:r.diff, pf:r.pf}])
+          .sort((x,y)=> y[1].pts-x[1].pts || y[1].diff-x[1].diff || y[1].pf-x[1].pf);
+        out.push({tier, id, table});
+      }
+    });
+    return out;
+  }
+  const tables=groupTables();
+  // Race to the top: the group winner and runner-up ended level on standings points,
+  // decided only on differential — a genuinely tight finish worth telling.
+  let groupRace=null;
+  tables.forEach(g=>{
+    if(g.table.length>=2 && g.table[0][1].pts===g.table[1][1].pts && groupRace===null){
+      groupRace={ id:g.id, first:g.table[0][0], second:g.table[1][0] };
+    }
+  });
+  // The winner who topped their group on points despite a worse differential than the
+  // runner-up — i.e. a draw/consistency edge beat raw dominance.
+  let ptsOverDiff=null;
+  tables.forEach(g=>{
+    if(g.table.length>=2 && groupRace===null && ptsOverDiff===null
+       && g.table[0][1].pts>g.table[1][1].pts
+       && g.table[0][1].diff<g.table[1][1].diff){
+      ptsOverDiff={ id:g.id, first:g.table[0][0], second:g.table[1][0] };
+    }
+  });
+  // Play-In survivors that also grabbed a top-2 group spot (a bracket ticket).
+  const playInTeams=new Set();
+  const q=STATE.quali||{};
+  for(const id in q){ (q[id].slots||[]).forEach(s=>{ if(s!=null) playInTeams.add(s); }); }
+  const survivors=[];
+  tables.forEach(g=>{
+    g.table.slice(0,2).forEach(([t])=>{ if(playInTeams.has(t)) survivors.push(t); });
+  });
+
+  // --- Tracks ---
+  const mostPlayedTrack = Object.entries(trackUses).sort((a,b)=>b[1]-a[1])[0] || null;
+  // Which tracks split the two teams the most (decisive) vs the least (equaliser),
+  // measured by the average per-race point margin. Only tracks with enough races.
+  const TRACK_MIN=8;
+  const trackAvgMargin = Object.entries(trackMargins)
+    .filter(([,arr])=>arr.length>=TRACK_MIN)
+    .map(([tid,arr])=>[tid, arr.reduce((s,v)=>s+v,0)/arr.length])
+    .sort((a,b)=>b[1]-a[1]);
+  const decisiveTracks = trackAvgMargin.slice(0,3);            // [[tid,avg],…]
+  const equaliserTrack = trackAvgMargin.length ? trackAvgMargin[trackAvgMargin.length-1] : null;
+
+  return {
+    matchesCount: matches.length, racesPlayed, totalPoints,
+    playersPlayed: distinctPlayers.size, distinctTracks: distinctTracks.size,
+    comeback, closest, draw, dramaMatch,
+    bestMatch, secondBestMatch, mostPerfect, topScorer, streak,
+    undefeated, bestOffenseByTier, bestDiff, groupRace, ptsOverDiff, survivors,
+    mostPlayedTrack, decisiveTracks, equaliserTrack, playerTeam, p15
+  };
+}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
@@ -1512,7 +1735,19 @@ function renderHomeView(){
       </div>
     </div>
 
-    ${allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
+    ${groupStageDone() ? `<a class="nutshell-teaser" data-navto="groupnutshell">
+      <span class="nt-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
+          <line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="13.5" x2="16" y2="13.5"></line><line x1="8" y1="17" x2="13" y2="17"></line>
+        </svg>
+      </span>
+      <span class="nt-body">
+        <span class="nt-eyebrow">${ntg('eyebrow')}</span>
+        <span class="nt-title">${ntg('title')}</span>
+      </span>
+      <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
+    </a>` : (allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
       <span class="nt-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
@@ -1524,7 +1759,7 @@ function renderHomeView(){
         <span class="nt-title">${nt('title')}</span>
       </span>
       <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
-    </a>` : ''}
+    </a>` : '')}
 
     <div class="stage-block">
       <h2 class="outline" style="font-size:18px;margin-bottom:10px;">${t('homeRecent')}</h2>
@@ -2661,6 +2896,126 @@ const NUTSHELL_I18N = {
     dyk2:'チームは多彩さを見せ、ゲームの<fig>{tracks}</fig>コースすべてがステージ中に少なくとも一度は選ばれました。'
   }
 };
+// Group-Stage recap article. Distinguishes the elite groups (A/B) from groups 1-4 in
+// the prose. Same lightweight markup (<b>, <fig>) as NUTSHELL_I18N.
+const NUTSHELL_GS_I18N = {
+  fr:{
+    eyebrow:'Récap · Phase de groupes',
+    title:'La phase de groupes en bref',
+    standfirst:'La phase de groupes du MKWC 2026 est terminée. 24 nations réparties en six groupes — les huit équipes les mieux classées dans les groupes A et B, les autres dans les groupes 1 à 4 — se sont disputé leur place pour le bracket. Retour sur les matchs marquants, les exploits individuels et quelques histoires que le classement ne raconte pas.',
+    byline:'Groupes A · B · 1 · 2 · 3 · 4',
+    hMatches:'Les matchs marquants',
+    hIndiv:'Les performances individuelles',
+    hTeams:'Du côté des équipes',
+    hTracks:'Les circuits',
+    hDyk:'Le saviez-vous ?',
+    comeback:'<b>{winner}</b> signe la plus belle remontée de la phase. Menée de <fig>{deficit}</fig> points contre <b>{loser}</b>, l’équipe a renversé la rencontre pour l’emporter <b>{scW}–{scL}</b> — le plus large retard comblé de la phase de groupes.',
+    closest:'À l’autre bout du spectre, le match le plus serré n’a tenu qu’à <fig>{margin}</fig> points : <b>{winner}</b> s’impose <b>{scW}–{scL}</b> face {loserAt} au terme des douze courses.',
+    draw:'Pour la deuxième fois dans ce tournoi, un match n’a pas pu être départagé : <b>{h}</b> et <b>{a}</b> se sont quittés dos à dos sur un <b>{sc}–{sc}</b> parfait, incapables de se séparer après douze courses.',
+    indivBest:'Côté joueur·euse·s, <b>{player}</b> ({team}) a réussi le plus gros match de la phase — <fig>{best}</fig> points, dont <fig>{streak}</fig> courses gagnées d’affilée, la plus longue série de la phase — en devançant <b>{p2}</b> d’un seul petit point ({best2}).',
+    indivBestSolo:'Côté joueur·euse·s, <b>{player}</b> ({team}) a réussi le plus gros match de la phase : <fig>{best}</fig> points, dont <fig>{streak}</fig> courses gagnées d’affilée — la plus longue série de la phase de groupes.',
+    topScorer:'Mais sur l’ensemble de la phase, personne n’a fait mieux que <b>{player}</b> ({team}) : <fig>{total}</fig> points marqués au total, plus que n’importe quel·le autre pilote, et <fig>{wins}</fig> courses remportées.',
+    undefeated:'{count} nations terminent la phase de groupes sans la moindre défaite : {list}.',
+    drama:'C’est dans les groupes A et B que la tension était à son maximum : y voir une équipe mener, se faire dépasser, puis repasser devant avant la fin a été bien plus courant que dans les groupes 1 à 4. Le meilleur exemple : le match entre <b>{winner}</b> et <b>{loser}</b>, où la première place a changé de mains à cinq reprises avant que tout se joue dans les dernières courses.',
+    survivors:'Et puis il y a les héros de l’ombre. <b>{a}</b> et <b>{b}</b> avaient déjà dû batailler pour sortir du Play-In ; les voilà qui enchaînent et arrachent leur billet pour le bracket, là où aucune autre rescapée du Play-In n’a réussi à passer. Deux parcours à contre-courant qui valent le coup d’œil : ces deux-là n’ont plus rien à perdre.',
+    groupRace:'Rien n’a été simple non plus au sommet : dans le groupe {id}, <b>{first}</b> et <b>{second}</b> ont fini à égalité de points, départagés au seul différentiel — avantage <b>{first}</b>.',
+    ptsOverDiff:'Rien n’a été simple non plus au sommet : dans le groupe {id}, <b>{first}</b> coiffe <b>{second}</b> pour la première place alors même que cette dernière affiche un meilleur différentiel. La preuve qu’en phase de groupes, la régularité prime sur les gros écarts.',
+    trackMost:'Parmi les trente circuits du jeu, c’est le <b>{track}</b> qui se démarque cette fois, sélectionné <fig>{n}</fig> fois sur <fig>{matches}</fig> matchs.',
+    trackImpact:'Mais tous les tracés ne pèsent pas de la même façon sur un match. En regardant, course par course, l’écart qu’ils creusent entre les deux équipes, deux profils se dégagent nettement. Les circuits les plus <b>décisifs</b> — <b>{d1}</b>, <b>{d2}</b> et <b>{d3}</b> en tête — sont ceux où une équipe peut vraiment prendre le large : près de <fig>{davg}</fig> points d’écart en moyenne à chaque passage. À l’opposé, la <b>{eq}</b> est le grand <b>égalisateur</b> de la phase : les deux équipes y terminent séparées de <fig>{eqavg}</fig> points à peine, comme si le circuit remettait tout le monde à niveau.',
+    trackAll:'Encore une fois, les <fig>{tracks}</fig> circuits du jeu auront tous été sélectionnés au moins une fois lors de cette phase.',
+    dyk1:'En tout, la phase de groupes aura réuni <fig>{players}</fig> joueur·euse·s sur la piste, pour <fig>{matches}</fig> matchs et <fig>{races}</fig> courses disputées. Mises bout à bout, ces courses représentent <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
+    dyk2:'Après tous ces retournements, la phase de bracket s’annonce plus excitante que prévu. Bonne chance à toutes les équipes, et que le meilleur gagne !'
+  },
+  en:{
+    eyebrow:'Recap · Group Stage',
+    title:'The Group Stage in a nutshell',
+    standfirst:'The MKWC 2026 Group Stage is over. Twenty-four nations across six groups — the eight top-ranked teams in groups A and B, the rest in groups 1 to 4 — battled for a spot in the bracket. A look back at the standout matches, the individual feats and a few stories the standings don’t tell.',
+    byline:'Groups A · B · 1 · 2 · 3 · 4',
+    hMatches:'Standout matches',
+    hIndiv:'Individual performances',
+    hTeams:'Around the teams',
+    hTracks:'The tracks',
+    hDyk:'Did you know?',
+    comeback:'<b>{winner}</b> pulled off the biggest comeback of the stage. Down by <fig>{deficit}</fig> points against <b>{loser}</b>, they turned it around to win <b>{scW}–{scL}</b> — the largest deficit overturned in the Group Stage.',
+    closest:'At the other end, the closest match came down to just <fig>{margin}</fig> points: <b>{winner}</b> edged <b>{loser}</b> <b>{scW}–{scL}</b> after twelve races.',
+    draw:'For the second time in this tournament, a match couldn’t be separated: <b>{h}</b> and <b>{a}</b> finished dead level at <b>{sc}–{sc}</b>, unable to break the tie after twelve races.',
+    indivBest:'Among the players, <b>{player}</b> ({team}) posted the biggest single match of the stage — <fig>{best}</fig> points on their own, including <fig>{streak}</fig> race wins in a row, the longest streak of the stage — edging <b>{p2}</b> by a single point ({best2}).',
+    indivBestSolo:'Among the players, <b>{player}</b> ({team}) posted the biggest single match of the stage: <fig>{best}</fig> points on their own, including <fig>{streak}</fig> race wins in a row — the longest streak of the Group Stage.',
+    topScorer:'But across the whole stage, no one topped <b>{player}</b> ({team}): <fig>{total}</fig> points scored in total, more than any other racer, along with <fig>{wins}</fig> race wins.',
+    undefeated:'{count} nations finish the Group Stage without a single loss: {list}.',
+    drama:'The tension peaked in groups A and B: seeing a team lead, get overtaken, then retake the front before the finish happened far more often there than in groups 1 to 4. The prime example: the match between <b>{winner}</b> and <b>{loser}</b>, where the lead changed hands five times before it was settled in the closing races.',
+    survivors:'And then there are the underdogs. <b>{a}</b> and <b>{b}</b> already had to scrap their way out of the Play-In — and now they’ve gone and punched their bracket ticket too, where no other Play-In survivor could. Two against-the-odds runs worth watching: these two have nothing left to lose.',
+    groupRace:'The top of the table was no picnic either: in group {id}, <b>{first}</b> and <b>{second}</b> finished level on points, split only on differential — edge to <b>{first}</b>.',
+    ptsOverDiff:'The top of the table was no picnic either: in group {id}, <b>{first}</b> pipped <b>{second}</b> to first place even though the runner-up boasted a better differential. Proof that in the group stage, consistency beats blowouts.',
+    trackMost:'Of the game’s thirty tracks, the <b>{track}</b> stood out this time, picked <fig>{n}</fig> times across <fig>{matches}</fig> matches.',
+    trackImpact:'But not every track weighs on a match the same way. Looking race by race at the gap they open between the two teams, two profiles clearly emerge. The most <b>decisive</b> tracks — led by <b>{d1}</b>, <b>{d2}</b> and <b>{d3}</b> — are the ones where a team can really pull away: close to <fig>{davg}</fig> points of margin on average each time out. At the other end, <b>{eq}</b> is the great <b>equaliser</b> of the stage: the two teams finish barely <fig>{eqavg}</fig> points apart there, as if the track put everyone back on level terms.',
+    trackAll:'Once again, all <fig>{tracks}</fig> of the game’s tracks were picked at least once during the stage.',
+    dyk1:'All told, the Group Stage brought <fig>{players}</fig> players to the track, across <fig>{matches}</fig> matches and <fig>{races}</fig> races. End to end, those races add up to <fig>{points}</fig> points scored by all racers combined.',
+    dyk2:'After all these twists, the bracket stage looks even more exciting than expected. Good luck to every team, and may the best one win!'
+  },
+  es:{
+    eyebrow:'Resumen · Fase de grupos',
+    title:'La fase de grupos en resumen',
+    standfirst:'La fase de grupos del MKWC 2026 ha terminado. Veinticuatro naciones en seis grupos —los ocho equipos mejor clasificados en los grupos A y B, el resto en los grupos 1 a 4— lucharon por un puesto en el bracket. Un repaso a los partidos destacados, las gestas individuales y algunas historias que la clasificación no cuenta.',
+    byline:'Grupos A · B · 1 · 2 · 3 · 4',
+    hMatches:'Partidos destacados',
+    hIndiv:'Actuaciones individuales',
+    hTeams:'En torno a los equipos',
+    hTracks:'Los circuitos',
+    hDyk:'¿Sabías que…?',
+    comeback:'<b>{winner}</b> firmó la mayor remontada de la fase. Con <fig>{deficit}</fig> puntos de desventaja ante <b>{loser}</b>, dieron la vuelta al marcador para ganar <b>{scW}–{scL}</b>, la mayor desventaja remontada de la fase de grupos.',
+    closest:'En el otro extremo, el partido más ajustado se decidió por solo <fig>{margin}</fig> puntos: <b>{winner}</b> superó a <b>{loser}</b> por <b>{scW}–{scL}</b> tras doce carreras.',
+    draw:'Por segunda vez en este torneo, un partido no pudo desempatarse: <b>{h}</b> y <b>{a}</b> acabaron igualados a <b>{sc}–{sc}</b>, incapaces de romper el empate tras doce carreras.',
+    indivBest:'Entre los jugadores, <b>{player}</b> ({team}) firmó el mejor partido individual de la fase — <fig>{best}</fig> puntos él solo, con <fig>{streak}</fig> victorias de carrera seguidas, la racha más larga de la fase — superando a <b>{p2}</b> por un solo punto ({best2}).',
+    indivBestSolo:'Entre los jugadores, <b>{player}</b> ({team}) firmó el mejor partido individual de la fase: <fig>{best}</fig> puntos él solo, con <fig>{streak}</fig> victorias de carrera seguidas, la racha más larga de la fase de grupos.',
+    topScorer:'Pero en el conjunto de la fase, nadie superó a <b>{player}</b> ({team}): <fig>{total}</fig> puntos en total, más que cualquier otro piloto, y <fig>{wins}</fig> carreras ganadas.',
+    undefeated:'{count} naciones terminan la fase de grupos sin una sola derrota: {list}.',
+    drama:'La mayor tensión se vivió en los grupos A y B: ver a un equipo mandar, ser adelantado y volver a ponerse por delante antes del final fue mucho más frecuente allí que en los grupos 1 a 4. El mejor ejemplo: el partido entre <b>{winner}</b> y <b>{loser}</b>, donde el liderato cambió de manos cinco veces antes de resolverse en las últimas carreras.',
+    survivors:'Y luego están los tapados. <b>{a}</b> y <b>{b}</b> ya habían tenido que pelear para salir del Play-In, y ahora encadenan y se llevan además su billete para el bracket, donde ningún otro superviviente del Play-In pudo pasar. Dos trayectorias a contracorriente que merece la pena seguir: estos dos ya no tienen nada que perder.',
+    groupRace:'Arriba tampoco fue sencillo: en el grupo {id}, <b>{first}</b> y <b>{second}</b> acabaron igualados a puntos, decididos solo por la diferencia — ventaja para <b>{first}</b>.',
+    ptsOverDiff:'Arriba tampoco fue sencillo: en el grupo {id}, <b>{first}</b> superó a <b>{second}</b> por el primer puesto pese a que este último tenía mejor diferencia. La prueba de que en la fase de grupos la regularidad pesa más que las goleadas.',
+    trackMost:'De los treinta circuitos del juego, el <b>{track}</b> destacó esta vez, elegido <fig>{n}</fig> veces en <fig>{matches}</fig> partidos.',
+    trackImpact:'Pero no todos los trazados pesan igual en un partido. Mirando carrera a carrera la brecha que abren entre los dos equipos, se perfilan dos perfiles claros. Los circuitos más <b>decisivos</b> — con <b>{d1}</b>, <b>{d2}</b> y <b>{d3}</b> a la cabeza — son aquellos en los que un equipo puede sacar ventaja de verdad: cerca de <fig>{davg}</fig> puntos de diferencia de media en cada paso. En el extremo opuesto, <b>{eq}</b> es el gran <b>igualador</b> de la fase: allí los dos equipos terminan separados por apenas <fig>{eqavg}</fig> puntos, como si el circuito volviera a poner a todos al mismo nivel.',
+    trackAll:'Una vez más, los <fig>{tracks}</fig> circuitos del juego se eligieron al menos una vez durante la fase.',
+    dyk1:'En total, la fase de grupos reunió a <fig>{players}</fig> jugadores en la pista, en <fig>{matches}</fig> partidos y <fig>{races}</fig> carreras. Sumadas, esas carreras representan <fig>{points}</fig> puntos anotados por todos los pilotos.',
+    dyk2:'Tras todos estos vuelcos, la fase de bracket se presenta aún más emocionante de lo previsto. ¡Suerte a todos los equipos, y que gane el mejor!'
+  },
+  ja:{
+    eyebrow:'まとめ · グループステージ',
+    title:'グループステージを振り返る',
+    standfirst:'MKWC 2026のグループステージが終了しました。6グループ24か国——上位8チームがA・Bグループ、残りがグループ1〜4——がブラケット進出を懸けて激突。注目の試合、個人の活躍、そして順位表だけでは見えない物語を振り返ります。',
+    byline:'グループ A · B · 1 · 2 · 3 · 4',
+    hMatches:'注目の試合',
+    hIndiv:'個人の活躍',
+    hTeams:'チームについて',
+    hTracks:'コース',
+    hDyk:'ご存じですか？',
+    comeback:'<b>{winner}</b>がステージ最大の逆転劇を演じました。<b>{loser}</b>に<fig>{deficit}</fig>点差をつけられながら試合をひっくり返し、<b>{scW}–{scL}</b>で勝利——グループステージ最大の逆転差です。',
+    closest:'一方、最も僅差だった試合はわずか<fig>{margin}</fig>点差。<b>{winner}</b>が12レースの末に<b>{loser}</b>を<b>{scW}–{scL}</b>で振り切りました。',
+    draw:'この大会で2度目、決着がつかなかった試合がありました。<b>{h}</b>と<b>{a}</b>は12レースを終えても<b>{sc}–{sc}</b>の互角で、引き分けに終わりました。',
+    indivBest:'選手では<b>{player}</b>（{team}）がステージ最高の個人得点を記録。1試合で<fig>{best}</fig>点を挙げ、うち<fig>{streak}</fig>連続でレースを制覇——ステージ最長の連勝——<b>{p2}</b>をわずか1点（{best2}）で上回りました。',
+    indivBestSolo:'選手では<b>{player}</b>（{team}）がステージ最高の個人得点を記録。1試合で<fig>{best}</fig>点を挙げ、うち<fig>{streak}</fig>連続でレースを制覇——グループステージ最長の連勝です。',
+    topScorer:'しかしステージ全体では、<b>{player}</b>（{team}）を上回る者はいませんでした。合計<fig>{total}</fig>点は全選手中最多で、レース勝利数も<fig>{wins}</fig>回です。',
+    undefeated:'{count}か国が無敗でグループステージを終えました：{list}。',
+    drama:'最も緊張感が高まったのはA・Bグループ。リードしたチームが逆転され、終盤に再び首位へ——そんな展開はグループ1〜4よりずっと頻繁でした。その代表例が<b>{winner}</b>対<b>{loser}</b>。首位が5回入れ替わり、最後のレースで決着しました。',
+    survivors:'そして影の主役たち。<b>{a}</b>と<b>{b}</b>はプレイインを勝ち抜くだけでも苦労したのに、そこからさらにブラケットの切符まで掴み取りました——ほかのプレイイン勢が誰も超えられなかった壁を越えて。逆境をものともしない二つの快進撃は必見。もう失うものは何もありません。',
+    groupRace:'首位争いも簡単ではありませんでした。グループ{id}では<b>{first}</b>と<b>{second}</b>が勝ち点で並び、得失点差で首位が決定——軍配は<b>{first}</b>に上がりました。',
+    ptsOverDiff:'首位争いも簡単ではありませんでした。グループ{id}では、得失点差で上回る<b>{second}</b>を、<b>{first}</b>が勝ち点で抑えて首位に。グループステージでは大差の勝利より安定感がものを言う、という証しです。',
+    trackMost:'ゲームの30コースのうち、今回ひときわ目立ったのが<b>{track}</b>。<fig>{matches}</fig>試合中<fig>{n}</fig>回選ばれました。',
+    trackImpact:'しかし、すべてのコースが試合に同じ重みを持つわけではありません。レースごとに2チームの差がどれだけ開くかを見ると、2つの傾向がはっきり表れます。最も<b>決定的</b>なのは<b>{d1}</b>、<b>{d2}</b>、<b>{d3}</b>——1回ごとに平均約<fig>{davg}</fig>点の差がつき、一方が大きく抜け出せるコースです。対照的に<b>{eq}</b>はこのステージ最大の<b>イコライザー</b>。両チームの差はわずか<fig>{eqavg}</fig>点にとどまり、まるでコースが全員を横一線に戻すかのようでした。',
+    trackAll:'今回もまた、ゲームの<fig>{tracks}</fig>コースすべてがステージ中に少なくとも一度は選ばれました。',
+    dyk1:'グループステージ全体で<fig>{players}</fig>人の選手がコースに立ち、<fig>{matches}</fig>試合・<fig>{races}</fig>レースが行われました。合わせると、全選手で<fig>{points}</fig>点が記録されました。',
+    dyk2:'これだけの波乱を経て、ブラケットは予想以上の盛り上がりになりそうです。全チームの健闘を祈ります——最高のチームに栄光あれ！'
+  }
+};
+function ntg(key, vars){
+  const dict = NUTSHELL_GS_I18N[LANG] || NUTSHELL_GS_I18N.en;
+  let s = dict[key] || NUTSHELL_GS_I18N.en[key] || key;
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  s = s.replace(/<b>/g,'<strong>').replace(/<\/b>/g,'</strong>')
+       .replace(/<fig>/g,'<span class="np-fig">').replace(/<\/fig>/g,'</span>');
+  return s;
+}
 function nt(key, vars){
   const dict = NUTSHELL_I18N[LANG] || NUTSHELL_I18N.en;
   let s = dict[key] || NUTSHELL_I18N.en[key] || key;
@@ -2734,6 +3089,113 @@ function renderNutshellView(){
   const back = document.getElementById('backFromNutshell');
   if(back) back.onclick = ()=>{ setView('home'); };
 }
+function groupStageDone(){ return allGroupMatchesPlayed(STATE.top) && allGroupMatchesPlayed(STATE.mid); }
+function renderGroupNutshellView(){
+  const el = document.getElementById('view-groupnutshell');
+  if(!el) return;
+  if(!groupStageDone()){
+    el.innerHTML = `<div class="stage-note">${t('calNoMatch')}</div>`;
+    return;
+  }
+  const r = getGroupStageRecap();
+  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
+  const paras = [];
+
+  // Comma-join team names with a localized final conjunction. Japanese uses full-width
+  // separators with no surrounding spaces.
+  const joinNames = names => {
+    if(names.length<=1) return names[0]||'';
+    const head = names.slice(0,-1), tail = names[names.length-1];
+    if(LANG==='ja') return head.join('、')+'、'+tail;
+    const conj = LANG==='en'?'and':LANG==='es'?'y':'et';
+    return head.join(', ')+' '+conj+' '+tail;
+  };
+
+  paras.push(`<h2 class="np-h2">${ntg('hMatches')}</h2>`);
+  if(r.comeback){
+    paras.push(`<p>${ntg('comeback',{winner:teamWithArticle(r.comeback.winner,true), verb:frVerbEnding(r.comeback.winner), loser:teamWithArticle(r.comeback.loser,false), deficit:Math.abs(r.comeback.deficit), scW:r.comeback.scW, scL:r.comeback.scL})}</p>`);
+  }
+  if(r.closest){
+    // {loser} = plain article name (EN/ES/JA); {loserAt} = FR "à"-contracted form (au/aux/à l').
+    paras.push(`<p>${ntg('closest',{winner:teamWithArticle(r.closest.winner,false), loser:teamWithArticle(r.closest.loser,false), loserAt:teamAfterPrep(r.closest.loser,'à'), margin:r.closest.margin, scW:r.closest.scW, scL:r.closest.scL})}</p>`);
+    paras.push(`<div class="np-score"><span class="t">${teamName(r.closest.winner)}</span><span class="n">${r.closest.scW}</span><span class="d">–</span><span class="n">${r.closest.scL}</span><span class="t">${teamName(r.closest.loser)}</span></div>`);
+  }
+  if(r.draw){
+    // {h} follows a colon mid-sentence in FR, so the article stays lowercase.
+    paras.push(`<p>${ntg('draw',{h:teamWithArticle(r.draw.H,false), a:teamWithArticle(r.draw.A,false), sc:r.draw.sc})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntg('hIndiv')}</h2>`);
+  const pTeam = n => teamName((r.playerTeam||{})[n]);
+  if(r.bestMatch && r.streak){
+    // Merge the "best match" and the "1-point duel" into a single sentence when
+    // the runner-up is exactly one point behind; otherwise use the solo phrasing.
+    const duel = r.secondBestMatch && (r.bestMatch[1]-r.secondBestMatch[1]===1);
+    const key = duel ? 'indivBest' : 'indivBestSolo';
+    paras.push(`<p>${ntg(key,{player:r.bestMatch[0], team:pTeam(r.bestMatch[0]), best:r.bestMatch[1], streak:r.streak[1], p2:(duel?r.secondBestMatch[0]:''), best2:(duel?r.secondBestMatch[1]:'')})}</p>`);
+  }
+  if(r.topScorer){
+    // Use the top scorer's OWN race-win count, not the global max, so the sentence stays true.
+    const wins = (r.p15||{})[r.topScorer[0]] || 0;
+    paras.push(`<p>${ntg('topScorer',{player:r.topScorer[0], team:pTeam(r.topScorer[0]), total:r.topScorer[1], wins})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntg('hTeams')}</h2>`);
+  if(r.undefeated && r.undefeated.length){
+    // FR takes an article before each nation ("l'Espagne, les États-Unis…"); other
+    // languages list the bare names.
+    const listName = LANG==='fr' ? (tag=>teamWithArticle(tag,false)) : teamName;
+    paras.push(`<p>${ntg('undefeated',{count:r.undefeated.length, list:joinNames(r.undefeated.map(listName))})}</p>`);
+  }
+  if(r.dramaMatch){
+    // "le match entre X et Y" — both teams sit mid-sentence, so no capital article.
+    paras.push(`<p>${ntg('drama',{winner:teamWithArticle(r.dramaMatch.winner,false), loser:teamWithArticle(r.dramaMatch.loser,false)})}</p>`);
+  }
+  if(r.survivors && r.survivors.length>=2){
+    // {a} opens a sentence in FR ("Le Brésil et l'Autriche…") → capitalized article.
+    paras.push(`<p>${ntg('survivors',{a:teamWithArticle(r.survivors[0],true), b:teamWithArticle(r.survivors[1],false)})}</p>`);
+  }
+  if(r.groupRace){
+    // A true points tie for 1st, split on differential. Mid-sentence → lowercase articles.
+    paras.push(`<p>${ntg('groupRace',{id:r.groupRace.id, first:teamWithArticle(r.groupRace.first,false), second:teamWithArticle(r.groupRace.second,false)})}</p>`);
+  } else if(r.ptsOverDiff){
+    // Winner topped the group on points despite a worse differential than the runner-up.
+    paras.push(`<p>${ntg('ptsOverDiff',{id:r.ptsOverDiff.id, first:teamWithArticle(r.ptsOverDiff.first,false), second:teamWithArticle(r.ptsOverDiff.second,false)})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntg('hTracks')}</h2>`);
+  if(r.mostPlayedTrack){
+    paras.push(`<p>${ntg('trackMost',{track:trackName(r.mostPlayedTrack[0]), n:r.mostPlayedTrack[1], matches:nf(r.matchesCount)})}</p>`);
+  }
+  // "Decisive vs equaliser" tracks — an advanced per-race margin analysis.
+  if(r.decisiveTracks && r.decisiveTracks.length>=3 && r.equaliserTrack){
+    const dAvg = Math.round(r.decisiveTracks.reduce((s,x)=>s+x[1],0)/r.decisiveTracks.length);
+    paras.push(`<p>${ntg('trackImpact',{
+      d1:trackName(r.decisiveTracks[0][0]), d2:trackName(r.decisiveTracks[1][0]), d3:trackName(r.decisiveTracks[2][0]),
+      davg:dAvg, eq:trackName(r.equaliserTrack[0]), eqavg:Math.round(r.equaliserTrack[1])
+    })}</p>`);
+  }
+  if(r.distinctTracks){
+    paras.push(`<p>${ntg('trackAll',{tracks:nf(r.distinctTracks)})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntg('hDyk')}</h2>`);
+  paras.push(`<p>${ntg('dyk1',{players:nf(r.playersPlayed), matches:nf(r.matchesCount), races:nf(r.racesPlayed), points:nf(r.totalPoints)})}</p>`);
+  paras.push(`<p>${ntg('dyk2')}</p>`);
+
+  el.innerHTML = `
+    <button class="back-btn" id="backFromGroupNutshell">← ${t('navHome')}</button>
+    <article class="np-article">
+      <div class="np-eyebrow">${ntg('eyebrow')}</div>
+      <h1 class="np-title outline">${ntg('title')}</h1>
+      <p class="np-standfirst">${ntg('standfirst')}</p>
+      <div class="np-byline">${ntg('byline')}</div>
+      <hr class="np-rule">
+      <div class="np-body">${paras.join('')}</div>
+    </article>`;
+  const back = document.getElementById('backFromGroupNutshell');
+  if(back) back.onclick = ()=>{ setView('home'); };
+}
 function decimalSep(){ return LANG==='en' ? '.' : ','; }
 
 /* =========================================================
@@ -2746,6 +3208,7 @@ function HERO_INFO_F(){ return {
   teams: {title:t('heroTitleTeams'), sub:t('heroSubTeams')},
   players: {title:t('heroTitlePlayers'), sub:t('heroSubPlayers')},
   nutshell: {title:t('heroTitleNutshell'), sub:t('heroSubNutshell')},
+  groupnutshell: {title:t('heroTitleGroupNutshell'), sub:t('heroSubGroupNutshell')},
 };}
 let selectedMatch = null;
 let selectedPlayer = null; // {tag, name}
@@ -2773,6 +3236,7 @@ const VIEW_RENDERERS = {
   teams: renderTeamsView,
   players: renderPlayersView,
   nutshell: renderNutshellView,
+  groupnutshell: renderGroupNutshellView,
 };
 let dirtyViews = new Set(Object.keys(VIEW_RENDERERS));
 function markAllDirty(){ dirtyViews = new Set(Object.keys(VIEW_RENDERERS)); }
@@ -2814,7 +3278,7 @@ function setView(view){
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell'};
+  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', groupnutshell:'view-groupnutshell'};
   document.getElementById(map[view]).classList.add('active');
   updateHero(view);
   ensureViewRendered(view);
@@ -3014,7 +3478,7 @@ function applyHashRoute(){
       selectedPlayer = {tag:parts[1], name:decodeURIComponent(parts.slice(2).join('/'))};
       setView('player'); renderPlayerDetail(selectedPlayer.tag, selectedPlayer.name); return true;
     }
-    if(['home','standings','calendar','teams','players','nutshell'].includes(view)){
+    if(['home','standings','calendar','teams','players','nutshell','groupnutshell'].includes(view)){
       setView(view); return true;
     }
   }catch(e){ /* malformed hash — fall back to the page's default view */ }
