@@ -1052,7 +1052,7 @@ const I18N = {
     roster:'Effectif', searchPlaceholder:'Rechercher un joueur ou une équipe...', showMore:'Voir plus', searchNoResult:'Aucun joueur trouvé.',
     playersNote:'Classement par indice (colonne « Indice ») : le score moyen par match, ajusté selon le nombre de matchs joués. La colonne « Moyenne » affiche le vrai score moyen.', playersEmpty:"Aucune donnée pour l'instant — les scores se rempliront au fil des matchs.",
     tabPlayers:'Joueurs', tabTeamsStats:'Équipes', colPlayer:'Joueur', colWarsPlayed:'Matchs joués', colWinPct:'% Victoires', colAvg:'Moyenne',
-    searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Classement des équipes par pourcentage de victoires, puis par différentiel de points.",
+    searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Classement des équipes par position dans leur groupe (1ers, puis 2èmes, 3èmes...), puis par différentiel de points.",
     dateQualiFull:'10–12 JUILLET', datePhaseFull:'17–19 JUILLET', dateBracketFull:'24 JUIL – 2 AOÛT',
     footer:'Projet de suivi communautaire, non affilié à Nintendo. Les données sont saisies manuellement et visibles par toute personne ayant ce lien.',
   },
@@ -1125,7 +1125,7 @@ const I18N = {
     roster:'Roster', searchPlaceholder:'Search for a player or team...', showMore:'Show more', searchNoResult:'No player found.',
     playersNote:'Ranked by rating (the "Rating" column): the average score per match, adjusted for the number of matches played. The "Average" column shows the real average score.', playersEmpty:'No data yet — scores will fill in as matches are played.',
     tabPlayers:'Players', tabTeamsStats:'Teams', colPlayer:'Player', colWarsPlayed:'Matches played', colWinPct:'Win %', colAvg:'Average',
-    searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Teams ranked by win percentage, then by point differential.',
+    searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Teams ranked by their position in their group (winners, then runners-up, third-placed…), then by point differential.',
     dateQualiFull:'JUL 10–12', datePhaseFull:'JUL 17–19', dateBracketFull:'JUL 24 – AUG 2',
     footer:"Community tracking project, not affiliated with Nintendo. Data is entered manually and visible to anyone with this link.",
   },
@@ -1198,7 +1198,7 @@ const I18N = {
     roster:'Plantilla', searchPlaceholder:'Buscar un jugador o equipo...', showMore:'Ver más', searchNoResult:'Ningún jugador encontrado.',
     playersNote:'Clasificación por índice (columna «Índice»): la puntuación media por partido, ajustada según el número de partidos jugados. La columna «Media» muestra la puntuación media real.', playersEmpty:'Todavía no hay datos — las puntuaciones se irán completando con los partidos.',
     tabPlayers:'Jugadores', tabTeamsStats:'Equipos', colPlayer:'Jugador', colWarsPlayed:'Partidos jugados', colWinPct:'% Victorias', colAvg:'Media',
-    searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Equipos clasificados por porcentaje de victorias, luego por diferencia de puntos.',
+    searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Equipos clasificados por su posición en su grupo (primeros, luego segundos, terceros…), luego por diferencia de puntos.',
     dateQualiFull:'10–12 JUL', datePhaseFull:'17–19 JUL', dateBracketFull:'24 JUL – 2 AGO',
     footer:'Proyecto de seguimiento comunitario, no afiliado a Nintendo. Los datos se introducen manualmente y son visibles para cualquiera que tenga este enlace.',
   },
@@ -1271,7 +1271,7 @@ const I18N = {
     roster:'メンバー', searchPlaceholder:'選手名またはチーム名で検索...', showMore:'もっと見る', searchNoResult:'該当する選手がいません。',
     playersNote:'「指数」列によるランキング：1試合あたりの平均得点を試合数に応じて調整した値です。「平均」列には実際の平均得点を表示しています。', playersEmpty:'まだデータがありません — 試合が進むとスコアが表示されます。',
     tabPlayers:'選手', tabTeamsStats:'チーム', colPlayer:'選手', colWarsPlayed:'試合数', colWinPct:'勝率', colAvg:'平均',
-    searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'勝率、次に得失点差でランキングしたチーム一覧です。',
+    searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'各グループ内の順位（1位、次に2位、3位…）、次に得失点差でランキングしたチーム一覧です。',
     dateQualiFull:'7月10〜12日', datePhaseFull:'7月17〜19日', dateBracketFull:'7月24日〜8月2日',
     footer:'非公式のコミュニティ運営プロジェクトです（任天堂とは無関係）。データは手動で入力されており、このリンクを持つ全員に表示されます。',
   },
@@ -3301,6 +3301,20 @@ function teamTier(tag){
   for(const id in STATE.mid){ if(STATE.mid[id].slots.includes(tag)) return 'middle'; }
   return 'lower';
 }
+// A team's rank within its own group (1 = first, …); 99 if not in any group.
+function groupPositionFor(tag){
+  const search = groupsObj => {
+    for(const id in groupsObj){
+      const g = groupsObj[id];
+      if(!g.slots.includes(tag)) continue;
+      const standings = computeStandings(g.slots, g.scores);
+      const pos = standings.findIndex(r=>r.tag===tag);
+      return pos>=0 ? pos+1 : 99;
+    }
+    return null;
+  };
+  return search(STATE.top) ?? search(STATE.mid) ?? 99;
+}
 // kept for compatibility with any leftover callers — now backed by the same data
 function getMvpCounts(){
   const stats = getPlayerStats();
@@ -3663,29 +3677,15 @@ function renderPlayersView(){
     }
   } else {
     const TIER_ORDER = {higher:0, middle:1, lower:2};
-    // Once the Play-In is over, its matches no longer decide table position: a team that
-    // only played the Play-In shouldn't sit above a group-stage team that hasn't played
-    // yet. During the Play-In itself, those matches still count. `activePlayed` picks the
-    // right match count for the current phase.
-    const playInOver = allGroupMatchesPlayed(STATE.quali);
-    const activePlayed = tm => playInOver ? tm.playedMain : tm.played;
     function compareTeams(a, b){
-      // Tier is the top-level split and always wins: the eight top-group teams (A/B)
-      // stay above the group-stage teams (1-4), which stay above the rest. They never
-      // played each other, so their win%/results are not comparable across tiers.
+      // Tier is the top-level split (top-group teams above group-stage teams, above the rest).
       const tierDiff = TIER_ORDER[teamTier(a.tag)] - TIER_ORDER[teamTier(b.tag)];
       if(tierDiff !== 0) return tierDiff;
-
-      // Within the same tier, rank by results.
-      const aPlayed = activePlayed(a)>0, bPlayed = activePlayed(b)>0;
-      if(!aPlayed && !bPlayed){
-        const aAny = a.played>0, bAny = b.played>0;
-        if(aAny !== bAny) return aAny ? 1 : -1; // teams with no matches first
-        if(!aAny && !bAny) return projectedRank(a.tag)-projectedRank(b.tag);
-        return (b.winPct-a.winPct) || (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
-      }
-      if(aPlayed !== bPlayed) return aPlayed ? -1 : 1; // a played team outranks one still waiting
-      return (b.winPct-a.winPct) || (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
+      // Then by position within their group (all winners, then all runners-up, …), point
+      // differential breaking ties (average and projected order are final tie-breakers).
+      const posDiff = groupPositionFor(a.tag) - groupPositionFor(b.tag);
+      if(posDiff !== 0) return posDiff;
+      return (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
