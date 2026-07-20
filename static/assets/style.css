@@ -242,6 +242,8 @@
     box-shadow:0 4px 14px rgba(0,0,0,0.22);
     transition:transform .15s, box-shadow .15s, border-color .15s;
   }
+  /* When two recap teasers stack, tighten the gap so they read as one group. */
+  .nutshell-teaser + .nutshell-teaser{ margin-top:-16px; }
   /* Gold accent rail down the left edge — the "byline" cue of a press card. */
   .nutshell-teaser::before{
     content:'';position:absolute;left:0;top:0;bottom:0;width:4px;

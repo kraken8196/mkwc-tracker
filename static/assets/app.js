@@ -1692,6 +1692,29 @@ function getTournamentPhaseStatus(){
   return {phase:'after', key:'homeStatusAfter'};
 }
 
+// Home teaser cards for the recap articles. Both are shown, most recent first: the
+// Group Stage teaser (once that stage is done) stacked above the Play-In one.
+function nutshellTeaserHTML(navto, eyebrow, title){
+  return `<a class="nutshell-teaser" data-navto="${navto}">
+      <span class="nt-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
+          <line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="13.5" x2="16" y2="13.5"></line><line x1="8" y1="17" x2="13" y2="17"></line>
+        </svg>
+      </span>
+      <span class="nt-body">
+        <span class="nt-eyebrow">${eyebrow}</span>
+        <span class="nt-title">${title}</span>
+      </span>
+      <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
+    </a>`;
+}
+function nutshellTeasersHTML(){
+  const cards = [];
+  if(groupStageDone()) cards.push(nutshellTeaserHTML('groupnutshell', ntg('eyebrow'), ntg('title')));
+  if(allGroupMatchesPlayed(STATE.quali)) cards.push(nutshellTeaserHTML('nutshell', nt('eyebrow'), nt('title')));
+  return cards.join('');
+}
 function renderHomeView(){
   const el = document.getElementById('view-home');
   const items = getAllMatchItems().sort((a,b)=>a.dateOrder-b.dateOrder);
@@ -1735,31 +1758,7 @@ function renderHomeView(){
       </div>
     </div>
 
-    ${groupStageDone() ? `<a class="nutshell-teaser" data-navto="groupnutshell">
-      <span class="nt-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
-          <line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="13.5" x2="16" y2="13.5"></line><line x1="8" y1="17" x2="13" y2="17"></line>
-        </svg>
-      </span>
-      <span class="nt-body">
-        <span class="nt-eyebrow">${ntg('eyebrow')}</span>
-        <span class="nt-title">${ntg('title')}</span>
-      </span>
-      <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
-    </a>` : (allGroupMatchesPlayed(STATE.quali) ? `<a class="nutshell-teaser" data-navto="nutshell">
-      <span class="nt-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 3h11l3 3v15H5z"></path><path d="M16 3v3h3"></path>
-          <line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="13.5" x2="16" y2="13.5"></line><line x1="8" y1="17" x2="13" y2="17"></line>
-        </svg>
-      </span>
-      <span class="nt-body">
-        <span class="nt-eyebrow">${nt('eyebrow')}</span>
-        <span class="nt-title">${nt('title')}</span>
-      </span>
-      <span class="nt-cta">${t('nutshellRead')} <span class="nt-arrow">→</span></span>
-    </a>` : '')}
+    ${nutshellTeasersHTML()}
 
     <div class="stage-block">
       <h2 class="outline" style="font-size:18px;margin-bottom:10px;">${t('homeRecent')}</h2>
