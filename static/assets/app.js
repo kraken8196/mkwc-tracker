@@ -2429,7 +2429,7 @@ function getPlayerStats(){
 // a Bayesian-adjusted average that gently pulls small samples toward the global mean,
 // so more matches earns trust without letting one lucky match top the board. Players are
 // still shown with their REAL average; only the ORDER uses this adjusted value.
-const RANK_CONFIDENCE = 2; // ~how many matches of "prior" weight a player is shrunk toward
+const RANK_CONFIDENCE = 3; // ~how many matches of "prior" weight a player is shrunk toward
 function makePlayerRanker(playerStats){
   let totalPoints = 0, totalCount = 0;
   for(const tag in playerStats){
