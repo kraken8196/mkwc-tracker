@@ -2051,9 +2051,9 @@ function renderCalendarView(){
 
     function renderDay(key, anchor){
       const d = days[key];
-      // The provisional-dates note sits just above the first bracket day (round 0 = R16).
+      // The provisional-dates note sits just below the first bracket day's date heading (round 0 = R16).
       const note = key==='bracket-0' ? `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>` : '';
-      let out = note + `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div><div class="cal-list">`;
+      let out = `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div>` + note + `<div class="cal-list">`;
       out += d.items.map(matchCardHTML).join('');
       return out + `</div>`;
     }
