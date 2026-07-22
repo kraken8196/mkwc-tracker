@@ -1029,7 +1029,7 @@ const I18N = {
     tipTrackAvgPlayer:'Score moyen du joueur par circuit.',
     lowSampleHint:'Circuit joué moins de {n} fois : moyenne peu représentative.',
     lowSampleLegend:'* Moyenne peu représentative (pas assez de courses sur ce circuit).',
-    tipConsistency:'Écart-type des scores de course du joueur : à quel point il reste proche de sa moyenne. Plus c\'est bas, plus il est régulier.',
+    tipConsistency:'Écart-type des totaux de match du joueur (1 match = 12 courses) : à quel point son niveau reste stable d\'un match à l\'autre. Plus c\'est bas, plus il est régulier.',
     tipClutch:'Moyenne de la 2e moitié du match (courses 7-12) moins la 1re moitié (courses 1-6). Positif = finit plus fort qu\'il n\'a commencé.',
     tipBalance:'Répartition des points entre les joueurs alignés sur un match, en moyenne sur les matchs de l\'équipe. Plus c\'est bas, plus les points sont partagés équitablement.',
     tipRacesPlayed:'Nombre de courses jouées par circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
@@ -1102,7 +1102,7 @@ const I18N = {
     tipTrackAvgPlayer:'Player\'s average score per track.',
     lowSampleHint:'Track played fewer than {n} times: average not very reliable.',
     lowSampleLegend:'* Average not very reliable (too few races on this track).',
-    tipConsistency:'Standard deviation of the player\'s race scores: how close they stay to their average. Lower means steadier.',
+    tipConsistency:'Standard deviation of the player\'s per-match totals (1 match = 12 races): how steady their level stays from one match to the next. Lower means steadier.',
     tipClutch:'Average of the second half (races 7-12) minus the first half (races 1-6). Positive = finishes stronger than they started.',
     tipBalance:'How evenly the players fielded in a match share the points, averaged over the team\'s matches. Lower means more evenly shared.',
     tipRacesPlayed:'Number of races played per track.', tipGB:'Points scored by the team in the group.',
@@ -1175,7 +1175,7 @@ const I18N = {
     tipTrackAvgPlayer:'Puntuación media del jugador por circuito.',
     lowSampleHint:'Circuito jugado menos de {n} veces: media poco fiable.',
     lowSampleLegend:'* Media poco fiable (pocas carreras en este circuito).',
-    tipConsistency:'Desviación típica de las puntuaciones de carrera del jugador: lo cerca que se mantiene de su media. Cuanto más bajo, más regular.',
+    tipConsistency:'Desviación típica de los totales por partido del jugador (1 partido = 12 carreras): lo estable que se mantiene su nivel de un partido a otro. Cuanto más bajo, más regular.',
     tipClutch:'Media de la 2ª mitad (carreras 7-12) menos la 1ª mitad (carreras 1-6). Positivo = termina más fuerte de lo que empezó.',
     tipBalance:'Cómo reparten los puntos los jugadores alineados en un partido, en promedio sobre los partidos del equipo. Cuanto más bajo, más equilibrado.',
     tipRacesPlayed:'Número de carreras jugadas por circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
@@ -1248,7 +1248,7 @@ const I18N = {
     tipTrackAvgPlayer:'コースごとの選手の平均スコア。',
     lowSampleHint:'このコースは{n}回未満：平均の信頼性は低いです。',
     lowSampleLegend:'* 走行回数が少なく、平均の信頼性は低いです。',
-    tipConsistency:'選手のレーススコアの標準偏差：平均からどれだけ離れないか。小さいほど安定。',
+    tipConsistency:'選手の1試合ごとの合計スコア（1試合＝12レース）の標準偏差：試合ごとに実力がどれだけ安定しているか。小さいほど安定。',
     tipClutch:'後半（7〜12レース目）の平均から前半（1〜6レース目）の平均を引いた値。プラスなら尻上がり。',
     tipBalance:'各試合に出場した選手間のポイント配分の均等さ（チームの試合平均）。小さいほど均等。',
     tipRacesPlayed:'コースごとの走行レース数。', tipGB:'グループでチームが獲得したポイント。',
@@ -3372,7 +3372,6 @@ function stdDev(arr){
   return Math.sqrt(variance);
 }
 function getAdvancedStats(){
-  const playerAllRaces = {}; // "tag|name" -> [every individual race score across the tournament]
   const playerMatchRaces = {}; // "tag|name" -> [ [12 race scores for one full match], ... ]
   const teamMatchTotals = {}; // tag -> [ [6 player totals for one match], ... ]
 
@@ -3393,7 +3392,6 @@ function getAdvancedStats(){
           const filled = races.filter(v=>v!=null);
           if(!filled.length) return;
           const pkey = tag+'|'+seg.name;
-          playerAllRaces[pkey] = (playerAllRaces[pkey]||[]).concat(filled);
           if(filled.length===12){ // only a full, un-substituted match counts toward "finishing strong"
             playerMatchRaces[pkey] = playerMatchRaces[pkey] || [];
             playerMatchRaces[pkey].push(races);
@@ -3425,14 +3423,15 @@ function getAdvancedStats(){
     }
   }
 
-  // Consistency: standard deviation of a player's individual race scores — smaller means
-  // steadier. (The old best-minus-worst range saturated near 14 for almost everyone, since
-  // any decent sample includes a ~15 and a ~1; stddev captures the real spread instead.)
+  // Consistency: standard deviation of a player's per-MATCH totals (one match = 12 races) —
+  // smaller means the player performs at a steadier level from one match to the next.
+  // (Measured match-by-match rather than race-by-race: a single race is dominated by luck,
+  // so a full-match total is a cleaner unit for judging how consistent a player really is.)
   const consistency = {};
-  for(const pkey in playerAllRaces){
-    const races = playerAllRaces[pkey];
-    if(races.length<2) continue;
-    const sd = stdDev(races);
+  for(const pkey in playerMatchRaces){
+    const matchTotals = playerMatchRaces[pkey].map(races=> races.reduce((s,v)=> s + (v!=null ? v : 0), 0));
+    if(matchTotals.length<2) continue;
+    const sd = stdDev(matchTotals);
     if(sd!=null) consistency[pkey] = sd;
   }
 
