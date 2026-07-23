@@ -151,7 +151,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', nextMatches:'Prochains matchs', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -224,7 +224,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', nextMatches:'Next matches', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -297,7 +297,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', nextMatches:'Próximos partidos', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -370,7 +370,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', nextMatches:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -1405,29 +1405,41 @@ function isCurrentlyLive(rawIso, sc){
 function getLiveMatchesNow(){
   return getAllMatchItems().filter(it => isCurrentlyLive(it.rawIso, it.sc));
 }
-// The next not-yet-played match that has a scheduled kickoff time still in the future,
-// both teams known. Used for the "next match" countdown block on the home page.
-function getNextScheduledMatch(){
+// All not-yet-played matches (both teams known) that kick off at the SAME earliest future
+// time — usually one, but two or more when matches are scheduled simultaneously. Used for the
+// "next match" countdown block on the home page so no simultaneous match is hidden.
+function getNextScheduledMatches(){
   const now = Date.now();
-  return getAllMatchItems()
+  const upcoming = getAllMatchItems()
     .filter(it => it.rawIso && it.h!=null && it.a!=null && !isPlayed(it.sc) && new Date(it.rawIso).getTime() > now)
-    .sort((a,b)=> new Date(a.rawIso).getTime() - new Date(b.rawIso).getTime())[0] || null;
+    .sort((a,b)=> new Date(a.rawIso).getTime() - new Date(b.rawIso).getTime());
+  if(!upcoming.length) return [];
+  const first = new Date(upcoming[0].rawIso).getTime();
+  return upcoming.filter(it => new Date(it.rawIso).getTime() === first);
 }
 function getPlayInStartMs(){
   return Math.min(...Object.values(SCHEDULED_TIMES).map(iso=>new Date(iso).getTime()));
 }
-// The "next match" hero block on the home page: both teams, stage, local time and a
-// live countdown to kickoff. Clicking it opens the match detail.
-function nextMatchBlockHTML(it){
-  const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
-  return `<div class="next-match-block match-card" data-matchref="${it.matchRef}">
-    <div class="nmb-label">${t('nextMatch')}</div>
-    <div class="nmb-teams">
-      <span class="nmb-team">${teamPlainHTML(it.h,'lg')}</span>
-      <span class="nmb-vs">${t('vs')}</span>
-      <span class="nmb-team">${teamPlainHTML(it.a,'lg')}</span>
-    </div>
-    <div class="nmb-meta">${it.stage}${ff} · ${it.date}</div>
+// The "next match" hero block on the home page: shows every match that kicks off at the same
+// earliest time (usually one, sometimes two or more simultaneous matches), each clickable to its
+// detail, above a single shared live countdown to that kickoff.
+function nextMatchBlockHTML(matches){
+  if(!matches || !matches.length) return '';
+  const label = matches.length > 1 ? t('nextMatches') : t('nextMatch');
+  const rows = matches.map(it=>{
+    const ff = forfeitSideFor(it.matchRef) ? `<span class="forfeit-badge">${t('forfeitBadge')}</span>` : '';
+    return `<div class="nmb-match match-card" data-matchref="${it.matchRef}">
+      <div class="nmb-teams">
+        <span class="nmb-team">${teamPlainHTML(it.h,'lg')}</span>
+        <span class="nmb-vs">${t('vs')}</span>
+        <span class="nmb-team">${teamPlainHTML(it.a,'lg')}</span>
+      </div>
+      <div class="nmb-meta">${it.stage}${ff} · ${it.date}</div>
+    </div>`;
+  }).join('');
+  return `<div class="next-match-block${matches.length>1?' next-match-block-multi':''}">
+    <div class="nmb-label">${label}</div>
+    ${rows}
     <div class="nmb-countdown" id="nextMatchCountdown"></div>
   </div>`;
 }
@@ -1866,7 +1878,7 @@ function renderHomeView(){
   const status = getTournamentPhaseStatus();
   const liveNow = status.phase!=='before' ? getLiveMatchesNow() : [];
   // Show the next-match countdown only when nothing is live right now.
-  const nextMatch = liveNow.length ? null : getNextScheduledMatch();
+  const nextMatches = liveNow.length ? [] : getNextScheduledMatches();
 
   let html = `
     <div class="stage-note" style="font-size:14px;margin:0 0 16px;">${t('homeIntro')}</div>
@@ -1875,7 +1887,7 @@ function renderHomeView(){
       <h3 class="live-now-title">${t('homeLiveNow')}</h3>
       <div class="cal-list">${liveNow.map(matchCardHTML).join('')}</div>
     </div>` : ''}
-    ${nextMatch ? nextMatchBlockHTML(nextMatch) : ''}
+    ${nextMatches.length ? nextMatchBlockHTML(nextMatches) : ''}
 
     <div class="match-progress" style="margin:18px 0 24px;">
       <div class="match-progress-label">${t('homeFactMatches')} <b>${matchesPlayed} / ${totalMatches}</b></div>
@@ -1930,7 +1942,7 @@ function renderHomeView(){
     };
   });
   if(status.phase==='before') startCountdown(getPlayInStartMs(), 'playinCountdown');
-  else if(nextMatch) startCountdown(new Date(nextMatch.rawIso).getTime(), 'nextMatchCountdown');
+  else if(nextMatches.length) startCountdown(new Date(nextMatches[0].rawIso).getTime(), 'nextMatchCountdown');
   else clearCountdownInterval();
   ensureHomeLiveRefresh();
 }
@@ -1942,8 +1954,8 @@ let lastHomeLiveSig = null;
 // rebuilds the DOM (and reloads every flag image) every 30s for nothing.
 function homeLiveSignature(){
   const live = getLiveMatchesNow().map(it=>it.matchRef).sort().join(',');
-  const next = getNextScheduledMatch();
-  return live + '|' + (next ? next.matchRef : '');
+  const next = getNextScheduledMatches().map(it=>it.matchRef).sort().join(',');
+  return live + '|' + next;
 }
 function ensureHomeLiveRefresh(){
   if(homeLiveRefreshStarted) return;
