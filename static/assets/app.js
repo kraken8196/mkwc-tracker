@@ -2628,7 +2628,12 @@ function getAllTeamMatches(tag){
     const meIsHome = idx%2===0;
     const mySc = played ? (meIsHome ? [String(res.gamesH),String(res.gamesA)] : [String(res.gamesA),String(res.gamesH)]) : null;
     const seriesWinner = meIsHome ? res.winnerSide : (res.winnerSide==='H'?'A':res.winnerSide==='A'?'H':null);
-    items.push({stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], opp, sc:mySc, played, isSeries:true, seriesWinner, dateOrder:(2+r)*1e10, matchRef:`b|${r}|${m}`});
+    // Use the confirmed kickoff (local date + time in the visitor's timezone) when known,
+    // exactly like the calendar; fall back to the round's provisional date label otherwise.
+    const iso = BRACKET_TIMES[`b|${r}|${m}`] || null;
+    const bDate = iso ? formatScheduledLocal(iso) : ROUND_DATES_F()[r];
+    const bOrder = iso ? (2+r)*1e10 + Math.floor(new Date(iso).getTime()/1000) : (2+r)*1e10;
+    items.push({stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:bDate, opp, sc:mySc, played, isSeries:true, seriesWinner, dateOrder:bOrder, matchRef:`b|${r}|${m}`, rawIso:iso});
   }
   items.sort((a,b)=> a.dateOrder-b.dateOrder);
   return items;
