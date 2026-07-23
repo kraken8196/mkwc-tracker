@@ -507,6 +507,19 @@ const SCHEDULED_TIMES = {
 function scheduledTimeFor(anchorPrefix, groupId, key){
   return SCHEDULED_TIMES[`${anchorPrefix}|${groupId}|${key}`] || null;
 }
+// Bracket kickoff times, keyed by "b|round|match" (Belgium time, UTC+2 in July, stored with an
+// explicit offset so each visitor's browser converts to their own local time and calendar day).
+// Round of 16 (round 0), match order follows the bracket slot order.
+const BRACKET_TIMES = {
+  'b|0|0':'2026-07-25T20:00:00+02:00',   // Spain vs Brazil
+  'b|0|1':'2026-07-25T14:00:00+02:00',   // England vs Australia
+  'b|0|2':'2026-07-25T16:00:00+02:00',   // Japan vs Chile
+  'b|0|3':'2026-07-26T03:00:00+02:00',   // Canada vs Asia
+  'b|0|4':'2026-07-25T20:00:00+02:00',   // USA vs Austria
+  'b|0|5':'2026-07-25T14:00:00+02:00',   // Italy vs South Korea
+  'b|0|6':'2026-07-25T17:00:00+02:00',   // France vs Caledonbria
+  'b|0|7':'2026-07-25T20:00:00+02:00',   // Germany vs Ireland
+};
 function localeForLang(){
   return { fr:'fr-FR', en:'en-US', es:'es-ES', ja:'ja-JP' }[LANG] || 'en-US';
 }
@@ -995,7 +1008,8 @@ function parseMatchRef(ref){
     const games = gameScores.map((s,gi)=>({ sc:s, players: gamePlayers[gi] || emptyMatchPlayers() }));
     // A single representative `players` object keeps legacy callers happy (first game).
     const pl = (games[0] && games[0].players) || emptyMatchPlayers();
-    return {h, a, sc, players:pl, series:{ round, games, res }, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date:ROUND_DATES_F()[round], anchor:null, rawIso:null};
+    const iso = BRACKET_TIMES[`b|${round}|${idx}`] || null;
+    return {h, a, sc, players:pl, series:{ round, games, res }, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date: iso ? formatScheduledLocal(iso) : ROUND_DATES_F()[round], anchor:null, rawIso: iso};
   }
   return null;
 }
@@ -1300,10 +1314,22 @@ function getAllMatchItems(){
       // Calendar cards show the series score (games won) for bracket matches.
       const res = seriesResult(r, bracketGames(r, m).gameScores);
       const sc = res.playedAny ? [String(res.gamesH), String(res.gamesA)] : ['',''];
+      // A confirmed kickoff time (when known) is rendered in the visitor's own timezone and
+      // bucketed into their local calendar day — so a match can land on a different day than
+      // Belgium's. Rounds without confirmed times keep the round's provisional date label.
+      const iso = BRACKET_TIMES[`b|${r}|${m}`] || null;
+      let itemDate = ROUND_DATES_F()[r], itemDayLabel = ROUND_DATES_F()[r];
+      let itemDateKey = `bracket-${r}`, itemDateOrder = (2+r) * 1e10 + 9e9;
+      if(iso){
+        itemDate = formatScheduledLocal(iso);
+        itemDayLabel = formatScheduledLocalDateOnly(iso);
+        itemDateKey = `bracket-${r}-${localDateKey(iso)}`; // one bucket per exact local calendar day within this round
+        itemDateOrder = (2+r) * 1e10 + Math.floor(new Date(iso).getTime()/1000);
+      }
       items.push({
-        stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:ROUND_DATES_F()[r], dayLabel:ROUND_DATES_F()[r], h, a, sc, isSeries:true, seriesWinner:res.winnerSide,
+        stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:itemDate, dayLabel:itemDayLabel, h, a, sc, isSeries:true, seriesWinner:res.winnerSide,
         matchRef:`b|${r}|${m}`, anchor:null,
-        dateKey:`bracket-${r}`, dateOrder: (2+r) * 1e10
+        dateKey:itemDateKey, dateOrder:itemDateOrder, rawIso: iso || null
       });
     }
   }
@@ -2051,9 +2077,7 @@ function renderCalendarView(){
 
     function renderDay(key, anchor){
       const d = days[key];
-      // The provisional-dates note sits just below the first bracket day's date heading (round 0 = R16).
-      const note = key==='bracket-0' ? `<div class="cal-provisional-note">${t('calGroupProvisional')}</div>` : '';
-      let out = `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div>` + note + `<div class="cal-list">`;
+      let out = `<div class="stage-subhead"${anchor?' id="cal-next"':''} style="margin-top:22px;">${d.label}</div><div class="cal-list">`;
       out += d.items.map(matchCardHTML).join('');
       return out + `</div>`;
     }
