@@ -647,6 +647,8 @@
   }
   .admin-stream-input:focus{outline:none;border-color:var(--gold);}
   .admin-forfeit-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .apr-side,.apr-input{padding:6px 8px;border-radius:6px;border:1px solid var(--line-strong);background:var(--panel-3);color:var(--cream);font-family:'JetBrains Mono',monospace;}
+  .admin-penalty-mrow[data-penalty-ref] .apr-side{min-width:140px;}
   .ff-btn{
     padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;
     background:var(--panel-3);border:1px solid var(--line-strong);color:var(--cream);
@@ -1483,7 +1485,7 @@ let STATE = {
 };
 
 function defaultState(){
-  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
+  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},penalties:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
   for(const g in QUALI_GROUPS) s.quali[g] = {slots:[...QUALI_GROUPS[g].teams], scores:{}, players:{}};
   for(const g in MID_GROUPS) s.mid[g] = {slots:[...MID_GROUPS[g].fixed, null, null], scores:{}, players:{}};
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
@@ -1509,6 +1511,24 @@ function streamInputRowHTML(ref, disabled){
 // (that team loses 0-150), or 'B' when BOTH teams forfeit (double forfeit, 0-0).
 // Nothing is played either way, so no individual stats.
 function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A'||v==='B') ? v : null; }
+// A match penalty: STATE.penalties[ref] = {side:'H'|'A', points:N}. Deducts from one side's
+// score IN THAT MATCH, applied only when a score is read (raw score stays intact, reversible).
+function penaltyForMatch(ref){
+  const p = STATE.penalties && STATE.penalties[ref];
+  if(!p || !(p.side==='H'||p.side==='A')) return null;
+  const n = Number(p.points);
+  return (isFinite(n) && n>0) ? {side:p.side, points:n} : null;
+}
+function penalisedScore(ref, sc){
+  if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) return sc;
+  const p = penaltyForMatch(ref);
+  if(!p) return sc;
+  let h = Number(sc[0]), a = Number(sc[1]);
+  if(!isFinite(h)||!isFinite(a)) return sc;
+  if(p.side==='H') h = Math.max(0, h - p.points);
+  else a = Math.max(0, a - p.points);
+  return [String(h), String(a)];
+}
 // Immediately reflect a forfeit (or its removal) in the match score, so the change
 // shows without waiting for the next full save/derive pass. side: 'H'|'A'|'B'|null.
 function applyForfeitToScore(ref, side){
@@ -1564,6 +1584,26 @@ function forfeitRowHTML(ref, teamH, teamA, disabled){
     <button type="button" class="ff-btn ${side==='A'?'ff-active':''}" data-forfeit-set="A" ${dis}>${nameA} déclare forfait</button>
     <button type="button" class="ff-btn ${side==='B'?'ff-active':''}" data-forfeit-set="B" ${dis}>Double forfait (0–0)</button>
     <button type="button" class="ff-btn ff-clear ${side?'':'ff-hidden'}" data-forfeit-set="">✖ Annuler le forfait</button>
+  </div>`;
+}
+// Penalty editor for one match: pick which team loses points and how many, in THIS match.
+// penRef is the match ref in the "g|stage|group|i-j" form used by penalisedScore/computeStandings.
+function penaltyRowHTML(penRef, teamH, teamA, disabled){
+  const cur = penaltyForMatch(penRef); // {side,points} or null
+  const nameH = teamH ? teamName(teamH) : '—';
+  const nameA = teamA ? teamName(teamA) : '—';
+  const dis = (teamH==null || teamA==null) ? 'disabled' : (disabled||'');
+  const sideVal = cur ? cur.side : '';
+  const ptsVal = cur ? cur.points : '';
+  return `<div class="admin-forfeit-row admin-penalty-mrow" data-penalty-ref="${penRef}">
+    <label class="admin-stream-label">⚠️ Pénalité</label>
+    <select class="apr-side" data-penalty-side ${dis}>
+      <option value="" ${sideVal===''?'selected':''}>— aucune —</option>
+      <option value="H" ${sideVal==='H'?'selected':''}>${nameH}</option>
+      <option value="A" ${sideVal==='A'?'selected':''}>${nameA}</option>
+    </select>
+    <input type="number" min="0" step="1" class="apr-input" data-penalty-points value="${ptsVal}" placeholder="points" ${dis} style="width:90px;">
+    <span style="font-size:11px;color:var(--dim);">points retirés à cette équipe pour ce match</span>
   </div>`;
 }
 function playerTotal(p){ return (p.races||[]).reduce((sum,v)=> sum + (v!=='' && v!=null ? (Number(v)||0) : 0), 0); }
@@ -2120,12 +2160,13 @@ function statTile(labelKey, tipKey, valueHTML){
 /* =========================================================
    STANDINGS CALC
 ========================================================= */
-function computeStandings(slots, scores){
+function computeStandings(slots, scores, refPrefix){
   const rows = slots.map(t=>({tag:t, w:0,l:0,d:0,pf:0,pa:0}));
   pairsFor(slots.length).forEach(([i,j])=>{
     const key = i+'-'+j;
-    const sc = scores[key];
+    let sc = scores[key];
     if(!sc || slots[i]==null || slots[j]==null) return;
+    if(refPrefix) sc = penalisedScore(`${refPrefix}|${key}`, sc); // deduct any match penalty
     const [h,a] = sc;
     if(h===''||a===''||h==null||a==null) return;
     const hh=Number(h), aa=Number(a);
@@ -2154,8 +2195,8 @@ function isGroupFullyPlayed(groupObj){
     return sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
   });
 }
-function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
-  const standings = computeStandings(groupObj.slots, groupObj.scores);
+function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId, refPrefix){
+  const standings = computeStandings(groupObj.slots, groupObj.scores, refPrefix);
   const anyPlayed = isGroupFullyPlayed(groupObj);
   let rows = '';
   standings.forEach((r,i)=>{
@@ -2267,7 +2308,7 @@ function parseMatchRef(ref){
     if(!g) return null;
     const h = g.slots[i], a = g.slots[j];
     const key = i+'-'+j;
-    const sc = g.scores[key] || ['',''];
+    const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key] || ['','']);
     const pl = g.players[key] || emptyMatchPlayers();
     const stageLabel = anchorPrefix==='quali' ? t('stageQuali') : t('stagePhaseGroupes');
     const iso = scheduledTimeFor(anchorPrefix, id, key);
@@ -2501,7 +2542,7 @@ function renderStandingsView(){
     <div class="tier-badge">${t('tierQuali')}</div>
     <div class="stage-note">${t('noteQuali')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(QUALI_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.quali[id], 2, null, 'group-quali-'+id)).join('')}
+      ${Object.entries(QUALI_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.quali[id], 2, null, 'group-quali-'+id, 'g|quali|'+id)).join('')}
     </div>
   </div>`;
 
@@ -2511,13 +2552,13 @@ function renderStandingsView(){
     <div class="tier-badge">${t('tier14')}</div>
     <div class="stage-note">${t('note14')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(MID_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.mid[id], 2, null, 'group-mid-'+id)).join('')}
+      ${Object.entries(MID_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.mid[id], 2, null, 'group-mid-'+id, 'g|mid|'+id)).join('')}
     </div>
     <div class="stage-subhead">${t('subheadAB')}</div>
     <div class="tier-badge">${t('tierAB')}</div>
     <div class="stage-note">${t('noteAB')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(TOP_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.top[id], 4, null, 'group-top-'+id)).join('')}
+      ${Object.entries(TOP_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.top[id], 4, null, 'group-top-'+id, 'g|top|'+id)).join('')}
     </div>
   </div>`;
 
@@ -2551,7 +2592,7 @@ function getAllMatchItems(){
         const h=g.slots[i], a=g.slots[j];
         if(h==null || a==null) return;
         const key = i+'-'+j;
-        const sc = g.scores[key];
+        const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key]);
         const iso = scheduledTimeFor(anchorPrefix, id, key);
         // Matches with no confirmed kickoff time sort AFTER the timed ones within the
         // same phase (real timestamp ~1.78e9 s < this 9e9 offset, still inside the phase).
@@ -3823,7 +3864,7 @@ function getAllTeamMatches(tag){
         const opp = g.slots[i===idx?j:i];
         if(opp==null) return;
         const key = i+'-'+j;
-        const sc = g.scores[key];
+        const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key]);
         const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
         const mySc = played ? (i===idx ? sc : [sc[1],sc[0]]) : null;
         const iso = scheduledTimeFor(anchorPrefix, id, key);
@@ -4763,6 +4804,7 @@ function renderAdminView(){
         </div>
         ${streamInputRowHTML(streamRefFor(adminSection, adminGroup, key), disabled)}
         ${forfeitRowHTML(streamRefFor(adminSection, adminGroup, key), h, a, disabled)}
+        ${penaltyRowHTML(`g|${adminSection}|${adminGroup}|${key}`, h, a, disabled)}
         ${trackSelectorRowHTML(key, pl.tracks, disabled)}
         ${raceTableHTML(key, 0, pl.h, h, disabled)}
         ${raceTableHTML(key, 1, pl.a, a, disabled)}
@@ -4973,6 +5015,15 @@ function renderAdminView(){
     }
     if(adminSection==='quali' || adminSection==='top' || adminSection==='mid'){
       const stateGroup = adminSection==='quali'?STATE.quali[adminGroup]:(adminSection==='top'?STATE.top[adminGroup]:STATE.mid[adminGroup]);
+      // Match penalties: read each match's penalty row (side + points).
+      if(!STATE.penalties || typeof STATE.penalties !== 'object') STATE.penalties = {};
+      el.querySelectorAll('[data-penalty-ref]').forEach(rowEl=>{
+        const penRef = rowEl.dataset.penaltyRef;
+        const side = rowEl.querySelector('[data-penalty-side]').value;
+        const pts = Number(rowEl.querySelector('[data-penalty-points]').value);
+        if((side==='H'||side==='A') && isFinite(pts) && pts>0) STATE.penalties[penRef] = {side, points:pts};
+        else delete STATE.penalties[penRef]; // no side or 0 points = no penalty
+      });
       el.querySelectorAll('[data-pmatch]').forEach(field=>{
         const key = field.dataset.pmatch, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();

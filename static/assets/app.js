@@ -617,7 +617,7 @@ let STATE = {
 };
 
 function defaultState(){
-  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
+  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},penalties:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
   for(const g in QUALI_GROUPS) s.quali[g] = {slots:[...QUALI_GROUPS[g].teams], scores:{}, players:{}};
   for(const g in MID_GROUPS) s.mid[g] = {slots:[...MID_GROUPS[g].fixed, null, null], scores:{}, players:{}};
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
@@ -840,12 +840,15 @@ function statTile(labelKey, tipKey, valueHTML){
 /* =========================================================
    STANDINGS CALC
 ========================================================= */
-function computeStandings(slots, scores){
+// refPrefix (e.g. "g|mid|1") lets a per-match penalty be applied to that match's score before
+// it counts toward the standings. Omit it and scores are used as-is.
+function computeStandings(slots, scores, refPrefix){
   const rows = slots.map(t=>({tag:t, w:0,l:0,d:0,pf:0,pa:0}));
   pairsFor(slots.length).forEach(([i,j])=>{
     const key = i+'-'+j;
-    const sc = scores[key];
+    let sc = scores[key];
     if(!sc || slots[i]==null || slots[j]==null) return;
+    if(refPrefix) sc = penalisedScore(`${refPrefix}|${key}`, sc); // deduct any match penalty
     const [h,a] = sc;
     if(h===''||a===''||h==null||a==null) return;
     const hh=Number(h), aa=Number(a);
@@ -874,8 +877,8 @@ function isGroupFullyPlayed(groupObj){
     return sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
   });
 }
-function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
-  const standings = computeStandings(groupObj.slots, groupObj.scores);
+function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId, refPrefix){
+  const standings = computeStandings(groupObj.slots, groupObj.scores, refPrefix);
   const anyPlayed = isGroupFullyPlayed(groupObj);
   let rows = '';
   standings.forEach((r,i)=>{
@@ -987,7 +990,7 @@ function parseMatchRef(ref){
     if(!g) return null;
     const h = g.slots[i], a = g.slots[j];
     const key = i+'-'+j;
-    const sc = g.scores[key] || ['',''];
+    const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key] || ['','']);
     const pl = g.players[key] || emptyMatchPlayers();
     const stageLabel = anchorPrefix==='quali' ? t('stageQuali') : t('stagePhaseGroupes');
     const iso = scheduledTimeFor(anchorPrefix, id, key);
@@ -1231,7 +1234,7 @@ function renderStandingsView(){
     <div class="tier-badge">${t('tierQuali')}</div>
     <div class="stage-note">${t('noteQuali')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(QUALI_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.quali[id], 2, null, 'group-quali-'+id)).join('')}
+      ${Object.entries(QUALI_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.quali[id], 2, null, 'group-quali-'+id, 'g|quali|'+id)).join('')}
     </div>
   </div>`;
 
@@ -1241,13 +1244,13 @@ function renderStandingsView(){
     <div class="tier-badge">${t('tier14')}</div>
     <div class="stage-note">${t('note14')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(MID_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.mid[id], 2, null, 'group-mid-'+id)).join('')}
+      ${Object.entries(MID_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.mid[id], 2, null, 'group-mid-'+id, 'g|mid|'+id)).join('')}
     </div>
     <div class="stage-subhead">${t('subheadAB')}</div>
     <div class="tier-badge">${t('tierAB')}</div>
     <div class="stage-note">${t('noteAB')}</div>
     <div class="groups-grid standings-grid">
-      ${Object.entries(TOP_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.top[id], 4, null, 'group-top-'+id)).join('')}
+      ${Object.entries(TOP_GROUPS).map(([id,g])=>renderGroupCard(t('group')+' '+id, STATE.top[id], 4, null, 'group-top-'+id, 'g|top|'+id)).join('')}
     </div>
   </div>`;
 
@@ -1281,7 +1284,7 @@ function getAllMatchItems(){
         const h=g.slots[i], a=g.slots[j];
         if(h==null || a==null) return;
         const key = i+'-'+j;
-        const sc = g.scores[key];
+        const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key]);
         const iso = scheduledTimeFor(anchorPrefix, id, key);
         // Matches with no confirmed kickoff time sort AFTER the timed ones within the
         // same phase: a real kickoff timestamp (~1.78e9 s) is well under this 9e9 offset,
@@ -1396,6 +1399,28 @@ function streamLinkFor(ref){
 // A forfeited match is stored in STATE.forfeits[matchRef] as the losing side ('H'|'A'),
 // or 'B' for a double forfeit (both teams out, 0-0).
 function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A'||v==='B') ? v : null; }
+// A match penalty deducts points from ONE side's score IN THAT MATCH. Stored, per match, as
+// STATE.penalties[ref] = {side:'H'|'A', points:N}. The raw encoded score is never modified;
+// the deduction is applied only when a score is read for display or standings, so it stays
+// fully reversible. Returns {side, points} or null.
+function penaltyForMatch(ref){
+  const p = STATE.penalties && STATE.penalties[ref];
+  if(!p || !(p.side==='H'||p.side==='A')) return null;
+  const n = Number(p.points);
+  return (isFinite(n) && n>0) ? {side:p.side, points:n} : null;
+}
+// Apply a match penalty to a raw [h,a] score pair. Empty/unplayed scores pass through.
+// The penalised side loses `points` (floored at 0). Returns a new [h,a] pair (strings).
+function penalisedScore(ref, sc){
+  if(!sc || sc[0]===''||sc[1]===''||sc[0]==null||sc[1]==null) return sc;
+  const p = penaltyForMatch(ref);
+  if(!p) return sc;
+  let h = Number(sc[0]), a = Number(sc[1]);
+  if(!isFinite(h)||!isFinite(a)) return sc;
+  if(p.side==='H') h = Math.max(0, h - p.points);
+  else a = Math.max(0, a - p.points);
+  return [String(h), String(a)];
+}
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a single group match (12 races) ~ an hour
 const SERIES_DURATION_MS = 3 * 60 * 60 * 1000; // a bracket BO3 can run up to ~3 hours
@@ -2612,7 +2637,7 @@ function getAllTeamMatches(tag){
         const opp = g.slots[i===idx?j:i];
         if(opp==null) return;
         const key = i+'-'+j;
-        const sc = g.scores[key];
+        const sc = penalisedScore(`g|${anchorPrefix}|${id}|${key}`, g.scores[key]);
         const played = sc && sc[0]!=='' && sc[1]!=='' && sc[0]!=null && sc[1]!=null;
         const mySc = played ? (i===idx ? sc : [sc[1],sc[0]]) : null;
         const iso = scheduledTimeFor(anchorPrefix, id, key);
