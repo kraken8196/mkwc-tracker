@@ -1129,7 +1129,8 @@ function renderMatchDetail(ref){
   const draw = played && !series && Number(sc[0])===Number(sc[1]);
   const hWin = played && (series ? series.res.winnerSide==='H' : (draw || Number(sc[0])>Number(sc[1])));
   const aWin = played && (series ? series.res.winnerSide==='A' : (draw || Number(sc[1])>Number(sc[0])));
-  const isLiveNow = isCurrentlyLive(rawIso, sc);
+  const seriesUndecided = !!(series && series.res.playedAny && !series.res.decided);
+  const isLiveNow = isCurrentlyLive(rawIso, sc, seriesUndecided, !!series);
   el.innerHTML = `
     <button class="back-btn" id="backToCalBtn">${backLabel()}</button>
     <div class="team-detail-page">
@@ -1328,6 +1329,8 @@ function getAllMatchItems(){
       items.push({
         stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[r]}`, date:itemDate, dayLabel:itemDayLabel, h, a, sc, isSeries:true, seriesWinner:res.winnerSide,
         matchRef:`b|${r}|${m}`, anchor:null,
+        // A series with games played but no clinch yet is still "in progress" for the live badge.
+        seriesUndecided: res.playedAny && !res.decided,
         dateKey:itemDateKey, dateOrder:itemDateOrder, rawIso: iso || null
       });
     }
@@ -1394,15 +1397,23 @@ function streamLinkFor(ref){
 // or 'B' for a double forfeit (both teams out, 0-0).
 function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A'||v==='B') ? v : null; }
 
-const MATCH_DURATION_MS = 60 * 60 * 1000; // a war/set is assumed to last about an hour
-function isCurrentlyLive(rawIso, sc){
-  if(!rawIso || isPlayed(sc)) return false;
+const MATCH_DURATION_MS = 60 * 60 * 1000; // a single group match (12 races) ~ an hour
+const SERIES_DURATION_MS = 3 * 60 * 60 * 1000; // a bracket BO3 can run up to ~3 hours
+// A bracket series is only "played" (and thus no longer live) once one side clinches the
+// needed game wins — a started-but-undecided series (e.g. games 1–0) is still in progress.
+// seriesUndecided=true keeps such a match eligible for the live window despite having a score.
+function isCurrentlyLive(rawIso, sc, seriesUndecided, isSeries){
+  if(!rawIso) return false;
+  if(isPlayed(sc) && !seriesUndecided) return false;
   const start = new Date(rawIso).getTime();
   const now = Date.now();
-  return start <= now && (now - start) < MATCH_DURATION_MS;
+  // A bracket series (BO3) can run much longer than a single group match, so it stays
+  // "live" for a wider window after kickoff.
+  const window = isSeries ? SERIES_DURATION_MS : MATCH_DURATION_MS;
+  return start <= now && (now - start) < window;
 }
 function getLiveMatchesNow(){
-  return getAllMatchItems().filter(it => isCurrentlyLive(it.rawIso, it.sc));
+  return getAllMatchItems().filter(it => isCurrentlyLive(it.rawIso, it.sc, it.seriesUndecided, it.isSeries));
 }
 // All not-yet-played matches (both teams known) that kick off at the SAME earliest future
 // time — usually one, but two or more when matches are scheduled simultaneously. Used for the
