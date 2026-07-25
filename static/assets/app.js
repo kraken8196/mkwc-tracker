@@ -189,7 +189,6 @@ const I18N = {
     subhead14:'Groupes 1 à 4', tier14:'Équipes moyennement classées', note14:'Les 2 premiers de chaque groupe avancent en bracket.',
     stageBracket:'Phase de Bracket', noteBracket:'Élimination directe à 16 équipes — chaque tour au meilleur des 3 manches.', gameLabel:'Manche {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Groupe', colTeam:'Équipe', colP:'J', colW:'V', colL:'D', colD:'N', colF:'PP', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts', tbd:'à définir',
-    penaltyTip:'Pénalité : −{n} points marqués (retirés du total, décision des organisateurs).',
     tipP:'Nombre de matchs joués.', tipF:'Points marqués (total sur tous les matchs).', tipA:'Points encaissés (total sur tous les matchs).', tipPts:'Points de classement : 3 par victoire, 1 par nul, 0 par défaite.',
     round16:'Round 1', quarterfinals:'Quarts de finale', semifinals:'Demi-finales', final:'Finale',
     dateQuali:'10–12 juil.', datePhase:'17–19 juil.', dateR16:'24 juillet', dateQF:'25 juillet', dateSF:'1 août', dateF:'2 août',
@@ -263,7 +262,6 @@ const I18N = {
     subhead14:'Groups 1 to 4', tier14:'Middle-projected teams', note14:'The top 2 of each group advance to the bracket.',
     stageBracket:'Bracket Stage', noteBracket:'16-team single elimination — every round is best-of-3.', gameLabel:'Game {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Group', colTeam:'Team', colP:'P', colW:'W', colL:'L', colD:'D', colF:'F', colA:'A', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'TBD',
-    penaltyTip:'Penalty: −{n} points scored (deducted from the total, organizers\' decision).',
     tipP:'Matches played.', tipF:'Points for (total scored across all matches).', tipA:'Points against (total conceded across all matches).', tipPts:'Standings points: 3 per win, 1 per draw, 0 per loss.',
     round16:'Round 1', quarterfinals:'Quarterfinals', semifinals:'Semifinals', final:'Final',
     dateQuali:'Jul 10–12', datePhase:'Jul 17–19', dateR16:'July 24', dateQF:'July 25', dateSF:'Aug 1', dateF:'Aug 2',
@@ -337,7 +335,6 @@ const I18N = {
     subhead14:'Grupos 1 a 4', tier14:'Equipos con proyección media', note14:'Los 2 primeros de cada grupo avanzan al cuadro final.',
     stageBracket:'Fase de Bracket', noteBracket:'Eliminación directa a 16 equipos — cada ronda al mejor de 3 mangas.', gameLabel:'Manga {n}', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'Grupo', colTeam:'Equipo', colP:'PJ', colW:'G', colL:'P', colD:'E', colF:'PF', colA:'PC', colGB:'GB', colDiff:'+/-', colPts:'Pts.', tbd:'por determinar',
-    penaltyTip:'Sanción: −{n} puntos anotados (restados del total, decisión de los organizadores).',
     tipP:'Partidos jugados.', tipF:'Puntos a favor (total anotado en todos los partidos).', tipA:'Puntos en contra (total recibido en todos los partidos).', tipPts:'Puntos de clasificación: 3 por victoria, 1 por empate, 0 por derrota.',
     round16:'Ronda 1', quarterfinals:'Cuartos de final', semifinals:'Semifinales', final:'Final',
     dateQuali:'10–12 jul.', datePhase:'17–19 jul.', dateR16:'24 de julio', dateQF:'25 de julio', dateSF:'1 de agosto', dateF:'2 de agosto',
@@ -411,7 +408,6 @@ const I18N = {
     subhead14:'グループ1〜4', tier14:'中位予想チーム', note14:'各グループの上位2チームが決勝トーナメントに進出。',
     stageBracket:'ブラケットステージ', noteBracket:'16チームによるノックアウト方式 — 全ラウンドが3本勝負。', gameLabel:'第{n}マッチ', seriesBo3:'BO3', seriesBo5:'BO5',
     group:'グループ', colTeam:'チーム', colP:'試合', colW:'勝', colL:'負', colD:'分', colF:'得点', colA:'失点', colGB:'GB', colDiff:'+/-', colPts:'勝点', tbd:'未定',
-    penaltyTip:'ペナルティ：−{n}得点（合計から減点、主催者の判断）。',
     tipP:'試合数。', tipF:'総得点（全試合の合計）。', tipA:'総失点（全試合の合計）。', tipPts:'順位ポイント：勝ち3、引き分け1、負け0。',
     round16:'ラウンド1', quarterfinals:'準々決勝', semifinals:'準決勝', final:'決勝',
     dateQuali:'7月10〜12日', datePhase:'7月17〜19日', dateR16:'7月24日', dateQF:'7月25日', dateSF:'8月1日', dateF:'8月2日',
@@ -621,7 +617,7 @@ let STATE = {
 };
 
 function defaultState(){
-  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},penalties:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
+  const s = {quali:{},mid:{},top:{},streams:{},forfeits:{},bracket:{slots:Array(16).fill(null),scores:{r0:{},r1:{},r2:{},r3:{}},players:{r0:{},r1:{},r2:{},r3:{}}}};
   for(const g in QUALI_GROUPS) s.quali[g] = {slots:[...QUALI_GROUPS[g].teams], scores:{}, players:{}};
   for(const g in MID_GROUPS) s.mid[g] = {slots:[...MID_GROUPS[g].fixed, null, null], scores:{}, players:{}};
   for(const g in TOP_GROUPS) s.top[g] = {slots:[...TOP_GROUPS[g].teams], scores:{}, players:{}};
@@ -857,14 +853,9 @@ function computeStandings(slots, scores){
     rows[j].pf+=aa; rows[j].pa+=hh;
     if(hh>aa){ rows[i].w++; rows[j].l++; } else if(aa>hh){ rows[j].w++; rows[i].l++; } else { rows[i].d++; rows[j].d++; }
   });
-  // Standings points, MKWC style: 3 per win, 1 per draw, 0 per loss. An admin penalty is
-  // subtracted from a team's points-for (and thus its differential); it never touches the
-  // encoded match scores, wins/losses, or draws — only the points total used for tie-breaks.
-  const sorted = rows.map((r,idx)=>{
-    const pen = penaltyFor(r.tag);
-    const pf = r.pf - pen;
-    return {...r, pf, penalty:pen, played:r.w+r.d+r.l, pts:r.w*3+r.d, diff:pf-r.pa, slotIdx:idx};
-  }).sort((a,b)=> b.pts-a.pts || b.diff-a.diff || b.pf-a.pf || projectedRank(a.tag)-projectedRank(b.tag));
+  // Standings points, MKWC style: 3 per win, 1 per draw, 0 per loss.
+  const sorted = rows.map((r,idx)=>({...r, played:r.w+r.d+r.l, pts:r.w*3+r.d, diff:r.pf-r.pa, slotIdx:idx}))
+    .sort((a,b)=> b.pts-a.pts || b.diff-a.diff || b.pf-a.pf || projectedRank(a.tag)-projectedRank(b.tag));
   const leader = sorted.find(r=>r.tag!=null);
   sorted.forEach(r=>{
     r.gb = (leader && r.tag!=null) ? ((leader.w - r.w) + (r.l - leader.l)) / 2 : null;
@@ -892,7 +883,7 @@ function renderGroupCard(title, groupObj, qualifyCount, hint, anchorId){
     const posClass = i===0 ? 'pos p1' : 'pos';
     rows += `<tr class="${isQ?'qualified':''}">
       <td class="${posClass}">P${i+1}</td>
-      <td><div class="teamcell">${r.tag? teamLinkHTML(r.tag) : tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}${r.penalty>0?`<span class="penalty-badge" title="${t('penaltyTip').replace('{n}', r.penalty)}">−${r.penalty}</span>`:''}</div></td>
+      <td><div class="teamcell">${r.tag? teamLinkHTML(r.tag) : tbdEl()+`<span class="tbdname">${t('tbd')}</span>`}</div></td>
       <td class="num">${r.played}</td>
       <td class="num col-w">${r.w}</td>
       <td class="num col-d">${r.d}</td>
@@ -1405,8 +1396,6 @@ function streamLinkFor(ref){
 // A forfeited match is stored in STATE.forfeits[matchRef] as the losing side ('H'|'A'),
 // or 'B' for a double forfeit (both teams out, 0-0).
 function forfeitSideFor(ref){ const v = STATE.forfeits && STATE.forfeits[ref]; return (v==='H'||v==='A'||v==='B') ? v : null; }
-// An admin penalty (in match points) subtracted from a team's points-for in the standings.
-function penaltyFor(tag){ const v = STATE.penalties && STATE.penalties[tag]; const n = Number(v); return (tag && isFinite(n) && n>0) ? n : 0; }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a single group match (12 races) ~ an hour
 const SERIES_DURATION_MS = 3 * 60 * 60 * 1000; // a bracket BO3 can run up to ~3 hours
