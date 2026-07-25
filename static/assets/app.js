@@ -2540,6 +2540,31 @@ function teamTier(tag){
   for(const id in STATE.mid){ if(STATE.mid[id].slots.includes(tag)) return 'middle'; }
   return 'lower';
 }
+// How far a team got in the bracket, as a rank where SMALLER = better:
+//   0 champion · 1 finalist · 2 semi-finalist · 3 quarter-finalist · 4 round-of-16
+// A team still alive is ranked by the furthest round it has reached (so it sorts above teams
+// already knocked out earlier). Returns Infinity for teams that aren't in the bracket at all.
+function bracketProgressRank(tag){
+  if(tag==null) return Infinity;
+  const slots = (STATE.bracket && STATE.bracket.slots) || [];
+  if(!slots.includes(tag)) return Infinity;
+  const { rounds } = deriveBracketRounds();
+  // rounds[0]=R16 field(16), [1]=QF field(8), [2]=SF field(4), [3]=final field(2).
+  // The champion is the winner of the final (round 3).
+  let champion = null;
+  if(rounds[3] && rounds[3][0]!=null && rounds[3][1]!=null){
+    const res = seriesResult(3, bracketGames(3, 0).gameScores);
+    if(res.decided) champion = res.winnerSide==='H' ? rounds[3][0] : rounds[3][1];
+  }
+  if(champion===tag) return 0;
+  // Otherwise: the deepest round the team appears in. rounds index → progress rank:
+  //   appears in final field (idx 3) but not champion → finalist (1)
+  //   appears in SF field (idx 2) but not beyond → semi-finalist (2), etc.
+  const RANK_FOR_DEEPEST = {3:1, 2:2, 1:3, 0:4}; // deepest round index → progress rank
+  let deepest = 0;
+  for(let r=0;r<rounds.length;r++){ if(rounds[r] && rounds[r].includes(tag)) deepest = r; }
+  return RANK_FOR_DEEPEST[deepest];
+}
 // A team's rank within its own group (1 = first, 2 = second, …), from that group's
 // standings. Returns 99 if the team isn't in any group. Used to rank the team-stats
 // table by group position (all group winners, then all runners-up, …).
@@ -2932,6 +2957,11 @@ function renderPlayersView(){
   } else {
     const TIER_ORDER = {higher:0, middle:1, lower:2};
     function compareTeams(a, b){
+      // Bracket progress comes first: qualified teams are ranked by how far they got
+      // (champion, finalist, semis, quarters, round-of-16), all above non-qualified teams.
+      const brDiff = bracketProgressRank(a.tag) - bracketProgressRank(b.tag);
+      if(brDiff !== 0) return brDiff;
+
       // Tier is the top-level split and always wins: the eight top-group teams (A/B)
       // stay above the group-stage teams (1-4), which stay above the rest. They never
       // played each other, so their results aren't comparable across tiers.
