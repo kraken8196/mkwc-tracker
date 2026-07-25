@@ -173,6 +173,7 @@ const I18N = {
     tipBalance:'Répartition des points entre les joueurs alignés sur un match, en moyenne sur les matchs de l\'équipe. Plus c\'est bas, plus les points sont partagés équitablement.',
     tipRacesPlayed:'Nombre de courses jouées par circuit.', tipGB:'Points marqués par l\'équipe dans le groupe.',
     clickPlayerForTracks:'Clique sur un joueur pour voir son détail par circuit.', trackStatsPending:'⏳ Les statistiques circuit par circuit arriveront bientôt, une fois les scores de chaque course encodés.', teamTracksTitle:'Circuits joués par l\'équipe', watchLiveTwitch:'Ce match est en direct sur Twitch — regarder maintenant', watchLive:'Ce match est en direct — regarder maintenant', liveNoStream:'Ce match est en cours — aucun stream disponible', forfeitBadge:'Forfait', forfeitNote:'Match remporté par forfait (150–0), non joué.', forfeitNoteDouble:'Double forfait (0–0) : les deux équipes ont déclaré forfait, match non joué.',
+    teamPenalty:'Pénalité : −{n} pts',
     adminSubLabel:'Remplaçant', adminSubFromLabel:'Depuis course #', subTag:'remplaçant', thanksText:'Un grand merci au staff du tournoi pour l\'organisation et la gestion des données ! Le MKWC est organisé via <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plateforme communautaire gratuite qui gère les tournois Mario Kart.',
     homeFactTeams:'Équipes', homeFactMatches:'Matchs joués', homeFactGroups:'Groupes au total', homeFactBracketTeams:'Places en bracket',
     homeExploreTitle:'Explorer le site',
@@ -246,6 +247,7 @@ const I18N = {
     tipBalance:'How evenly the players fielded in a match share the points, averaged over the team\'s matches. Lower means more evenly shared.',
     tipRacesPlayed:'Number of races played per track.', tipGB:'Points scored by the team in the group.',
     clickPlayerForTracks:'Click a player to see their track-by-track breakdown.', trackStatsPending:'⏳ Track-by-track stats are coming soon, once each race score has been entered.', teamTracksTitle:'Tracks played by the team', watchLiveTwitch:'This match is live on Twitch — watch now', watchLive:'This match is live — watch now', liveNoStream:'This match is live — no stream available', forfeitBadge:'Forfeit', forfeitNote:'Won by forfeit (150–0), not played.', forfeitNoteDouble:'Double forfeit (0–0): both teams forfeited, match not played.',
+    teamPenalty:'Penalty: −{n} pts',
     adminSubLabel:'Substitute', adminSubFromLabel:'From race #', subTag:'substitute', thanksText:'A big thank you to the tournament staff for the organization and data! MKWC is run through <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, the free community platform that manages Mario Kart tournaments.',
     homeFactTeams:'Teams', homeFactMatches:'Matches played', homeFactGroups:'Groups total', homeFactBracketTeams:'Bracket spots',
     homeExploreTitle:'Explore the site',
@@ -319,6 +321,7 @@ const I18N = {
     tipBalance:'Cómo reparten los puntos los jugadores alineados en un partido, en promedio sobre los partidos del equipo. Cuanto más bajo, más equilibrado.',
     tipRacesPlayed:'Número de carreras jugadas por circuito.', tipGB:'Puntos anotados por el equipo en el grupo.',
     clickPlayerForTracks:'Haz clic en un jugador para ver su detalle por circuito.', trackStatsPending:'⏳ Las estadísticas circuito por circuito llegarán pronto, una vez introducida la puntuación de cada carrera.', teamTracksTitle:'Circuitos jugados por el equipo', watchLiveTwitch:'Este partido está en directo en Twitch — verlo ahora', watchLive:'Este partido está en directo — verlo ahora', liveNoStream:'Este partido está en directo — no hay stream disponible', forfeitBadge:'Abandono', forfeitNote:'Ganado por abandono (150–0), no jugado.', forfeitNoteDouble:'Doble abandono (0–0): ambos equipos abandonaron, partido no jugado.',
+    teamPenalty:'Sanción: −{n} pts',
     adminSubLabel:'Suplente', adminSubFromLabel:'Desde carrera #', subTag:'suplente', thanksText:'¡Un gran agradecimiento al staff del torneo por la organización y los datos! El MKWC se organiza a través de <a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>, la plataforma comunitaria gratuita que gestiona los torneos de Mario Kart.',
     homeFactTeams:'Equipos', homeFactMatches:'Partidos jugados', homeFactGroups:'Grupos en total', homeFactBracketTeams:'Plazas en el bracket',
     homeExploreTitle:'Explorar el sitio',
@@ -392,6 +395,7 @@ const I18N = {
     tipBalance:'各試合に出場した選手間のポイント配分の均等さ（チームの試合平均）。小さいほど均等。',
     tipRacesPlayed:'コースごとの走行レース数。', tipGB:'グループでチームが獲得したポイント。',
     clickPlayerForTracks:'選手をクリックするとコース別の詳細が見られます。', trackStatsPending:'⏳ コースごとの統計は、各レースのスコア入力後まもなく表示されます。', teamTracksTitle:'チームが走行したコース', watchLiveTwitch:'この試合はTwitchでライブ配信中 — 今すぐ見る', watchLive:'この試合はライブ配信中 — 今すぐ見る', liveNoStream:'この試合はライブ中です — 配信はありません', forfeitBadge:'棄権', forfeitNote:'棄権により勝利（150–0）、試合は行われていません。', forfeitNoteDouble:'両チーム棄権（0–0）：試合は行われていません。',
+    teamPenalty:'ペナルティ：−{n}点',
     adminSubLabel:'交代選手', adminSubFromLabel:'何レース目から', subTag:'交代', thanksText:'大会の運営とデータ管理をしてくださるスタッフの皆さんに感謝します！MKWCは、マリオカートの大会を運営する無料のコミュニティプラットフォーム<a href="https://mkcentral.com" target="_blank" rel="noopener noreferrer">MKCentral</a>を通じて開催されています。',
     homeFactTeams:'チーム数', homeFactMatches:'消化試合数', homeFactGroups:'総グループ数', homeFactBracketTeams:'決勝T出場枠',
     homeExploreTitle:'サイトを見る',
@@ -1422,6 +1426,27 @@ function penalisedScore(ref, sc){
   if(p.side==='H') h = Math.max(0, h - p.points);
   else a = Math.max(0, a - p.points);
   return [String(h), String(a)];
+}
+// Total penalty points charged to a team across all its matches/games. Each penalty ref names
+// a match (group) or game (bracket, "b|r|m|gi"); we resolve that match's two teams and add the
+// points if the penalised side is this team. Used to show a team's total penalty in its header.
+function teamPenaltyTotal(tag){
+  if(!tag || !STATE.penalties) return 0;
+  let total = 0;
+  for(const ref in STATE.penalties){
+    const p = STATE.penalties[ref];
+    if(!p || !(p.side==='H'||p.side==='A')) continue;
+    const n = Number(p.points);
+    if(!(isFinite(n) && n>0)) continue;
+    // Resolve the match ref (a bracket game ref drops its trailing game index).
+    let matchRef = ref;
+    if(ref.startsWith('b|')){ const parts = ref.split('|'); if(parts.length>=4) matchRef = parts.slice(0,3).join('|'); }
+    const md = parseMatchRef(matchRef);
+    if(!md) continue;
+    const penalisedTag = p.side==='H' ? md.h : md.a;
+    if(penalisedTag === tag) total += n;
+  }
+  return total;
 }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a single group match (12 races) ~ an hour
@@ -2701,6 +2726,7 @@ function renderTeamDetail(tag){
       <div class="tdp-header">
         ${flagEl(tag,'lg')}
         <h2 class="outline">${teamFullName(tag)}</h2>
+        ${teamPenaltyTotal(tag)>0 ? `<span class="team-penalty-badge">${t('teamPenalty').replace('{n}', teamPenaltyTotal(tag))}</span>` : ''}
       </div>
       <div class="stat-strip">
         ${statTile('statMatches','tipMatches', stats.played)}
