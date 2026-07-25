@@ -1017,7 +1017,7 @@ function parseMatchRef(ref){
     // A single representative `players` object keeps legacy callers happy (first game).
     const pl = (games[0] && games[0].players) || emptyMatchPlayers();
     const iso = BRACKET_TIMES[`b|${round}|${idx}`] || null;
-    return {h, a, sc, players:pl, series:{ round, games, res }, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date: iso ? formatScheduledLocal(iso) : ROUND_DATES_F()[round], anchor:null, rawIso: iso};
+    return {h, a, sc, players:pl, series:{ round, match:idx, games, res }, stage:`${t('stageBracket')} · ${ROUND_NAMES_F()[round]}`, date: iso ? formatScheduledLocal(iso) : ROUND_DATES_F()[round], anchor:null, rawIso: iso};
   }
   return null;
 }
@@ -1095,9 +1095,12 @@ function raceProgressChartHTML(playersH, playersA, teamH, teamA){
     </div>
   </div>`;
 }
-function playerListHTML(entries, teamTag){
+function playerListHTML(entries, teamTag, penaltyRef, side){
   const filled = entries.filter(p=>p.n);
   if(!filled.length) return '';
+  // Show this team's penalty for THIS match/game, if any, next to its name in the table header.
+  const pen = penaltyRef ? penaltyForMatch(penaltyRef) : null;
+  const penaltyLabel = (pen && pen.side===side) ? `<span class="pl-penalty">${t('teamPenalty').replace('{n}', pen.points)}</span>` : '';
   const rows = [];
   filled.forEach(p=>{
     if(playerRacesFilled(p)){
@@ -1116,7 +1119,7 @@ function playerListHTML(entries, teamTag){
   rows.sort((a,b)=> b.score-a.score);
   return `<div class="stats-table-wrap">
     <table class="stats-table">
-      <thead><tr><th colspan="2">${teamPlainHTML(teamTag)}</th></tr></thead>
+      <thead><tr><th colspan="2"><span class="pl-head">${teamPlainHTML(teamTag)}${penaltyLabel}</span></th></tr></thead>
       <tbody>
         ${rows.map(r=>`<tr><td class="lname">${r.name}${r.isSub?` <span class="sub-tag">(${t('subTag')})</span>`:''}</td><td class="num highlight">${r.hasData?r.score:'—'}</td></tr>`).join('')}
       </tbody>
@@ -1161,17 +1164,18 @@ function renderMatchDetail(ref){
           ${played? `<span class="mdt-score ${aWin?'score-win':'score-lose'}">${sc[1]}</span>` : ''}
         </div>
       </div>
-      ${series ? seriesGamesDetailHTML(series, h, a) : oneMatchDetailHTML(players, h, a)}
+      ${series ? seriesGamesDetailHTML(series, h, a) : oneMatchDetailHTML(players, h, a, ref)}
     </div>
   `;
   wireMatchDetailEvents();
 }
 // Detail block for a single (non-series) match: player lists, progress chart, race table.
-function oneMatchDetailHTML(players, h, a){
+// penaltyRef (when given) is the match/game ref used to show each team's penalty in its header.
+function oneMatchDetailHTML(players, h, a, penaltyRef){
   if(!(players.h.some(p=>p.n) || players.a.some(p=>p.n))) return '';
   return `<div class="match-detail-players-row">
-        <div class="mdp-col">${playerListHTML(players.h, h)}</div>
-        <div class="mdp-col">${playerListHTML(players.a, a)}</div>
+        <div class="mdp-col">${playerListHTML(players.h, h, penaltyRef, 'H')}</div>
+        <div class="mdp-col">${playerListHTML(players.a, a, penaltyRef, 'A')}</div>
       </div>
       ${raceProgressChartHTML(players.h, players.a, h, a)}
       ${anyRaceEntered(players.h, players.a)
@@ -1193,7 +1197,7 @@ function seriesGamesDetailHTML(series, h, a){
         <span class="series-game-label">${t('gameLabel').replace('{n}', gi+1)}</span>
         ${scored ? `<span class="series-game-score"><span class="${gHwin?'score-win':'score-lose'}">${g.sc[0]}</span><span class="sg-dash">–</span><span class="${gAwin?'score-win':'score-lose'}">${g.sc[1]}</span></span>` : ''}
       </div>
-      ${oneMatchDetailHTML(pl, h, a)}
+      ${oneMatchDetailHTML(pl, h, a, `b|${series.round}|${series.match}|${gi}`)}
     </div>`);
   });
   return out.join('');
@@ -1426,27 +1430,6 @@ function penalisedScore(ref, sc){
   if(p.side==='H') h = Math.max(0, h - p.points);
   else a = Math.max(0, a - p.points);
   return [String(h), String(a)];
-}
-// Total penalty points charged to a team across all its matches/games. Each penalty ref names
-// a match (group) or game (bracket, "b|r|m|gi"); we resolve that match's two teams and add the
-// points if the penalised side is this team. Used to show a team's total penalty in its header.
-function teamPenaltyTotal(tag){
-  if(!tag || !STATE.penalties) return 0;
-  let total = 0;
-  for(const ref in STATE.penalties){
-    const p = STATE.penalties[ref];
-    if(!p || !(p.side==='H'||p.side==='A')) continue;
-    const n = Number(p.points);
-    if(!(isFinite(n) && n>0)) continue;
-    // Resolve the match ref (a bracket game ref drops its trailing game index).
-    let matchRef = ref;
-    if(ref.startsWith('b|')){ const parts = ref.split('|'); if(parts.length>=4) matchRef = parts.slice(0,3).join('|'); }
-    const md = parseMatchRef(matchRef);
-    if(!md) continue;
-    const penalisedTag = p.side==='H' ? md.h : md.a;
-    if(penalisedTag === tag) total += n;
-  }
-  return total;
 }
 
 const MATCH_DURATION_MS = 60 * 60 * 1000; // a single group match (12 races) ~ an hour
@@ -2726,7 +2709,6 @@ function renderTeamDetail(tag){
       <div class="tdp-header">
         ${flagEl(tag,'lg')}
         <h2 class="outline">${teamFullName(tag)}</h2>
-        ${teamPenaltyTotal(tag)>0 ? `<span class="team-penalty-badge">${t('teamPenalty').replace('{n}', teamPenaltyTotal(tag))}</span>` : ''}
       </div>
       <div class="stat-strip">
         ${statTile('statMatches','tipMatches', stats.played)}

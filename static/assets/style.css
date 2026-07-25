@@ -489,11 +489,12 @@
     box-shadow:0 6px 18px rgba(0,0,0,0.25);
   }
   .tdp-header{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
-  .team-penalty-badge{
-    margin-left:auto;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;
-    color:#fff;background:var(--red);border-radius:20px;padding:4px 12px;white-space:nowrap;
+  /* Penalty shown next to a team's name in the match player-table header. */
+  .pl-head{display:flex;align-items:center;gap:8px;width:100%;}
+  .pl-penalty{
+    margin-left:auto;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    color:#fff;background:var(--red);border-radius:20px;padding:2px 9px;white-space:nowrap;
   }
-  @media(max-width:480px){.team-penalty-badge{font-size:11px;padding:3px 9px;}}
   .match-detail-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;padding:20px 0;}
   .match-detail-team{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:160px;text-align:center;}
   .match-detail-team .team-link{flex-direction:column;gap:10px;}
