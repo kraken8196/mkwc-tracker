@@ -2249,6 +2249,8 @@ function bracketGames(round, idx){
     gameScores = [rawSc || ['','']];
     gamePlayers = [rawPl || emptyMatchPlayers()];
   }
+  // Apply any per-game penalty (ref "b|round|idx|gi") so it flips that game and the series.
+  gameScores = gameScores.map((s,gi)=> penalisedScore(`b|${round}|${idx}|${gi}`, s));
   return { gameScores, gamePlayers };
 }
 // The list of per-game {h,a,tracks} objects for a cell (each is a match for stats).
@@ -4864,6 +4866,7 @@ function renderAdminView(){
               <span class="amr-total" id="btotal-${bkey}-1">${totalA}</span>
               <span class="team-select" style="text-align:right;">${a?teamName(a):'—'}</span>
             </div>
+            ${penaltyRowHTML(`b|${r}|${m}|${gi}`, h, a, disabled)}
             ${trackSelectorRowHTML(bkey, pl.tracks, disabled, 'bpmatch')}
             ${raceTableHTML(bkey, 0, pl.h, h, disabled, 'bpmatch')}
             ${raceTableHTML(bkey, 1, pl.a, a, disabled, 'bpmatch')}
@@ -5001,6 +5004,15 @@ function renderAdminView(){
       if(url) STATE.streams[ref] = url;
       else delete STATE.streams[ref]; // empty = no stream, keep STATE.streams tidy
     });
+    // Match penalties (group matches OR bracket games): read each penalty row in the DOM.
+    if(!STATE.penalties || typeof STATE.penalties !== 'object') STATE.penalties = {};
+    el.querySelectorAll('[data-penalty-ref]').forEach(rowEl=>{
+      const penRef = rowEl.dataset.penaltyRef;
+      const side = rowEl.querySelector('[data-penalty-side]').value;
+      const pts = Number(rowEl.querySelector('[data-penalty-points]').value);
+      if((side==='H'||side==='A') && isFinite(pts) && pts>0) STATE.penalties[penRef] = {side, points:pts};
+      else delete STATE.penalties[penRef]; // no side or 0 points = no penalty
+    });
     if(adminSection==='mid'){
       el.querySelectorAll('[data-slot]').forEach(sel=>{
         const idx = Number(sel.dataset.slot);
@@ -5015,15 +5027,6 @@ function renderAdminView(){
     }
     if(adminSection==='quali' || adminSection==='top' || adminSection==='mid'){
       const stateGroup = adminSection==='quali'?STATE.quali[adminGroup]:(adminSection==='top'?STATE.top[adminGroup]:STATE.mid[adminGroup]);
-      // Match penalties: read each match's penalty row (side + points).
-      if(!STATE.penalties || typeof STATE.penalties !== 'object') STATE.penalties = {};
-      el.querySelectorAll('[data-penalty-ref]').forEach(rowEl=>{
-        const penRef = rowEl.dataset.penaltyRef;
-        const side = rowEl.querySelector('[data-penalty-side]').value;
-        const pts = Number(rowEl.querySelector('[data-penalty-points]').value);
-        if((side==='H'||side==='A') && isFinite(pts) && pts>0) STATE.penalties[penRef] = {side, points:pts};
-        else delete STATE.penalties[penRef]; // no side or 0 points = no penalty
-      });
       el.querySelectorAll('[data-pmatch]').forEach(field=>{
         const key = field.dataset.pmatch, side = Number(field.dataset.pside), pidx = Number(field.dataset.pidx);
         if(!stateGroup.players[key]) stateGroup.players[key] = emptyMatchPlayers();

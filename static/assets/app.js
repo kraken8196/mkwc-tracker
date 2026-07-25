@@ -931,6 +931,8 @@ function bracketGames(round, idx){
     gameScores = [rawSc || ['','']];
     gamePlayers = [rawPl || emptyMatchPlayers()];
   }
+  // Apply any per-game penalty (ref "b|round|idx|gi") so it flips that game and the series.
+  gameScores = gameScores.map((s,gi)=> penalisedScore(`b|${round}|${idx}|${gi}`, s));
   return { gameScores, gamePlayers };
 }
 // The list of per-game {h,a,tracks} objects for a cell (each is a match for stats).
