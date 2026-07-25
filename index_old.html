@@ -3176,9 +3176,12 @@ function nutshellTeasersHTML(){
 function renderHomeView(){
   const el = document.getElementById('view-home');
   const items = getAllMatchItems().sort((a,b)=>a.dateOrder-b.dateOrder);
-  const upcoming = items.filter(it=>!isPlayed(it.sc)).slice(0,6);
-  const recent = items.filter(it=>isPlayed(it.sc)).slice(-6).reverse();
-  const matchesPlayed = items.filter(it=>isPlayed(it.sc)).length;
+  // A match counts as complete only when its result is final: a bracket series must be decided
+  // (2-0 or 2-1), not just have its first game played (which shows as a 1-0 series score).
+  const isComplete = it => isPlayed(it.sc) && !it.seriesUndecided;
+  const upcoming = items.filter(it=>!isComplete(it)).slice(0,6);
+  const recent = items.filter(isComplete).slice(-6).reverse();
+  const matchesPlayed = items.filter(isComplete).length;
   const totalMatches = getTotalMatchCount();
   const pct = totalMatches ? Math.round((matchesPlayed/totalMatches)*100) : 0;
   const status = getTournamentPhaseStatus();
