@@ -204,7 +204,7 @@ const I18N = {
     roster:'Effectif', searchPlaceholder:'Rechercher un joueur ou une équipe...', showMore:'Voir plus', searchNoResult:'Aucun joueur trouvé.',
     playersNote:'Classement par indice (colonne « Indice ») : le score moyen par match, ajusté selon le nombre de matchs joués. La colonne « Moyenne » affiche le vrai score moyen.', playersEmpty:"Aucune donnée pour l'instant — les scores se rempliront au fil des matchs.",
     tabPlayers:'Joueurs', tabTeamsStats:'Équipes', colPlayer:'Joueur', colWarsPlayed:'Matchs joués', colWinPct:'% Victoires', colAvg:'Moyenne',
-    searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Classement des équipes selon leur progression dans le bracket (championne, finaliste, demies, quarts, huitièmes), puis par différentiel de la phase atteinte : manches gagnées puis points pour les équipes du bracket, différentiel de points de groupe pour les autres.",
+    searchTeamPlaceholder:'Rechercher une équipe...', teamsStatsNote:"Trois blocs, du meilleur au moins bon : les équipes qualifiées pour le bracket (classées par le stade atteint — championne, finaliste, demies, quarts, huitièmes — puis par leur différentiel dans le bracket : manches gagnées puis points) ; les équipes éliminées en phase de groupes (classées par leur position dans leur groupe, puis par le différentiel de points de cette phase) ; et les équipes éliminées au play-in (classées par leur position dans leur groupe de play-in, puis par le différentiel de points du play-in).",
     dateQualiFull:'10–12 JUILLET', datePhaseFull:'17–19 JUILLET', dateBracketFull:'24 JUIL – 2 AOÛT',
     footer:'Projet de suivi communautaire, non affilié à Nintendo. Les données sont saisies manuellement et visibles par toute personne ayant ce lien.',
   },
@@ -278,7 +278,7 @@ const I18N = {
     roster:'Roster', searchPlaceholder:'Search for a player or team...', showMore:'Show more', searchNoResult:'No player found.',
     playersNote:'Ranked by rating (the "Rating" column): the average score per match, adjusted for the number of matches played. The "Average" column shows the real average score.', playersEmpty:'No data yet — scores will fill in as matches are played.',
     tabPlayers:'Players', tabTeamsStats:'Teams', colPlayer:'Player', colWarsPlayed:'Matches played', colWinPct:'Win %', colAvg:'Average',
-    searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Teams ranked by how far they got in the bracket (champion, finalist, semis, quarters, round of 16), then by the differential of the phase reached: games won then points for bracket teams, group point differential for the rest.',
+    searchTeamPlaceholder:'Search for a team...', teamsStatsNote:'Three blocs, best to worst: teams that reached the bracket (ranked by how far they got — champion, finalist, semis, quarters, round of 16 — then by their bracket differential: games won then points); teams eliminated in the group phase (ranked by their group position, then that phase’s point differential); and teams eliminated in the play-in (ranked by their play-in group position, then the play-in point differential).',
     dateQualiFull:'JUL 10–12', datePhaseFull:'JUL 17–19', dateBracketFull:'JUL 24 – AUG 2',
     footer:"Community tracking project, not affiliated with Nintendo. Data is entered manually and visible to anyone with this link.",
   },
@@ -352,7 +352,7 @@ const I18N = {
     roster:'Plantilla', searchPlaceholder:'Buscar un jugador o equipo...', showMore:'Ver más', searchNoResult:'Ningún jugador encontrado.',
     playersNote:'Clasificación por índice (columna «Índice»): la puntuación media por partido, ajustada según el número de partidos jugados. La columna «Media» muestra la puntuación media real.', playersEmpty:'Todavía no hay datos — las puntuaciones se irán completando con los partidos.',
     tabPlayers:'Jugadores', tabTeamsStats:'Equipos', colPlayer:'Jugador', colWarsPlayed:'Partidos jugados', colWinPct:'% Victorias', colAvg:'Media',
-    searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Equipos clasificados según su avance en el bracket (campeón, finalista, semis, cuartos, octavos), luego por la diferencia de la fase alcanzada: mangas ganadas y después puntos para los equipos del bracket, diferencia de puntos de grupo para los demás.',
+    searchTeamPlaceholder:'Buscar un equipo...', teamsStatsNote:'Tres bloques, de mejor a peor: los equipos que llegaron al bracket (ordenados por hasta dónde llegaron — campeón, finalista, semis, cuartos, octavos — y luego por su diferencia en el bracket: mangas ganadas y después puntos); los equipos eliminados en la fase de grupos (ordenados por su posición en el grupo y luego por la diferencia de puntos de esa fase); y los equipos eliminados en el play-in (ordenados por su posición en el grupo de play-in y luego por la diferencia de puntos del play-in).',
     dateQualiFull:'10–12 JUL', datePhaseFull:'17–19 JUL', dateBracketFull:'24 JUL – 2 AGO',
     footer:'Proyecto de seguimiento comunitario, no afiliado a Nintendo. Los datos se introducen manualmente y son visibles para cualquiera que tenga este enlace.',
   },
@@ -426,7 +426,7 @@ const I18N = {
     roster:'メンバー', searchPlaceholder:'選手名またはチーム名で検索...', showMore:'もっと見る', searchNoResult:'該当する選手がいません。',
     playersNote:'「指数」列によるランキング：1試合あたりの平均得点を試合数に応じて調整した値です。「平均」列には実際の平均得点を表示しています。', playersEmpty:'まだデータがありません — 試合が進むとスコアが表示されます。',
     tabPlayers:'選手', tabTeamsStats:'チーム', colPlayer:'選手', colWarsPlayed:'試合数', colWinPct:'勝率', colAvg:'平均',
-    searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'ブラケットでの進出度（優勝、準優勝、ベスト4、ベスト8、ベスト16）で順位付けし、次に到達フェーズの差で並べます：ブラケット出場チームは獲得マッチ数、次に得点差、その他はグループの得失点差。',
+    searchTeamPlaceholder:'チームを検索...', teamsStatsNote:'上位から3つのブロックに分けています。まずブラケット進出チーム（優勝・準優勝・ベスト4・ベスト8・ベスト16という到達段階順、同段階内はブラケットでの成績＝獲得マッチ数、次に得点差）。次にグループステージ敗退チーム（グループ内順位順、同順位はそのフェーズの得失点差）。最後にプレーイン敗退チーム（プレーイングループ内順位順、同順位はプレーインの得失点差）。',
     dateQualiFull:'7月10〜12日', datePhaseFull:'7月17〜19日', dateBracketFull:'7月24日〜8月2日',
     footer:'非公式のコミュニティ運営プロジェクトです（任天堂とは無関係）。データは手動で入力されており、このリンクを持つ全員に表示されます。',
   },
@@ -2602,17 +2602,33 @@ function bracketDiffs(tag){
 // standings. Returns 99 if the team isn't in any group. Used to rank the team-stats
 // table by group position (all group winners, then all runners-up, …).
 function groupPositionFor(tag){
-  const search = groupsObj => {
+  const ctx = groupPhaseContext(tag);
+  return ctx ? ctx.pos : 99;
+}
+// The context used to rank a NON-bracket team: the furthest group phase it reached
+// (top group > mid group > play-in/quali), giving:
+//   phase = 1 for a group-stage exit (top/mid), 2 for a play-in exit (quali only)
+//           → smaller sorts higher, so all group-stage teams sit above play-in teams.
+//   pos   = its finishing position in that group (1,2,3,4)  — from computeStandings.
+//   diff  = its point differential in THAT phase only (pf − pa within the group).
+// Returns null if the team isn't in any group phase at all.
+function groupPhaseContext(tag){
+  const find = (groupsObj, refPrefix) => {
     for(const id in groupsObj){
       const g = groupsObj[id];
       if(!g.slots.includes(tag)) continue;
-      const standings = computeStandings(g.slots, g.scores);
-      const pos = standings.findIndex(r=>r.tag===tag);
-      return pos>=0 ? pos+1 : 99;
+      const standings = computeStandings(g.slots, g.scores, refPrefix);
+      const row = standings.find(r=>r.tag===tag);
+      const pos = standings.findIndex(r=>r.tag===tag)+1;
+      return { pos: pos>0?pos:99, diff: row ? row.diff : 0 };
     }
     return null;
   };
-  return search(STATE.top) ?? search(STATE.mid) ?? 99;
+  // Furthest phase first: a team that played both quali and mid is ranked on its mid run.
+  const top = find(STATE.top, 'top');   if(top) return { phase:1, ...top };
+  const mid = find(STATE.mid, 'mid');   if(mid) return { phase:1, ...mid };
+  const qua = find(STATE.quali, 'quali'); if(qua) return { phase:2, ...qua };
+  return null;
 }
 // kept for compatibility with any leftover callers — now backed by the same data
 function getMvpCounts(){
@@ -2989,19 +3005,34 @@ function renderPlayersView(){
     }
   } else {
     const bracketSlots = (STATE.bracket && STATE.bracket.slots) || [];
+    // Which of the three ranking blocs a team belongs to (smaller = higher in the table):
+    //   0 = reached the bracket
+    //   1 = eliminated in the group phase (top/mid)
+    //   2 = eliminated in the play-in (quali only)
+    const blocOf = tag => {
+      if(bracketSlots.includes(tag)) return 0;
+      const ctx = groupPhaseContext(tag);
+      return ctx ? ctx.phase : 3; // ctx.phase is 1 (group) or 2 (play-in); 3 = no phase at all
+    };
     function compareTeams(a, b){
-      // First: how far each team got in the bracket (round winners above round losers).
-      const brDiff = bracketProgressRank(a.tag) - bracketProgressRank(b.tag);
-      if(brDiff !== 0) return brDiff;
-      // Tie-break within the same level, using ONLY the phase they reached:
-      //  - both in the bracket → their bracket differential (games won first, then points)
-      //  - otherwise → their group point differential
-      const aIn = bracketSlots.includes(a.tag), bIn = bracketSlots.includes(b.tag);
-      if(aIn && bIn){
+      // 1) Bloc: bracket teams, then group-phase exits, then play-in exits.
+      const blocA = blocOf(a.tag), blocB = blocOf(b.tag);
+      if(blocA !== blocB) return blocA - blocB;
+      // 2) Within the BRACKET bloc: by furthest round reached, then bracket differential
+      //    (games won − lost first, then points), using ONLY bracket-phase results.
+      if(blocA === 0){
+        const brDiff = bracketProgressRank(a.tag) - bracketProgressRank(b.tag);
+        if(brDiff !== 0) return brDiff;
         const da = bracketDiffs(a.tag), db = bracketDiffs(b.tag);
         return (db.games-da.games) || (db.points-da.points) || projectedRank(a.tag)-projectedRank(b.tag);
       }
-      return (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
+      // 3) Within a GROUP bloc (group exit or play-in exit): by group position
+      //    (all 3rds above all 4ths, …), then by that phase's point differential only.
+      const ca = groupPhaseContext(a.tag), cb = groupPhaseContext(b.tag);
+      if(ca && cb){
+        return (ca.pos - cb.pos) || (cb.diff - ca.diff) || projectedRank(a.tag)-projectedRank(b.tag);
+      }
+      return projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;

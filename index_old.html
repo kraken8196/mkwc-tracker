@@ -3823,17 +3823,31 @@ function bracketDiffs(tag){
 }
 // A team's rank within its own group (1 = first, …); 99 if not in any group.
 function groupPositionFor(tag){
-  const search = groupsObj => {
+  const ctx = groupPhaseContext(tag);
+  return ctx ? ctx.pos : 99;
+}
+// The context used to rank a NON-bracket team: the furthest group phase it reached
+// (top group > mid group > play-in/quali), giving:
+//   phase = 1 for a group-stage exit (top/mid), 2 for a play-in exit (quali only)
+//   pos   = its finishing position in that group (1,2,3,4) — from computeStandings.
+//   diff  = its point differential in THAT phase only (pf − pa within the group).
+// Returns null if the team isn't in any group phase at all.
+function groupPhaseContext(tag){
+  const find = (groupsObj, refPrefix) => {
     for(const id in groupsObj){
       const g = groupsObj[id];
       if(!g.slots.includes(tag)) continue;
-      const standings = computeStandings(g.slots, g.scores);
-      const pos = standings.findIndex(r=>r.tag===tag);
-      return pos>=0 ? pos+1 : 99;
+      const standings = computeStandings(g.slots, g.scores, refPrefix);
+      const row = standings.find(r=>r.tag===tag);
+      const pos = standings.findIndex(r=>r.tag===tag)+1;
+      return { pos: pos>0?pos:99, diff: row ? row.diff : 0 };
     }
     return null;
   };
-  return search(STATE.top) ?? search(STATE.mid) ?? 99;
+  const top = find(STATE.top, 'top');     if(top) return { phase:1, ...top };
+  const mid = find(STATE.mid, 'mid');     if(mid) return { phase:1, ...mid };
+  const qua = find(STATE.quali, 'quali'); if(qua) return { phase:2, ...qua };
+  return null;
 }
 // kept for compatibility with any leftover callers — now backed by the same data
 function getMvpCounts(){
@@ -4203,18 +4217,30 @@ function renderPlayersView(){
     }
   } else {
     const bracketSlots = (STATE.bracket && STATE.bracket.slots) || [];
+    // Which of the three ranking blocs a team belongs to (smaller = higher in the table):
+    //   0 = reached the bracket · 1 = eliminated in the group phase (top/mid) · 2 = play-in exit (quali only)
+    const blocOf = tag => {
+      if(bracketSlots.includes(tag)) return 0;
+      const ctx = groupPhaseContext(tag);
+      return ctx ? ctx.phase : 3;
+    };
     function compareTeams(a, b){
-      // First: bracket progress (round winners above round losers). Then, within the same level,
-      // by the phase reached: bracket teams by bracket differential (games won, then points);
-      // others by group point differential.
-      const brDiff = bracketProgressRank(a.tag) - bracketProgressRank(b.tag);
-      if(brDiff !== 0) return brDiff;
-      const aIn = bracketSlots.includes(a.tag), bIn = bracketSlots.includes(b.tag);
-      if(aIn && bIn){
+      // 1) Bloc: bracket teams, then group-phase exits, then play-in exits.
+      const blocA = blocOf(a.tag), blocB = blocOf(b.tag);
+      if(blocA !== blocB) return blocA - blocB;
+      // 2) Within the BRACKET bloc: furthest round reached, then bracket differential (games, then points).
+      if(blocA === 0){
+        const brDiff = bracketProgressRank(a.tag) - bracketProgressRank(b.tag);
+        if(brDiff !== 0) return brDiff;
         const da = bracketDiffs(a.tag), db = bracketDiffs(b.tag);
         return (db.games-da.games) || (db.points-da.points) || projectedRank(a.tag)-projectedRank(b.tag);
       }
-      return (b.diff-a.diff) || (b.avg-a.avg) || projectedRank(a.tag)-projectedRank(b.tag);
+      // 3) Within a GROUP bloc (group or play-in exit): by group position, then that phase's differential only.
+      const ca = groupPhaseContext(a.tag), cb = groupPhaseContext(b.tag);
+      if(ca && cb){
+        return (ca.pos - cb.pos) || (cb.diff - ca.diff) || projectedRank(a.tag)-projectedRank(b.tag);
+      }
+      return projectedRank(a.tag)-projectedRank(b.tag);
     }
     const teams = getAllTeamStats().sort(compareTeams);
     html += `<div class="stage-note">${t('teamsStatsNote')}</div>`;
