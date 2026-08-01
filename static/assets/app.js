@@ -531,6 +531,8 @@ const BRACKET_TIMES = {
   // Semi-finals (round 2).
   'b|2|0':'2026-08-01T15:00:00+02:00',   // Spain vs Japan
   'b|2|1':'2026-08-01T17:00:00+02:00',   // USA vs France
+  // Final (round 3).
+  'b|3|0':'2026-08-02T15:00:00+02:00',   // Japan vs France
 };
 function localeForLang(){
   return { fr:'fr-FR', en:'en-US', es:'es-ES', ja:'ja-JP' }[LANG] || 'en-US';
