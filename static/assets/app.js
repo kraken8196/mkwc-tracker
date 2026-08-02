@@ -151,7 +151,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', nextMatches:'Prochains matchs', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes', heroTitleBracketNutshell:'Le bracket en bref', heroSubBracketNutshell:'Récap de la phase finale', heroTitleWrap:'Le tournoi en bref', heroSubWrap:'Bilan du tournoi et pourquoi ce site',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', nextMatches:'Prochains matchs', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -225,7 +225,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', nextMatches:'Next matches', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap', heroTitleBracketNutshell:'The bracket in a nutshell', heroSubBracketNutshell:'Knockout stage recap', heroTitleWrap:'The tournament in a nutshell', heroSubWrap:'Tournament wrap-up and why this site',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', nextMatches:'Next matches', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -299,7 +299,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', nextMatches:'Próximos partidos', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos', heroTitleBracketNutshell:'El bracket en resumen', heroSubBracketNutshell:'Resumen de la fase final', heroTitleWrap:'El torneo en resumen', heroSubWrap:'Balance del torneo y por qué este sitio',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', nextMatches:'Próximos partidos', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -373,7 +373,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', nextMatches:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ', heroTitleBracketNutshell:'ブラケットを振り返る', heroSubBracketNutshell:'決勝トーナメントのまとめ', heroTitleWrap:'大会を振り返る', heroSubWrap:'大会総括と、このサイトを作った理由',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', nextMatches:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -1880,140 +1880,6 @@ function getGroupStageRecap(){
     mostPlayedTrack, decisiveTracks, equaliserTrack, playerTeam, p15
   };
 }
-// The whole knockout is over once the final (round 3) series is decided.
-function bracketDone(){
-  const { rounds } = deriveBracketRounds();
-  if(!(rounds[3] && rounds[3][0]!=null && rounds[3][1]!=null)) return false;
-  return seriesResult(3, bracketGames(3, 0).gameScores).decided;
-}
-// Computes every stat shown in the Bracket recap article, straight from STATE.bracket.
-// A bracket "match" is a whole BO3 series; each individual game inside it is one 12-race
-// contest, so individual/track stats iterate games while match/series stats iterate series.
-function getBracketRecap(){
-  const { rounds } = deriveBracketRounds();
-  const ROUND_KEY = ['r16','qf','sf','final']; // index → round tag for the prose
-  const series = []; // {round, roundKey, H, A, gamesH, gamesA, winner, loser, ptsW, ptsL, aggMargin, wentDeciding, games:[{h,a,tracks,scH,scA}]}
-  for(let r=0;r<4;r++){
-    const field = rounds[r];
-    if(!field) continue;
-    for(let m=0;m<field.length/2;m++){
-      const H = field[2*m], A = field[2*m+1];
-      if(H==null || A==null) continue;
-      const { gameScores } = bracketGames(r, m);
-      const res = seriesResult(r, gameScores);
-      if(!res.decided) continue;
-      const plList = bracketGamePlayersList(r, m);
-      let ptsH=0, ptsA=0; const games=[];
-      gameScores.forEach((s,gi)=>{
-        if(!isPlayed(s)) return;
-        const h=Number(s[0]), a=Number(s[1]);
-        ptsH+=h; ptsA+=a;
-        games.push({ scH:h, scA:a, tracks:(plList[gi]||{}).tracks||[], pl:plList[gi]||{h:[],a:[]} });
-      });
-      const winH = res.winnerSide==='H';
-      series.push({
-        round:r, roundKey:ROUND_KEY[r], H, A,
-        gamesH:res.gamesH, gamesA:res.gamesA,
-        winner: winH?H:A, loser: winH?A:H,
-        gamesW: Math.max(res.gamesH,res.gamesA), gamesL: Math.min(res.gamesH,res.gamesA),
-        ptsW: winH?ptsH:ptsA, ptsL: winH?ptsA:ptsH,
-        aggMargin: Math.abs(ptsH-ptsA),
-        wentDeciding: (res.gamesH+res.gamesA) >= maxGamesFor(r),
-        games
-      });
-    }
-  }
-
-  // --- Per-player / per-track / totals, iterating every GAME of every series ---
-  const praces = {};        // name -> [race scores]
-  const pmatchTotal = {};   // name -> best single-game total
-  const p15 = {};           // name -> count of race wins (15s)
-  const playerTeam = {};    // name -> team tag (last seen)
-  const trackScores = {};   // trackId -> [{n,v}]
-  const trackUses = {};     // trackId -> selections
-  const distinctTracks = new Set();
-  const distinctPlayers = new Set();
-  let racesPlayed = 0, totalPoints = 0, gamesCount = 0;
-  function bump(obj,k,by){ obj[k]=(obj[k]||0)+by; }
-
-  series.forEach(s=>{
-    s.games.forEach(g=>{
-      gamesCount++;
-      (g.tracks||[]).forEach(tid=>{ if(tid){ bump(trackUses,tid,1); distinctTracks.add(tid); } });
-      const raceIdxSeen = new Set();
-      [['h',s.H],['a',s.A]].forEach(([side, teamTag])=>{
-        (g.pl[side]||[]).forEach(p=>{
-          if(!p||!p.n) return;
-          (p.races||[]).forEach((v,i)=>{
-            if(v==='' || v==null) return;
-            const val = Number(v)||0;
-            const owner = raceOwnerName(p,i);
-            praces[owner]=praces[owner]||[]; praces[owner].push(val);
-            playerTeam[owner]=teamTag;
-            if(val===15) bump(p15,owner,1);
-            distinctPlayers.add(teamTag+'|'+owner);
-            const tid = (g.tracks||[])[i];
-            if(tid){ trackScores[tid]=trackScores[tid]||[]; trackScores[tid].push({n:owner,v:val}); }
-            raceIdxSeen.add(i);
-            totalPoints += val;
-          });
-        });
-        (g.pl[side]||[]).forEach(p=>{
-          playerSegments(p).forEach(seg=>{
-            const tot = seg.races.reduce((s2,v)=> s2 + (v!=='' && v!=null ? Number(v) : 0), 0);
-            if(seg.races.some(v=>v!=='' && v!=null)) pmatchTotal[seg.name]=Math.max(pmatchTotal[seg.name]||0, tot);
-          });
-        });
-      });
-      racesPlayed += raceIdxSeen.size;
-    });
-  });
-
-  // --- Champion & final ---
-  const finalSeries = series.find(s=>s.round===3) || null;
-  const champion = finalSeries ? finalSeries.winner : null;
-  const runnerUp = finalSeries ? finalSeries.loser : null;
-
-  // --- Series highlights ---
-  const decidedSeries = series.filter(s=>s.round>=0);
-  // Biggest blow-out: the largest aggregate points margin across a whole series.
-  const blowout = decidedSeries.slice().sort((a,b)=>b.aggMargin-a.aggMargin)[0] || null;
-  // Tightest series: went the full distance (deciding game) with the smallest aggregate margin.
-  const deciders = decidedSeries.filter(s=>s.wentDeciding);
-  const tightest = deciders.slice().sort((a,b)=>a.aggMargin-b.aggMargin)[0] || null;
-  const sweeps = decidedSeries.filter(s=>s.gamesL===0).length;
-  const deciderCount = deciders.length;
-
-  // --- Individual bests (per single game) ---
-  const bestMatch = Object.entries(pmatchTotal).sort((a,b)=>b[1]-a[1])[0] || null;
-  const mostPerfect = Object.entries(p15).sort((a,b)=>b[1]-a[1])[0] || null;
-  const consList = Object.entries(praces).filter(([,rs])=>rs.length>=12)
-    .map(([n,rs])=>[n, stdDev(rs)]).filter(([,sd])=>sd!=null).sort((a,b)=>a[1]-b[1]);
-  const mostConsistent = consList[0] || null;
-
-  // --- Tracks ---
-  const mostPlayedTrack = Object.entries(trackUses).sort((a,b)=>b[1]-a[1])[0] || null;
-  const meanByPlayer = Object.entries(praces).filter(([,rs])=>rs.length>=12)
-    .map(([n,rs])=>[n, rs.reduce((s,v)=>s+v,0)/rs.length]).sort((a,b)=>b[1]-a[1]);
-  const nGood = Math.max(6, Math.round(meanByPlayer.length*0.25));
-  const goodSet = new Set(meanByPlayer.slice(0,nGood).map(([n])=>n));
-  const eliteTrackAvg = Object.entries(trackScores).map(([tid,arr])=>{
-    const vals = arr.filter(x=>goodSet.has(x.n)).map(x=>x.v);
-    return vals.length>=6 ? [tid, vals.reduce((s,v)=>s+v,0)/vals.length] : null;
-  }).filter(Boolean).sort((a,b)=>b[1]-a[1]);
-  const skillTrack = eliteTrackAvg[0] || null;
-  const levellerTrack = eliteTrackAvg.length ? eliteTrackAvg[eliteTrackAvg.length-1] : null;
-
-  return {
-    champion, runnerUp, finalSeries,
-    seriesCount: series.length, gamesCount, racesPlayed, totalPoints,
-    playersPlayed: distinctPlayers.size, distinctTracks: distinctTracks.size,
-    blowout, tightest, sweeps, deciderCount,
-    bestMatch, mostPerfect, mostConsistent,
-    mostPlayedTrack, skillTrack, levellerTrack,
-    playerTeam, p15
-  };
-}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
@@ -2052,7 +1918,6 @@ function nutshellTeaserHTML(navto, eyebrow, title){
 }
 function nutshellTeasersHTML(){
   const cards = [];
-  if(bracketDone()) cards.push(nutshellTeaserHTML('bracketnutshell', ntb('eyebrow'), ntb('title')));
   if(groupStageDone()) cards.push(nutshellTeaserHTML('groupnutshell', ntg('eyebrow'), ntg('title')));
   if(allGroupMatchesPlayed(STATE.quali)) cards.push(nutshellTeaserHTML('nutshell', nt('eyebrow'), nt('title')));
   return cards.join('');
@@ -3457,101 +3322,6 @@ const NUTSHELL_GS_I18N = {
     dyk2:'これだけの波乱を経て、ブラケットは予想以上の盛り上がりになりそうです。全チームの健闘を祈ります——最高のチームに栄光あれ！'
   }
 };
-// Bracket recap article. A "match" here is a whole best-of-3 series. Same <b>/<fig> markup.
-const NUTSHELL_BR_I18N = {
-  fr:{
-    eyebrow:'Récap · Phase finale',
-    title:'Le bracket en bref',
-    standfirst:'Le MKWC 2026 a rendu son verdict. Seize équipes sont entrées dans le grand tableau à élimination directe, chaque tour se jouant au meilleur des trois manches. Retour sur le sacre, les séries marquantes, les exploits individuels et quelques chiffres qui résument cette phase finale.',
-    byline:'Huitièmes · Quarts · Demies · Finale',
-    hChamp:'Le sacre',
-    hSeries:'Les séries marquantes',
-    hIndiv:'Les performances individuelles',
-    hTracks:'Les circuits',
-    hDyk:'Le saviez-vous ?',
-    champion:'Au bout du parcours, c’est <b>{champion}</b> qui soulève le trophée du MKWC 2026. En finale, l’équipe s’impose <b>{gW}–{gL}</b> en manches face {loserAt}, au terme d’une phase à élimination directe où la moindre erreur pouvait tout arrêter.',
-    blowout:'La démonstration la plus nette est à mettre au crédit de <b>{winner}</b>, qui écarte <b>{loser}</b> avec <fig>{margin}</fig> points d’écart cumulés sur la série — le plus large gouffre de tout le bracket.',
-    tightest:'À l’opposé, la série la plus accrochée est allée jusqu’à la manche décisive : <b>{winner}</b> et <b>{loser}</b> n’étaient séparés que de <fig>{margin}</fig> points sur l’ensemble de leur duel, un fil sur lequel s’est joué le résultat.',
-    sweeps:'Sur les <fig>{total}</fig> séries du tableau, <fig>{sweeps}</fig> se sont terminées sur un <b>2–0</b> sans appel, contre seulement <fig>{deciders}</fig> poussées jusqu’à la manche décisive. À ce niveau, quand l’écart de niveau est là, il se voit vite : les BO3 tournent rarement au thriller.',
-    indiv:'Côté joueur·euse·s, <b>{player}</b> ({team}) signe le plus gros match du bracket — <fig>{best}</fig> points sur une seule manche — et a franchi la ligne en tête à <fig>{perfect}</fig> reprises, le plus grand nombre de courses gagnées de la phase.',
-    consistent:'Pour la régularité, <b>{player}</b> ({team}) se distingue comme le·la pilote le·la plus constant·e du plateau : d’une course à l’autre, ses scores restent au plus près de sa moyenne — précieux quand une seule manche peut tout faire basculer.',
-    trackMost:'Parmi les trente circuits du jeu, c’est le <b>{track}</b> qui a eu la faveur des équipes en phase finale, sélectionné <fig>{n}</fig> fois.',
-    trackSkill:'Et comme sur le reste du tournoi, tous les tracés ne se valent pas pour l’élite. C’est sur <b>{skill}</b> que le niveau s’exprime le plus — les meilleur·e·s y marquent <fig>{skillAvg}</fig> points de moyenne par course — tandis que <b>{leveller}</b> a plutôt tendance à rebattre les cartes, avec <fig>{levAvg}</fig> de moyenne.',
-    dyk1:'En tout, le bracket aura réuni <fig>{players}</fig> joueur·euse·s pour <fig>{matches}</fig> séries, <fig>{games}</fig> manches et <fig>{races}</fig> courses disputées — soit <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
-    dyk2:'Et voilà, le MKWC 2026 est terminé. Merci à toutes les équipes pour le spectacle, et rendez-vous pour la prochaine édition !'
-  },
-  en:{
-    eyebrow:'Recap · Knockout Stage',
-    title:'The bracket in a nutshell',
-    standfirst:'MKWC 2026 has crowned its champion. Sixteen teams entered the single-elimination bracket, every round played as a best-of-three. A look back at the title, the standout series, the individual feats and a few numbers that sum up the knockout stage.',
-    byline:'Round of 16 · Quarters · Semis · Final',
-    hChamp:'The title',
-    hSeries:'Standout series',
-    hIndiv:'Individual performances',
-    hTracks:'The tracks',
-    hDyk:'Did you know?',
-    champion:'At the end of the road, <b>{champion}</b> lifts the MKWC 2026 trophy. In the final they won <b>{gW}–{gL}</b> in games over <b>{loser}</b>, capping a single-elimination run where one slip could end it all.',
-    blowout:'The most emphatic statement came from <b>{winner}</b>, who brushed <b>{loser}</b> aside by <fig>{margin}</fig> aggregate points across the series — the widest gap in the whole bracket.',
-    tightest:'At the other end, the tightest series went all the way to a deciding game: <b>{winner}</b> and <b>{loser}</b> were separated by just <fig>{margin}</fig> points across their entire duel, a razor’s edge that settled the tie.',
-    sweeps:'Of the bracket’s <fig>{total}</fig> series, <fig>{sweeps}</fig> ended in a clean <b>2–0</b>, against only <fig>{deciders}</fig> that reached a deciding game. At this level, when the skill gap is there it shows fast: these BO3s rarely turned into thrillers.',
-    indiv:'Among the players, <b>{player}</b> ({team}) posted the biggest single game of the bracket — <fig>{best}</fig> points in one game — and crossed the line first <fig>{perfect}</fig> times, the most race wins of the stage.',
-    consistent:'For consistency, <b>{player}</b> ({team}) stood out as the steadiest racer on the roster: from race to race, their scores stayed closest to their average — priceless when a single game can flip everything.',
-    trackMost:'Of the game’s thirty tracks, the <b>{track}</b> was the teams’ favourite in the knockout stage, picked <fig>{n}</fig> times.',
-    trackSkill:'And as across the rest of the tournament, not all tracks reward the elite equally. It’s on <b>{skill}</b> that skill shows most — the best average <fig>{skillAvg}</fig> points per race there — while <b>{leveller}</b> tends to reshuffle the deck, at <fig>{levAvg}</fig> on average.',
-    dyk1:'All told, the bracket brought <fig>{players}</fig> players together for <fig>{matches}</fig> series, <fig>{games}</fig> games and <fig>{races}</fig> races — <fig>{points}</fig> points scored by all racers combined.',
-    dyk2:'And that’s a wrap: MKWC 2026 is over. Thanks to every team for the show, and see you for the next edition!'
-  },
-  es:{
-    eyebrow:'Resumen · Fase final',
-    title:'El bracket en resumen',
-    standfirst:'El MKWC 2026 ya tiene campeón. Dieciséis equipos entraron en el cuadro de eliminación directa, con cada ronda al mejor de tres. Un repaso al título, las series destacadas, las gestas individuales y algunas cifras que resumen la fase final.',
-    byline:'Octavos · Cuartos · Semis · Final',
-    hChamp:'El título',
-    hSeries:'Series destacadas',
-    hIndiv:'Actuaciones individuales',
-    hTracks:'Los circuitos',
-    hDyk:'¿Sabías que…?',
-    champion:'Al final del camino, <b>{champion}</b> levanta el trofeo del MKWC 2026. En la final se impuso por <b>{gW}–{gL}</b> en mangas a <b>{loser}</b>, cerrando un recorrido a eliminación directa donde un solo error podía acabar con todo.',
-    blowout:'La demostración más rotunda fue de <b>{winner}</b>, que apartó a <b>{loser}</b> por <fig>{margin}</fig> puntos acumulados en la serie: la mayor brecha de todo el bracket.',
-    tightest:'En el otro extremo, la serie más ajustada llegó hasta la manga decisiva: <b>{winner}</b> y <b>{loser}</b> quedaron separados por solo <fig>{margin}</fig> puntos en todo su duelo, un hilo del que dependió el resultado.',
-    sweeps:'De las <fig>{total}</fig> series del cuadro, <fig>{sweeps}</fig> terminaron en un <b>2–0</b> sin discusión, frente a solo <fig>{deciders}</fig> que llegaron a la manga decisiva. A este nivel, cuando hay diferencia de nivel se nota rápido: estos BO3 rara vez fueron un thriller.',
-    indiv:'Entre los jugadores, <b>{player}</b> ({team}) firmó la mejor manga del bracket — <fig>{best}</fig> puntos en una sola — y cruzó la meta en primer lugar <fig>{perfect}</fig> veces, el mayor número de carreras ganadas de la fase.',
-    consistent:'En regularidad, <b>{player}</b> ({team}) fue el piloto más constante del plantel: de una carrera a otra, sus puntuaciones se mantuvieron lo más cerca de su media, algo valiosísimo cuando una sola manga puede cambiarlo todo.',
-    trackMost:'De los treinta circuitos del juego, el <b>{track}</b> fue el favorito de los equipos en la fase final, elegido <fig>{n}</fig> veces.',
-    trackSkill:'Y como en el resto del torneo, no todos los trazados recompensan igual a la élite. Es en <b>{skill}</b> donde más se expresa el nivel — los mejores promedian allí <fig>{skillAvg}</fig> puntos por carrera — mientras que <b>{leveller}</b> tiende a barajar de nuevo las cartas, con <fig>{levAvg}</fig> de media.',
-    dyk1:'En total, el bracket reunió a <fig>{players}</fig> jugadores en <fig>{matches}</fig> series, <fig>{games}</fig> mangas y <fig>{races}</fig> carreras: <fig>{points}</fig> puntos anotados por el conjunto de pilotos.',
-    dyk2:'Y con esto se cierra el MKWC 2026. ¡Gracias a todos los equipos por el espectáculo, y nos vemos en la próxima edición!'
-  },
-  ja:{
-    eyebrow:'まとめ · 決勝トーナメント',
-    title:'ブラケットを振り返る',
-    standfirst:'MKWC 2026の王者が決まりました。16チームがシングルエリミネーションのブラケットに臨み、各ラウンドは3本先取（BO3）で争われました。優勝、注目のシリーズ、個人の活躍、そして決勝トーナメントを総括する数字を振り返ります。',
-    byline:'ベスト16 · 準々決勝 · 準決勝 · 決勝',
-    hChamp:'優勝',
-    hSeries:'注目のシリーズ',
-    hIndiv:'個人の活躍',
-    hTracks:'コース',
-    hDyk:'ご存じですか？',
-    champion:'長い戦いの末、<b>{champion}</b>がMKWC 2026の栄冠を掴みました。決勝では<b>{loser}</b>を<b>{gW}–{gL}</b>（マッチ)で下し、一つのミスがすべてを終わらせかねないトーナメントを制しました。',
-    blowout:'最も圧巻だったのは<b>{winner}</b>。<b>{loser}</b>をシリーズ通算<fig>{margin}</fig>点差で退けました——ブラケット全体で最大の点差です。',
-    tightest:'対照的に、最も競ったシリーズは最終マッチまでもつれました。<b>{winner}</b>と<b>{loser}</b>の差はシリーズ全体でわずか<fig>{margin}</fig>点。この紙一重が勝敗を分けました。',
-    sweeps:'ブラケットの<fig>{total}</fig>シリーズのうち、<fig>{sweeps}</fig>が文句なしの<b>2–0</b>で決着し、最終マッチまで至ったのはわずか<fig>{deciders}</fig>でした。このレベルでは実力差があればすぐ表れます——BO3がスリラーになることはめったにありませんでした。',
-    indiv:'選手では<b>{player}</b>（{team}）がブラケット最高のマッチを記録——1マッチで<fig>{best}</fig>点——さらに<fig>{perfect}</fig>回トップでゴールし、このステージ最多のレース勝利数を挙げました。',
-    consistent:'安定性では、<b>{player}</b>（{team}）がロスター随一の安定感を見せました。レースごとのスコアが平均から最もぶれない選手で、1マッチですべてが決まりうる舞台では何よりの武器です。',
-    trackMost:'ゲームの30コースのうち、決勝トーナメントでチームに最も好まれたのが<b>{track}</b>。<fig>{n}</fig>回選ばれました。',
-    trackSkill:'そして大会全体と同様、すべてのコースが実力を等しく反映するわけではありません。実力が最も出るのが<b>{skill}</b>——上位選手はここで1レース平均<fig>{skillAvg}</fig>点を記録——一方<b>{leveller}</b>は展開を読みにくくし、平均<fig>{levAvg}</fig>点でした。',
-    dyk1:'ブラケット全体で<fig>{players}</fig>人の選手が<fig>{matches}</fig>シリーズ・<fig>{games}</fig>マッチ・<fig>{races}</fig>レースを戦いました——全選手で<fig>{points}</fig>点が記録されました。',
-    dyk2:'これにてMKWC 2026は幕を閉じます。素晴らしい戦いを見せてくれた全チームに感謝を——次回大会でまたお会いしましょう！'
-  }
-};
-function ntb(key, vars){
-  const dict = NUTSHELL_BR_I18N[LANG] || NUTSHELL_BR_I18N.en;
-  let s = dict[key] || NUTSHELL_BR_I18N.en[key] || key;
-  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
-  s = s.replace(/<b>/g,'<strong>').replace(/<\/b>/g,'</strong>')
-       .replace(/<fig>/g,'<span class="np-fig">').replace(/<\/fig>/g,'</span>');
-  return s;
-}
 function ntg(key, vars){
   const dict = NUTSHELL_GS_I18N[LANG] || NUTSHELL_GS_I18N.en;
   let s = dict[key] || NUTSHELL_GS_I18N.en[key] || key;
@@ -3753,67 +3523,6 @@ function renderGroupNutshellView(){
   const back = document.getElementById('backFromGroupNutshell');
   if(back) back.onclick = ()=>{ setView('home'); };
 }
-function renderBracketNutshellView(){
-  const el = document.getElementById('view-bracketnutshell');
-  if(!el) return;
-  if(!bracketDone()){
-    el.innerHTML = `<div class="stage-note">${t('calNoMatch')}</div>`;
-    return;
-  }
-  const r = getBracketRecap();
-  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
-  const pTeam = n => teamName((r.playerTeam||{})[n]);
-  const paras = [];
-
-  paras.push(`<h2 class="np-h2">${ntb('hChamp')}</h2>`);
-  if(r.champion && r.finalSeries){
-    paras.push(`<p>${ntb('champion',{champion:teamWithArticle(r.champion,true), loser:teamWithArticle(r.runnerUp,false), loserAt:teamAfterPrep(r.runnerUp,'à'), gW:r.finalSeries.gamesW, gL:r.finalSeries.gamesL})}</p>`);
-  }
-
-  paras.push(`<h2 class="np-h2">${ntb('hSeries')}</h2>`);
-  if(r.blowout){
-    paras.push(`<p>${ntb('blowout',{winner:teamWithArticle(r.blowout.winner,true), loser:teamWithArticle(r.blowout.loser,false), margin:r.blowout.aggMargin})}</p>`);
-  }
-  if(r.tightest){
-    paras.push(`<p>${ntb('tightest',{winner:teamWithArticle(r.tightest.winner,false), loser:teamWithArticle(r.tightest.loser,false), margin:r.tightest.aggMargin})}</p>`);
-  }
-  if(r.seriesCount){
-    paras.push(`<p>${ntb('sweeps',{total:nf(r.seriesCount), sweeps:nf(r.sweeps), deciders:nf(r.deciderCount)})}</p>`);
-  }
-
-  paras.push(`<h2 class="np-h2">${ntb('hIndiv')}</h2>`);
-  if(r.bestMatch && r.mostPerfect){
-    paras.push(`<p>${ntb('indiv',{player:r.bestMatch[0], team:pTeam(r.bestMatch[0]), best:r.bestMatch[1], perfect:r.mostPerfect[1]})}</p>`);
-  }
-  if(r.mostConsistent){
-    paras.push(`<p>${ntb('consistent',{player:r.mostConsistent[0], team:pTeam(r.mostConsistent[0])})}</p>`);
-  }
-
-  paras.push(`<h2 class="np-h2">${ntb('hTracks')}</h2>`);
-  if(r.mostPlayedTrack){
-    paras.push(`<p>${ntb('trackMost',{track:trackName(r.mostPlayedTrack[0]), n:r.mostPlayedTrack[1]})}</p>`);
-  }
-  if(r.skillTrack && r.levellerTrack && r.skillTrack[0]!==r.levellerTrack[0]){
-    paras.push(`<p>${ntb('trackSkill',{skill:trackName(r.skillTrack[0]), skillAvg:r.skillTrack[1].toFixed(1).replace('.',decimalSep()), leveller:trackName(r.levellerTrack[0]), levAvg:r.levellerTrack[1].toFixed(1).replace('.',decimalSep())})}</p>`);
-  }
-
-  paras.push(`<h2 class="np-h2">${ntb('hDyk')}</h2>`);
-  paras.push(`<p>${ntb('dyk1',{players:nf(r.playersPlayed), matches:nf(r.seriesCount), games:nf(r.gamesCount), races:nf(r.racesPlayed), points:nf(r.totalPoints)})}</p>`);
-  paras.push(`<p>${ntb('dyk2')}</p>`);
-
-  el.innerHTML = `
-    <button class="back-btn" id="backFromBracketNutshell">← ${t('navHome')}</button>
-    <article class="np-article">
-      <div class="np-eyebrow">${ntb('eyebrow')}</div>
-      <h1 class="np-title outline">${ntb('title')}</h1>
-      <p class="np-standfirst">${ntb('standfirst')}</p>
-      <div class="np-byline">${ntb('byline')}</div>
-      <hr class="np-rule">
-      <div class="np-body">${paras.join('')}</div>
-    </article>`;
-  const back = document.getElementById('backFromBracketNutshell');
-  if(back) back.onclick = ()=>{ setView('home'); };
-}
 function decimalSep(){ return LANG==='en' ? '.' : ','; }
 
 /* =========================================================
@@ -3827,7 +3536,6 @@ function HERO_INFO_F(){ return {
   players: {title:t('heroTitlePlayers'), sub:t('heroSubPlayers')},
   nutshell: {title:t('heroTitleNutshell'), sub:t('heroSubNutshell')},
   groupnutshell: {title:t('heroTitleGroupNutshell'), sub:t('heroSubGroupNutshell')},
-  bracketnutshell: {title:t('heroTitleBracketNutshell'), sub:t('heroSubBracketNutshell')},
 };}
 let selectedMatch = null;
 let selectedPlayer = null; // {tag, name}
@@ -3856,7 +3564,6 @@ const VIEW_RENDERERS = {
   players: renderPlayersView,
   nutshell: renderNutshellView,
   groupnutshell: renderGroupNutshellView,
-  bracketnutshell: renderBracketNutshellView,
 };
 let dirtyViews = new Set(Object.keys(VIEW_RENDERERS));
 function markAllDirty(){ dirtyViews = new Set(Object.keys(VIEW_RENDERERS)); }
@@ -3898,7 +3605,7 @@ function setView(view){
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', groupnutshell:'view-groupnutshell', bracketnutshell:'view-bracketnutshell'};
+  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', groupnutshell:'view-groupnutshell'};
   document.getElementById(map[view]).classList.add('active');
   updateHero(view);
   ensureViewRendered(view);
