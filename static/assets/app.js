@@ -110,6 +110,16 @@ function teamWithArticle(tag, cap){
   if(cap) art = art.charAt(0).toUpperCase()+art.slice(1);
   return elided ? art+name : art+' '+name;
 }
+// Team name for running prose, with only the NAME in bold and the FR determiner kept
+// lowercase and OUTSIDE the bold (e.g. "le <strong>Japon</strong>"). Other languages just
+// bold the plain name. Never capitalizes the article — callers place it mid-sentence.
+function teamProseHTML(tag){
+  const name = teamName(tag);
+  if(LANG!=='fr') return `<strong>${name}</strong>`;
+  const art = TEAM_ARTICLE_FR[tag];
+  if(art==null || art==='') return `<strong>${name}</strong>`;
+  return art==="l'" ? `l'<strong>${name}</strong>` : `${art} <strong>${name}</strong>`;
+}
 // Team name after a French preposition, applying contractions:
 // de+le=du, de+les=des ; à+le=au, à+les=aux ; contre keeps the article as-is.
 function teamAfterPrep(tag, prep){
@@ -151,7 +161,7 @@ const I18N = {
     homeStatusGroup:'En ce moment : Phase de groupes',
     homeStatusBetween2:'Phase de groupes terminée — la Phase de Bracket commence le 24 juillet',
     homeStatusBracket:'En ce moment : Phase de Bracket',
-    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', nextMatches:'Prochains matchs', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes',
+    homeStatusAfter:'Le tournoi est terminé.', homeLiveNow:'En direct maintenant', nextMatch:'Prochain match', nextMatches:'Prochains matchs', countdownDay:'j', nutshellRead:'Lire l’article', heroTitleNutshell:'Le Play-In en bref', heroSubNutshell:'Récap de la phase de Play-In', heroTitleGroupNutshell:'La phase de groupes en bref', heroSubGroupNutshell:'Récap de la phase de groupes', heroTitleBracketNutshell:'Le bracket en bref', heroSubBracketNutshell:'Récap de la phase finale', heroTitleWrap:'Le tournoi en bref', heroSubWrap:'Bilan du tournoi et pourquoi ce site',
     thanksTitle:'Remerciements', raceChartTitle:'Évolution du score, course par course', adminTrackLabel:'Circuit',
     bestRaceLabel:'Meilleure course du tournoi', onTrack:'sur', tabTracks:'Circuits',
     tracksNote:'Score moyen obtenu sur chaque circuit, tous joueurs et tous matchs confondus.',
@@ -225,7 +235,7 @@ const I18N = {
     homeStatusGroup:'Happening now: Group Stage',
     homeStatusBetween2:'Group Stage finished — the Bracket Stage starts July 24',
     homeStatusBracket:'Happening now: Bracket Stage',
-    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', nextMatches:'Next matches', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap',
+    homeStatusAfter:'The tournament is over.', homeLiveNow:'Live now', nextMatch:'Next match', nextMatches:'Next matches', countdownDay:'d', nutshellRead:'Read the article', heroTitleNutshell:'The Play-In in a nutshell', heroSubNutshell:'Play-In stage recap', heroTitleGroupNutshell:'The Group Stage in a nutshell', heroSubGroupNutshell:'Group Stage recap', heroTitleBracketNutshell:'The bracket in a nutshell', heroSubBracketNutshell:'Knockout stage recap', heroTitleWrap:'The tournament in a nutshell', heroSubWrap:'Tournament wrap-up and why this site',
     thanksTitle:'Thanks', raceChartTitle:'Score progression, race by race', adminTrackLabel:'Track',
     bestRaceLabel:'Best race of the tournament', onTrack:'on', tabTracks:'Tracks',
     tracksNote:'Average score on each track, across every player and match.',
@@ -299,7 +309,7 @@ const I18N = {
     homeStatusGroup:'Ahora mismo: Fase de grupos',
     homeStatusBetween2:'Fase de grupos terminada — la Fase de Bracket empieza el 24 de julio',
     homeStatusBracket:'Ahora mismo: Fase de Bracket',
-    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', nextMatches:'Próximos partidos', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos',
+    homeStatusAfter:'El torneo ha terminado.', homeLiveNow:'En directo ahora', nextMatch:'Próximo partido', nextMatches:'Próximos partidos', countdownDay:'d', nutshellRead:'Leer el artículo', heroTitleNutshell:'El Play-In en resumen', heroSubNutshell:'Resumen de la fase de Play-In', heroTitleGroupNutshell:'La fase de grupos en resumen', heroSubGroupNutshell:'Resumen de la fase de grupos', heroTitleBracketNutshell:'El bracket en resumen', heroSubBracketNutshell:'Resumen de la fase final', heroTitleWrap:'El torneo en resumen', heroSubWrap:'Balance del torneo y por qué este sitio',
     thanksTitle:'Agradecimientos', raceChartTitle:'Evolución del puntaje, carrera por carrera', adminTrackLabel:'Circuito',
     bestRaceLabel:'Mejor carrera del torneo', onTrack:'en', tabTracks:'Circuitos',
     tracksNote:'Puntuación media obtenida en cada circuito, entre todos los jugadores y partidos.',
@@ -373,7 +383,7 @@ const I18N = {
     homeStatusGroup:'現在開催中：グループステージ',
     homeStatusBetween2:'グループステージ終了 — ブラケットステージは7月24日開始',
     homeStatusBracket:'現在開催中：ブラケットステージ',
-    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', nextMatches:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ',
+    homeStatusAfter:'大会は終了しました。', homeLiveNow:'ライブ配信中', nextMatch:'次の試合', nextMatches:'次の試合', countdownDay:'日', nutshellRead:'記事を読む', heroTitleNutshell:'プレイインを振り返る', heroSubNutshell:'プレイインステージのまとめ', heroTitleGroupNutshell:'グループステージを振り返る', heroSubGroupNutshell:'グループステージのまとめ', heroTitleBracketNutshell:'ブラケットを振り返る', heroSubBracketNutshell:'決勝トーナメントのまとめ', heroTitleWrap:'大会を振り返る', heroSubWrap:'大会総括と、このサイトを作った理由',
     thanksTitle:'謝辞', raceChartTitle:'レースごとのスコア推移', adminTrackLabel:'コース',
     bestRaceLabel:'大会最高スコア', onTrack:'コース：', tabTracks:'コース',
     tracksNote:'各コースの、全選手・全試合を通じた平均スコアです。',
@@ -1880,6 +1890,372 @@ function getGroupStageRecap(){
     mostPlayedTrack, decisiveTracks, equaliserTrack, playerTeam, p15
   };
 }
+// The whole knockout is over once the final (round 3) series is decided.
+function bracketDone(){
+  const { rounds } = deriveBracketRounds();
+  if(!(rounds[3] && rounds[3][0]!=null && rounds[3][1]!=null)) return false;
+  return seriesResult(3, bracketGames(3, 0).gameScores).decided;
+}
+// Computes every stat shown in the Bracket recap article, straight from STATE.bracket.
+// A bracket "match" is a whole BO3 series; each individual game inside it is one 12-race
+// contest, so individual/track stats iterate games while match/series stats iterate series.
+function getBracketRecap(){
+  const { rounds } = deriveBracketRounds();
+  const ROUND_KEY = ['r16','qf','sf','final']; // index → round tag for the prose
+  const series = []; // {round, roundKey, H, A, gamesH, gamesA, winner, loser, ptsW, ptsL, aggMargin, wentDeciding, games:[{h,a,tracks,scH,scA}]}
+  for(let r=0;r<4;r++){
+    const field = rounds[r];
+    if(!field) continue;
+    for(let m=0;m<field.length/2;m++){
+      const H = field[2*m], A = field[2*m+1];
+      if(H==null || A==null) continue;
+      const { gameScores } = bracketGames(r, m);
+      const res = seriesResult(r, gameScores);
+      if(!res.decided) continue;
+      const plList = bracketGamePlayersList(r, m);
+      let ptsH=0, ptsA=0; const games=[];
+      gameScores.forEach((s,gi)=>{
+        if(!isPlayed(s)) return;
+        const h=Number(s[0]), a=Number(s[1]);
+        ptsH+=h; ptsA+=a;
+        games.push({ scH:h, scA:a, tracks:(plList[gi]||{}).tracks||[], pl:plList[gi]||{h:[],a:[]} });
+      });
+      const winH = res.winnerSide==='H';
+      series.push({
+        round:r, roundKey:ROUND_KEY[r], H, A,
+        gamesH:res.gamesH, gamesA:res.gamesA,
+        winner: winH?H:A, loser: winH?A:H,
+        gamesW: Math.max(res.gamesH,res.gamesA), gamesL: Math.min(res.gamesH,res.gamesA),
+        ptsW: winH?ptsH:ptsA, ptsL: winH?ptsA:ptsH,
+        aggMargin: Math.abs(ptsH-ptsA),
+        wentDeciding: (res.gamesH+res.gamesA) >= maxGamesFor(r),
+        games
+      });
+    }
+  }
+
+  // --- Per-player / per-track / totals, iterating every GAME of every series ---
+  const praces = {};        // name -> [race scores]
+  const pmatchTotal = {};   // name -> best single-game total
+  const p15 = {};           // name -> count of race wins (15s)
+  const playerTeam = {};    // name -> team tag (last seen)
+  const trackScores = {};   // trackId -> [{n,v}]
+  const trackUses = {};     // trackId -> selections
+  const teamPoints = {};    // tag -> total points scored across the bracket
+  const pTotalPoints = {};  // name -> total points scored across the bracket
+  const distinctTracks = new Set();
+  const distinctPlayers = new Set();
+  let racesPlayed = 0, totalPoints = 0, gamesCount = 0;
+  // The single most dominant race by one team: highest team total on one race (out of 90),
+  // remembering which track it happened on.
+  let maxRaceDomination = null; // { pts, team, track }
+  // The biggest deficit a team overturned within one bracket game.
+  let comeback = null; // { deficit(<0), winner, loser }
+  function bump(obj,k,by){ obj[k]=(obj[k]||0)+by; }
+
+  series.forEach(s=>{
+    s.games.forEach(g=>{
+      gamesCount++;
+      (g.tracks||[]).forEach(tid=>{ if(tid){ bump(trackUses,tid,1); distinctTracks.add(tid); } });
+      const raceIdxSeen = new Set();
+      // Per-race team totals (for the "most dominant race" stat): sum the 6 racers per side, per race.
+      const teamRaceTotals = { h:{}, a:{} }; // side → raceIdx → summed points
+      [['h',s.H],['a',s.A]].forEach(([side, teamTag])=>{
+        (g.pl[side]||[]).forEach(p=>{
+          if(!p||!p.n) return;
+          (p.races||[]).forEach((v,i)=>{
+            if(v==='' || v==null) return;
+            const val = Number(v)||0;
+            const owner = raceOwnerName(p,i);
+            praces[owner]=praces[owner]||[]; praces[owner].push(val);
+            playerTeam[owner]=teamTag;
+            bump(pTotalPoints, owner, val);
+            bump(teamPoints, teamTag, val);
+            if(val===15) bump(p15,owner,1);
+            distinctPlayers.add(teamTag+'|'+owner);
+            const tid = (g.tracks||[])[i];
+            if(tid){ trackScores[tid]=trackScores[tid]||[]; trackScores[tid].push({n:owner,v:val}); }
+            teamRaceTotals[side][i] = (teamRaceTotals[side][i]||0) + val;
+            raceIdxSeen.add(i);
+            totalPoints += val;
+          });
+        });
+        (g.pl[side]||[]).forEach(p=>{
+          playerSegments(p).forEach(seg=>{
+            const tot = seg.races.reduce((s2,v)=> s2 + (v!=='' && v!=null ? Number(v) : 0), 0);
+            if(seg.races.some(v=>v!=='' && v!=null)) pmatchTotal[seg.name]=Math.max(pmatchTotal[seg.name]||0, tot);
+          });
+        });
+      });
+      // A full 6-racer race total is only comparable when all six scored — find the peak.
+      ['h','a'].forEach(side=>{
+        const tag = side==='h'?s.H:s.A;
+        for(const i in teamRaceTotals[side]){
+          const pts = teamRaceTotals[side][i];
+          // count how many of the six racers actually posted a score this race
+          const filled = (g.pl[side]||[]).filter(p=>p&&p.n && p.races && p.races[i]!=='' && p.races[i]!=null).length;
+          if(filled<6) continue; // only whole-lineup races are comparable (max is 90)
+          if(!maxRaceDomination || pts>maxRaceDomination.pts){
+            maxRaceDomination = { pts, team:tag, track:(g.tracks||[])[i]||null };
+          }
+        }
+      });
+      // Biggest in-game comeback: the winner's largest running deficit over the 12 races.
+      {
+        let ch=0, ca=0, worst=0, okAll=true;
+        for(let i=0;i<12;i++){
+          const hv=teamRaceTotals.h[i], av=teamRaceTotals.a[i];
+          if(hv==null || av==null){ okAll=false; break; }
+          ch+=hv; ca+=av;
+        }
+        if(okAll && ch!==ca){
+          const winH = ch>ca; ch=0; ca=0;
+          for(let i=0;i<12;i++){ ch+=teamRaceTotals.h[i]; ca+=teamRaceTotals.a[i]; const d=winH?(ch-ca):(ca-ch); if(d<worst) worst=d; }
+          if(worst<0 && (!comeback || worst<comeback.deficit)){
+            comeback = { deficit:worst, winner:winH?s.H:s.A, loser:winH?s.A:s.H };
+          }
+        }
+      }
+      racesPlayed += raceIdxSeen.size;
+    });
+  });
+
+  // --- Champion & final ---
+  const finalSeries = series.find(s=>s.round===3) || null;
+  const champion = finalSeries ? finalSeries.winner : null;
+  const runnerUp = finalSeries ? finalSeries.loser : null;
+
+  // --- Series highlights ---
+  const decidedSeries = series.filter(s=>s.round>=0);
+  // Tightest series: went the full distance (deciding game) with the smallest aggregate margin.
+  const deciders = decidedSeries.filter(s=>s.wentDeciding);
+  const tightest = deciders.slice().sort((a,b)=>a.aggMargin-b.aggMargin)[0] || null;
+  const sweeps = decidedSeries.filter(s=>s.gamesL===0).length;
+  const deciderCount = deciders.length;
+
+  // --- Individual bests ---
+  const bestMatch = Object.entries(pmatchTotal).sort((a,b)=>b[1]-a[1])[0] || null;
+  // Best finisher: highest share of races won (1st place = 15 pts), over a meaningful sample.
+  const MIN_RACES = 24;
+  const finisherList = Object.keys(praces)
+    .filter(n=>praces[n].length>=MIN_RACES)
+    .map(n=>({ name:n, wins:(p15[n]||0), races:praces[n].length, rate:(p15[n]||0)/praces[n].length }))
+    .sort((a,b)=> b.rate-a.rate || b.wins-a.wins);
+  const bestFinisher = finisherList[0] || null;
+
+  // --- Teams ---
+  const mostProlific = Object.entries(teamPoints).sort((a,b)=>b[1]-a[1])[0] || null; // [tag, pts]
+  const topScorer = Object.entries(pTotalPoints).sort((a,b)=>b[1]-a[1])[0] || null;   // [name, pts]
+
+  // --- Tracks ---
+  const mostPlayedTrack = Object.entries(trackUses).sort((a,b)=>b[1]-a[1])[0] || null;
+  const allTracksPlayed = distinctTracks.size >= 30; // all 30 game tracks appeared at least once
+
+  return {
+    champion, runnerUp, finalSeries,
+    seriesCount: series.length, gamesCount, racesPlayed, totalPoints,
+    playersPlayed: distinctPlayers.size, distinctTracks: distinctTracks.size,
+    tightest, sweeps, deciderCount, comeback,
+    bestMatch, bestFinisher, maxRaceDomination,
+    mostProlific, topScorer,
+    mostPlayedTrack, allTracksPlayed,
+    playerTeam, p15
+  };
+}
+// Tournament-wide records + headline counts for the wrap-up article's "Records" section.
+// Iterates every scored race of every phase (group + bracket). Returns team TAGS (not names)
+// so the render layer can apply the right article/determiner per language.
+function getWrapRecords(){
+  const { rounds } = deriveBracketRounds();
+  // Collect every game (12 races × 6+6) with its two team tags + the tracks played, all phases.
+  const gameList = []; // { H, A, h:[6 players], a:[6 players], tracks:[12] }
+  function pushGame(H, A, plH, plA, tracks){
+    if(H==null || A==null || !plH || !plA) return;
+    gameList.push({ H, A, h:plH, a:plA, tracks:tracks||[] });
+  }
+  for(const stage of ['quali','mid','top']){
+    const groups = STATE[stage] || {};
+    for(const id in groups){
+      const g = groups[id]; if(!g) continue;
+      pairsFor(g.slots.length).forEach(([i,j])=>{
+        const key=i+'-'+j, sc=g.scores[key];
+        if(!isPlayed(sc) || g.slots[i]==null || g.slots[j]==null) return;
+        const pl = g.players[key] || {h:[],a:[]};
+        pushGame(g.slots[i], g.slots[j], pl.h, pl.a, pl.tracks);
+      });
+    }
+  }
+  for(let r=0;r<4;r++){
+    const field = rounds[r]; if(!field) continue;
+    for(let m=0;m<field.length/2;m++){
+      const H=field[2*m], A=field[2*m+1];
+      if(H==null||A==null) continue;
+      const { gameScores } = bracketGames(r, m);
+      const games = bracketGamePlayersList(r, m);
+      gameScores.forEach((sc,gi)=>{ if(isPlayed(sc)){ const pl=games[gi]||{h:[],a:[]}; pushGame(H, A, pl.h, pl.a, pl.tracks); } });
+    }
+  }
+
+  // --- Global counts + per-player / per-team tallies ---
+  const distinctPlayers = new Set();
+  const teams = new Set();
+  const praces = {};        // name -> [race scores]
+  const pmatchBest = {};    // name -> best single-game total   { total, team }
+  const pstreak = {};       // name -> longest run of race wins { streak, team }
+  const pteam = {};
+  const teamPoints = {};    // tag -> total points
+  const teamTop6 = {};      // tag -> count of "perfect top-6" races (all 6 finish 1st–6th)
+  const trackUses = {};     // trackId -> number of races played on it (all phases)
+  let totalRaces = 0, totalPoints = 0, totalMatches = 0;
+  const POS6 = new Set([15,12,10,9,8,7]); // points for finishing places 1..6
+  const num = x => (x!=='' && x!=null && isFinite(Number(x))) ? Number(x) : null;
+
+  gameList.forEach(g=>{
+    totalMatches; // matches counted separately below
+    teams.add(g.H); teams.add(g.A);
+    // per-race team totals (for top-6 + points + race count)
+    for(let c=0;c<12;c++){
+      const hv=[], av=[];
+      (g.h||[]).forEach(p=>{ if(p&&p.n){ const val=num((p.races||[])[c]); if(val!=null) hv.push(val); }});
+      (g.a||[]).forEach(p=>{ if(p&&p.n){ const val=num((p.races||[])[c]); if(val!=null) av.push(val); }});
+      if(hv.length===6 && av.length===6){
+        totalRaces++;
+        const sh=hv.reduce((s,x)=>s+x,0), sa=av.reduce((s,x)=>s+x,0);
+        totalPoints += sh+sa;
+        teamPoints[g.H]=(teamPoints[g.H]||0)+sh; teamPoints[g.A]=(teamPoints[g.A]||0)+sa;
+        if(hv.every(x=>POS6.has(x))) teamTop6[g.H]=(teamTop6[g.H]||0)+1;
+        if(av.every(x=>POS6.has(x))) teamTop6[g.A]=(teamTop6[g.A]||0)+1;
+        const tid = (g.tracks||[])[c];
+        if(tid) trackUses[tid]=(trackUses[tid]||0)+1;
+      }
+    }
+    // per-player: race list, best single-game total, longest win streak
+    [['h',g.H],['a',g.A]].forEach(([side,tag])=>{
+      (g[side]||[]).forEach(p=>{
+        if(!p||!p.n) return;
+        distinctPlayers.add(tag+'|'+p.n);
+        let run=0, tot=0, any=false;
+        (p.races||[]).forEach((v,i)=>{
+          const val=num(v); if(val==null){ run=0; return; }
+          any=true;
+          const owner=raceOwnerName(p,i);
+          praces[owner]=praces[owner]||[]; praces[owner].push(val); pteam[owner]=tag;
+          tot+=val;
+          if(val===15){ run++; if(!pstreak[owner]||run>pstreak[owner].streak) pstreak[owner]={streak:run,team:tag}; }
+          else run=0;
+        });
+        if(any && (!pmatchBest[p.n] || tot>pmatchBest[p.n].total)) pmatchBest[p.n]={total:tot,team:tag};
+      });
+    });
+  });
+
+  // count matches: group matches played + bracket series decided
+  for(const stage of ['quali','mid','top']){
+    const groups = STATE[stage] || {};
+    for(const id in groups){
+      const g=groups[id]; if(!g) continue;
+      pairsFor(g.slots.length).forEach(([i,j])=>{
+        if(isPlayed(g.scores[i+'-'+j]) && g.slots[i]!=null && g.slots[j]!=null) totalMatches++;
+      });
+    }
+  }
+  for(let r=0;r<4;r++){
+    const field=rounds[r]; if(!field) continue;
+    for(let m=0;m<field.length/2;m++){
+      if(field[2*m]==null||field[2*m+1]==null) continue;
+      if(seriesResult(r, bracketGames(r,m).gameScores).decided) totalMatches++;
+    }
+  }
+
+  // --- Individual records ---
+  // Best player = highest RANKING INDICE (the same shrinkage-adjusted average the Players tab
+  // ranks by): a raw mean would crown a player with very few matches, which the site avoids.
+  const pStats = getPlayerStats();
+  const rankAvg = makePlayerRanker(pStats);
+  let bestPlayer = null;
+  for(const tag in pStats){
+    for(const name in pStats[tag]){
+      const s = pStats[tag][name];
+      const indice = rankAvg(s.count, s.avg);
+      if(!bestPlayer || indice>bestPlayer.indice) bestPlayer = { name, team:tag, indice };
+    }
+  }
+  // Attach the player's real per-race average (out of 15) + race count for a readable detail line.
+  if(bestPlayer){
+    const rs = praces[bestPlayer.name] || [];
+    bestPlayer.raceAvg = rs.length ? rs.reduce((s,x)=>s+x,0)/rs.length : 0;
+    bestPlayer.races = rs.length;
+  }
+  const winsList = Object.keys(praces).map(n=>({name:n, wins:praces[n].filter(x=>x===15).length, team:pteam[n]}))
+    .sort((a,b)=> b.wins-a.wins);
+  const mostWins = winsList[0] || null;
+  const bigMatch = Object.keys(pmatchBest).map(n=>({name:n, ...pmatchBest[n]})).sort((a,b)=>b.total-a.total)[0] || null;
+  const longStreak = Object.keys(pstreak).map(n=>({name:n, ...pstreak[n]})).sort((a,b)=>b.streak-a.streak)[0] || null;
+  // Top scorer: most points scored across the whole tournament.
+  const topScorer = Object.keys(praces).map(n=>({name:n, pts:praces[n].reduce((s,x)=>s+x,0), team:pteam[n]}))
+    .sort((a,b)=> b.pts-a.pts)[0] || null;
+
+  // --- Team records ---
+  const champion = getBracketRecap().champion;
+  const mostPoints = Object.keys(teamPoints).map(t=>({tag:t, pts:teamPoints[t]})).sort((a,b)=>b.pts-a.pts)[0] || null;
+
+  // --- Biggest surprise: overperformance vs projected seeding ---
+  // Uses the SAME final ranking as the Stats tab (bracket progress → bracket differential, then
+  // group position → group differential), so a team's real finish place is what counts — not just
+  // the round it exited in. Two teams out in the same round can finish far apart.
+  const bracketSlots = (STATE.bracket && STATE.bracket.slots) || [];
+  const blocOf = tag => { if(bracketSlots.includes(tag)) return 0; const c=groupPhaseContext(tag); return c?c.phase:3; };
+  const finishOrder = Array.from(teams).sort((a,b)=>{
+    const ba=blocOf(a), bb=blocOf(b); if(ba!==bb) return ba-bb;
+    if(ba===0){
+      const d=bracketProgressRank(a)-bracketProgressRank(b); if(d) return d;
+      const da=bracketDiffs(a), db=bracketDiffs(b);
+      return (db.games-da.games) || (db.points-da.points) || projectedRank(a)-projectedRank(b);
+    }
+    const ca=groupPhaseContext(a), cb=groupPhaseContext(b);
+    if(ca&&cb) return (ca.pos-cb.pos) || (cb.diff-ca.diff) || projectedRank(a)-projectedRank(b);
+    return projectedRank(a)-projectedRank(b);
+  });
+  const finishRank = {}; finishOrder.forEach((t,i)=>finishRank[t]=i+1);
+  let surprise=null;
+  finishOrder.forEach(t=>{
+    const proj = projectedRank(t); // 0-based index in PROJECTED_RANK, 999 if unknown
+    if(proj>=999) return;
+    const delta = (proj+1) - finishRank[t]; // positive = finished higher than seeded
+    if(!surprise || delta>surprise.delta) surprise={tag:t, delta, finish:finishRank[t]};
+  });
+
+  // --- Biggest comeback within a single game ---
+  let comeback=null;
+  gameList.forEach(g=>{
+    let ch=0, ca=0; const cumH=[], cumA=[];
+    for(let c=0;c<12;c++){
+      let sh=0,sa=0,fh=0,fa=0;
+      (g.h||[]).forEach(p=>{ if(p&&p.n){ const val=num((p.races||[])[c]); if(val!=null){ sh+=val; fh++; }}});
+      (g.a||[]).forEach(p=>{ if(p&&p.n){ const val=num((p.races||[])[c]); if(val!=null){ sa+=val; fa++; }}});
+      if(fh!==6||fa!==6){ cumH.push(null); cumA.push(null); continue; }
+      ch+=sh; ca+=sa; cumH.push(ch); cumA.push(ca);
+    }
+    if(cumH[11]==null||cumA[11]==null||cumH[11]===cumA[11]) return;
+    const winH = cumH[11]>cumA[11];
+    let worst=0;
+    for(let c=0;c<12;c++){ if(cumH[c]==null) continue; const d = winH ? (cumH[c]-cumA[c]) : (cumA[c]-cumH[c]); if(d<worst) worst=d; }
+    if(worst<0 && (!comeback || worst<comeback.deficit)){
+      comeback={ deficit:worst, winner:winH?g.H:g.A, loser:winH?g.A:g.H };
+    }
+  });
+
+  return {
+    // global counts
+    teamsCount: teams.size, playersCount: distinctPlayers.size,
+    matchesCount: totalMatches, racesCount: totalRaces, pointsTotal: totalPoints,
+    // records
+    champion, bestPlayer, mostWins, bigMatch, longStreak, topScorer,
+    mostPoints, surprise, comeback,
+    // every track's selection count, most-played first (for the expandable track chart)
+    trackPrefs: Object.keys(trackUses).map(id=>({id, n:trackUses[id]})).sort((a,b)=>b.n-a.n)
+  };
+}
 function getTournamentPhaseStatus(){
   const now = new Date();
   const dOnly = (y,m,d)=> new Date(y,m-1,d).getTime();
@@ -1918,6 +2294,11 @@ function nutshellTeaserHTML(navto, eyebrow, title){
 }
 function nutshellTeasersHTML(){
   const cards = [];
+  if(bracketDone()){
+    const W = WRAP_I18N[LANG] || WRAP_I18N.en;
+    cards.push(nutshellTeaserHTML('wrap', W.eyebrow, W.title));
+  }
+  if(bracketDone()) cards.push(nutshellTeaserHTML('bracketnutshell', ntb('eyebrow'), ntb('title')));
   if(groupStageDone()) cards.push(nutshellTeaserHTML('groupnutshell', ntg('eyebrow'), ntg('title')));
   if(allGroupMatchesPlayed(STATE.quali)) cards.push(nutshellTeaserHTML('nutshell', nt('eyebrow'), nt('title')));
   return cards.join('');
@@ -3322,6 +3703,117 @@ const NUTSHELL_GS_I18N = {
     dyk2:'これだけの波乱を経て、ブラケットは予想以上の盛り上がりになりそうです。全チームの健闘を祈ります——最高のチームに栄光あれ！'
   }
 };
+// Bracket recap article. A "match" here is a whole best-of-3 series. Same <b>/<fig> markup.
+const NUTSHELL_BR_I18N = {
+  fr:{
+    eyebrow:'Récap · Phase finale',
+    title:'Le bracket en bref',
+    standfirst:'Le MKWC 2026 a rendu son verdict. Seize équipes sont entrées dans le grand tableau à élimination directe, chaque tour se jouant au meilleur des trois manches. Retour sur le sacre, les séries marquantes, les exploits individuels et quelques chiffres qui résument cette phase finale.',
+    byline:'Huitièmes · Quarts · Demies · Finale',
+    hChamp:'Le sacre',
+    hSeries:'Les séries marquantes',
+    hIndiv:'Les performances individuelles',
+    hTeams:'Du côté des équipes',
+    hTracks:'Les circuits',
+    hDyk:'Le saviez-vous ?',
+    champion:'Au bout du parcours, c’est {champion} qui soulève le trophée du MKWC 2026. En finale, l’équipe s’impose <b>{gW}–{gL}</b> en manches face {loserAt}, au terme d’une phase à élimination directe où la moindre erreur pouvait tout arrêter.',
+    finalClose:'Rien n’a pourtant été simple jusqu’au bout : sur les trois manches de la finale, les deux équipes n’ont été séparées que de <fig>{margin}</fig> points au total. Le titre s’est joué sur un rien.',
+    tightest:'La série la plus accrochée est allée jusqu’à la manche décisive : sur l’ensemble de leur duel, {winner} et {loser} n’étaient séparés que de <fig>{margin}</fig> points. Presque rien pour décider du vainqueur.',
+    comeback:'Le plus beau retournement revient à {winner} : mené·e de <fig>{deficit}</fig> points en cours de manche face {loserAt}, l’équipe a renversé la situation pour l’emporter — la plus grosse remontée de toute la phase finale.',
+    sweeps:'Sur les <fig>{total}</fig> séries du tableau, <fig>{sweeps}</fig> se sont terminées sur un <b>2–0</b> net, contre <fig>{deciders}</fig> poussées jusqu’à la manche décisive. Quand l’écart de niveau est là, il se voit vite : peu de séries ont vraiment tenu en haleine.',
+    indiv:'Côté joueur·euse·s, <b>{player}</b> ({team}) signe le plus gros match du bracket, avec <fig>{best}</fig> points marqués sur une seule manche.',
+    finisher:'Le·la meilleur·e finisseur·euse de la phase, c’est <b>{player}</b> ({team}) : il/elle a terminé <b>en tête</b> de <fig>{rate}</fig>&nbsp;% de ses courses — la plus forte proportion de victoires de course du bracket.',
+    topScorer:'Sur le cumul, personne n’a fait mieux que <b>{player}</b> ({team}) : <fig>{pts}</fig> points marqués sur l’ensemble du bracket, plus que n’importe quel·le autre pilote.',
+    teamProlific:'Du côté des équipes, c’est {team} qui a fait tourner le compteur le plus vite : <fig>{pts}</fig> points inscrits sur la phase finale, le meilleur total du bracket.',
+    trackMost:'Parmi les trente circuits du jeu, c’est le <b>{track}</b> qui a eu la faveur des équipes en phase finale, sélectionné <fig>{n}</fig> fois.',
+    trackAll:'Malgré la tension de l’élimination directe, les équipes n’ont rien boudé : les <fig>{tracks}</fig> circuits du jeu ont tous été joués au moins une fois pendant le bracket.',
+    dyk1:'En tout, le bracket aura réuni <fig>{players}</fig> joueur·euse·s pour <fig>{matches}</fig> séries, <fig>{games}</fig> manches et <fig>{races}</fig> courses disputées — soit <fig>{points}</fig> points marqués par l’ensemble des pilotes.',
+    dyk2:'Et voilà, le MKWC 2026 est terminé. Merci à toutes les équipes pour le spectacle — et merci à vous d’avoir suivi le tournoi ici !'
+  },
+  en:{
+    eyebrow:'Recap · Knockout Stage',
+    title:'The bracket in a nutshell',
+    standfirst:'MKWC 2026 has crowned its champion. Sixteen teams entered the single-elimination bracket, every round played as a best-of-three. A look back at the title, the standout series, the individual feats and a few numbers that sum up the knockout stage.',
+    byline:'Round of 16 · Quarters · Semis · Final',
+    hChamp:'The title',
+    hSeries:'Standout series',
+    hIndiv:'Individual performances',
+    hTeams:'Around the teams',
+    hTracks:'The tracks',
+    hDyk:'Did you know?',
+    champion:'At the end of the road, {champion} lifts the MKWC 2026 trophy. In the final they won <b>{gW}–{gL}</b> in games over {loser}, capping a single-elimination run where one slip could end it all.',
+    finalClose:'It was close to the very end, though: across the final’s three games, the two teams were separated by just <fig>{margin}</fig> points in total. The title came down to almost nothing.',
+    tightest:'The tightest series went all the way to a deciding game: across their entire duel, {winner} and {loser} were separated by just <fig>{margin}</fig> points. Next to nothing to decide the winner.',
+    comeback:'The finest turnaround belongs to {winner}: down by <fig>{deficit}</fig> points mid-game against {loser}, they flipped it to win — the biggest comeback of the whole knockout stage.',
+    sweeps:'Of the bracket’s <fig>{total}</fig> series, <fig>{sweeps}</fig> ended in a clean <b>2–0</b>, against <fig>{deciders}</fig> that reached a deciding game. When the skill gap is there, it shows fast: few series stayed genuinely in doubt.',
+    indiv:'Among the players, <b>{player}</b> ({team}) posted the biggest single game of the bracket, with <fig>{best}</fig> points scored in one game.',
+    finisher:'The stage’s best finisher was <b>{player}</b> ({team}): they crossed the line <b>first</b> in <fig>{rate}</fig>% of their races — the highest race-win share of the bracket.',
+    topScorer:'On the running total, no one topped <b>{player}</b> ({team}): <fig>{pts}</fig> points across the whole bracket, more than any other racer.',
+    teamProlific:'Among the teams, {team} kept the counter spinning fastest: <fig>{pts}</fig> points scored in the knockout stage, the highest team total of the bracket.',
+    trackMost:'Of the game’s thirty tracks, the <b>{track}</b> was the teams’ favourite in the knockout stage, picked <fig>{n}</fig> times.',
+    trackAll:'Despite the pressure of single-elimination, teams embraced the variety: all <fig>{tracks}</fig> of the game’s tracks were played at least once during the bracket.',
+    dyk1:'All told, the bracket brought <fig>{players}</fig> players together for <fig>{matches}</fig> series, <fig>{games}</fig> games and <fig>{races}</fig> races — <fig>{points}</fig> points scored by all racers combined.',
+    dyk2:'And that’s a wrap: MKWC 2026 is over. Thanks to every team for the show — and thank you for following the tournament here!'
+  },
+  es:{
+    eyebrow:'Resumen · Fase final',
+    title:'El bracket en resumen',
+    standfirst:'El MKWC 2026 ya tiene campeón. Dieciséis equipos entraron en el cuadro de eliminación directa, con cada ronda al mejor de tres. Un repaso al título, las series destacadas, las gestas individuales y algunas cifras que resumen la fase final.',
+    byline:'Octavos · Cuartos · Semis · Final',
+    hChamp:'El título',
+    hSeries:'Series destacadas',
+    hIndiv:'Actuaciones individuales',
+    hTeams:'En torno a los equipos',
+    hTracks:'Los circuitos',
+    hDyk:'¿Sabías que…?',
+    champion:'Al final del camino, {champion} levanta el trofeo del MKWC 2026. En la final se impuso por <b>{gW}–{gL}</b> en mangas a {loser}, cerrando un recorrido a eliminación directa donde un solo error podía acabar con todo.',
+    finalClose:'Y no fue nada fácil hasta el final: en las tres mangas de la final, los dos equipos quedaron separados por solo <fig>{margin}</fig> puntos en total. El título se decidió por muy poco.',
+    tightest:'La serie más ajustada llegó hasta la manga decisiva: en todo su duelo, {winner} y {loser} quedaron separados por solo <fig>{margin}</fig> puntos. Casi nada para decidir al ganador.',
+    comeback:'La mejor remontada es de {winner}: con <fig>{deficit}</fig> puntos de desventaja a media manga ante {loser}, le dio la vuelta para ganar — la mayor remontada de toda la fase final.',
+    sweeps:'De las <fig>{total}</fig> series del cuadro, <fig>{sweeps}</fig> terminaron en un <b>2–0</b> claro, frente a <fig>{deciders}</fig> que llegaron a la manga decisiva. Cuando hay diferencia de nivel, se nota rápido: pocas series mantuvieron la incertidumbre.',
+    indiv:'Entre los jugadores, <b>{player}</b> ({team}) firmó la mejor manga del bracket, con <fig>{best}</fig> puntos anotados en una sola.',
+    finisher:'El mejor finalizador de la fase fue <b>{player}</b> ({team}): cruzó la meta <b>primero</b> en el <fig>{rate}</fig>% de sus carreras, la mayor proporción de victorias de carrera del bracket.',
+    topScorer:'En el acumulado, nadie superó a <b>{player}</b> ({team}): <fig>{pts}</fig> puntos en todo el bracket, más que cualquier otro piloto.',
+    teamProlific:'Entre los equipos, {team} fue el que más rápido hizo girar el marcador: <fig>{pts}</fig> puntos en la fase final, el mejor total del bracket.',
+    trackMost:'De los treinta circuitos del juego, el <b>{track}</b> fue el favorito de los equipos en la fase final, elegido <fig>{n}</fig> veces.',
+    trackAll:'A pesar de la tensión de la eliminación directa, los equipos apostaron por la variedad: los <fig>{tracks}</fig> circuitos del juego se jugaron al menos una vez durante el bracket.',
+    dyk1:'En total, el bracket reunió a <fig>{players}</fig> jugadores en <fig>{matches}</fig> series, <fig>{games}</fig> mangas y <fig>{races}</fig> carreras: <fig>{points}</fig> puntos anotados por el conjunto de pilotos.',
+    dyk2:'Y con esto se cierra el MKWC 2026. ¡Gracias a todos los equipos por el espectáculo — y gracias a ti por seguir el torneo aquí!'
+  },
+  ja:{
+    eyebrow:'まとめ · 決勝トーナメント',
+    title:'ブラケットを振り返る',
+    standfirst:'MKWC 2026の王者が決まりました。16チームがシングルエリミネーションのブラケットに臨み、各ラウンドは3本先取（BO3）で争われました。優勝、注目のシリーズ、個人の活躍、そして決勝トーナメントを総括する数字を振り返ります。',
+    byline:'ベスト16 · 準々決勝 · 準決勝 · 決勝',
+    hChamp:'優勝',
+    hSeries:'注目のシリーズ',
+    hIndiv:'個人の活躍',
+    hTeams:'チームをめぐって',
+    hTracks:'コース',
+    hDyk:'ご存じですか？',
+    champion:'長い戦いの末、{champion}がMKWC 2026の栄冠を掴みました。決勝では{loser}を<b>{gW}–{gL}</b>（マッチ)で下し、一つのミスがすべてを終わらせかねないトーナメントを制しました。',
+    finalClose:'それでも最後まで大接戦でした。決勝の3マッチ通算で、両チームの差はわずか<fig>{margin}</fig>点。王座はほんの僅かな差で決まりました。',
+    tightest:'最も競ったシリーズは最終マッチまでもつれました。シリーズ全体で、{winner}と{loser}の差はわずか<fig>{margin}</fig>点。勝者を決めるにはあまりにも小さな差でした。',
+    comeback:'最高の逆転劇は{winner}。{loser}を相手にマッチ途中で<fig>{deficit}</fig>点差をつけられながら、ひっくり返して勝利——決勝トーナメント全体で最大の逆転でした。',
+    sweeps:'ブラケットの<fig>{total}</fig>シリーズのうち、<fig>{sweeps}</fig>が明確な<b>2–0</b>で決着し、最終マッチまで至ったのは<fig>{deciders}</fig>でした。実力差があればすぐ表れます——最後まで分からないシリーズはわずかでした。',
+    indiv:'選手では<b>{player}</b>（{team}）がブラケット最高のマッチを記録し、1マッチで<fig>{best}</fig>点を挙げました。',
+    finisher:'このステージ最高の「勝ち切る力」を見せたのが<b>{player}</b>（{team}）。自分のレースの<fig>{rate}</fig>%で<b>1位</b>でゴールし、ブラケット最高のレース勝率を記録しました。',
+    topScorer:'通算では、<b>{player}</b>（{team}）を上回る者はいませんでした。ブラケット全体で<fig>{pts}</fig>点を挙げ、どの選手よりも多く得点しました。',
+    teamProlific:'チームでは、{team}が最も速く得点を重ねました。決勝トーナメントで<fig>{pts}</fig>点を挙げ、ブラケット最高のチーム得点です。',
+    trackMost:'ゲームの30コースのうち、決勝トーナメントでチームに最も好まれたのが<b>{track}</b>。<fig>{n}</fig>回選ばれました。',
+    trackAll:'シングルエリミネーションの緊張の中でも、チームは多彩さを見せました。ゲームの<fig>{tracks}</fig>コースすべてが、ブラケット中に少なくとも一度は走られました。',
+    dyk1:'ブラケット全体で<fig>{players}</fig>人の選手が<fig>{matches}</fig>シリーズ・<fig>{games}</fig>マッチ・<fig>{races}</fig>レースを戦いました——全選手で<fig>{points}</fig>点が記録されました。',
+    dyk2:'これにてMKWC 2026は幕を閉じます。素晴らしい戦いを見せてくれた全チームに感謝を——そして、ここで大会を追ってくれたあなたにも感謝します！'
+  }
+};
+function ntb(key, vars){
+  const dict = NUTSHELL_BR_I18N[LANG] || NUTSHELL_BR_I18N.en;
+  let s = dict[key] || NUTSHELL_BR_I18N.en[key] || key;
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  s = s.replace(/<b>/g,'<strong>').replace(/<\/b>/g,'</strong>')
+       .replace(/<fig>/g,'<span class="np-fig">').replace(/<\/fig>/g,'</span>');
+  return s;
+}
 function ntg(key, vars){
   const dict = NUTSHELL_GS_I18N[LANG] || NUTSHELL_GS_I18N.en;
   let s = dict[key] || NUTSHELL_GS_I18N.en[key] || key;
@@ -3523,6 +4015,695 @@ function renderGroupNutshellView(){
   const back = document.getElementById('backFromGroupNutshell');
   if(back) back.onclick = ()=>{ setView('home'); };
 }
+function renderBracketNutshellView(){
+  const el = document.getElementById('view-bracketnutshell');
+  if(!el) return;
+  if(!bracketDone()){
+    el.innerHTML = `<div class="stage-note">${t('calNoMatch')}</div>`;
+    return;
+  }
+  const r = getBracketRecap();
+  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
+  const pTeam = n => teamName((r.playerTeam||{})[n]);
+  const paras = [];
+
+  paras.push(`<h2 class="np-h2">${ntb('hChamp')}</h2>`);
+  if(r.champion && r.finalSeries){
+    paras.push(`<p>${ntb('champion',{champion:teamProseHTML(r.champion), loser:teamProseHTML(r.runnerUp), loserAt:teamAfterPrep(r.runnerUp,'à'), gW:r.finalSeries.gamesW, gL:r.finalSeries.gamesL})}</p>`);
+    // Only worth telling if the final was actually tight.
+    if(r.finalSeries.aggMargin!=null && r.finalSeries.aggMargin<=120){
+      paras.push(`<p>${ntb('finalClose',{margin:r.finalSeries.aggMargin})}</p>`);
+    }
+  }
+
+  paras.push(`<h2 class="np-h2">${ntb('hSeries')}</h2>`);
+  if(r.tightest){
+    paras.push(`<p>${ntb('tightest',{winner:teamProseHTML(r.tightest.winner), loser:teamProseHTML(r.tightest.loser), margin:r.tightest.aggMargin})}</p>`);
+  }
+  if(r.comeback){
+    paras.push(`<p>${ntb('comeback',{winner:teamProseHTML(r.comeback.winner), loser:teamProseHTML(r.comeback.loser), loserAt:teamAfterPrep(r.comeback.loser,'à'), deficit:Math.abs(r.comeback.deficit)})}</p>`);
+  }
+  if(r.seriesCount){
+    paras.push(`<p>${ntb('sweeps',{total:nf(r.seriesCount), sweeps:nf(r.sweeps), deciders:nf(r.deciderCount)})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntb('hIndiv')}</h2>`);
+  if(r.bestMatch){
+    paras.push(`<p>${ntb('indiv',{player:r.bestMatch[0], team:pTeam(r.bestMatch[0]), best:r.bestMatch[1]})}</p>`);
+  }
+  if(r.bestFinisher){
+    paras.push(`<p>${ntb('finisher',{player:r.bestFinisher.name, team:pTeam(r.bestFinisher.name), rate:Math.round(r.bestFinisher.rate*100)})}</p>`);
+  }
+  if(r.topScorer){
+    paras.push(`<p>${ntb('topScorer',{player:r.topScorer[0], team:pTeam(r.topScorer[0]), pts:nf(r.topScorer[1])})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntb('hTeams')}</h2>`);
+  if(r.mostProlific){
+    paras.push(`<p>${ntb('teamProlific',{team:teamProseHTML(r.mostProlific[0]), pts:nf(r.mostProlific[1])})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntb('hTracks')}</h2>`);
+  if(r.mostPlayedTrack){
+    paras.push(`<p>${ntb('trackMost',{track:trackName(r.mostPlayedTrack[0]), n:r.mostPlayedTrack[1]})}</p>`);
+  }
+  if(r.allTracksPlayed){
+    paras.push(`<p>${ntb('trackAll',{tracks:nf(r.distinctTracks)})}</p>`);
+  }
+
+  paras.push(`<h2 class="np-h2">${ntb('hDyk')}</h2>`);
+  paras.push(`<p>${ntb('dyk1',{players:nf(r.playersPlayed), matches:nf(r.seriesCount), games:nf(r.gamesCount), races:nf(r.racesPlayed), points:nf(r.totalPoints)})}</p>`);
+  paras.push(`<p>${ntb('dyk2')}</p>`);
+
+  el.innerHTML = `
+    <button class="back-btn" id="backFromBracketNutshell">← ${t('navHome')}</button>
+    <article class="np-article">
+      <div class="np-eyebrow">${ntb('eyebrow')}</div>
+      <h1 class="np-title outline">${ntb('title')}</h1>
+      <p class="np-standfirst">${ntb('standfirst')}</p>
+      <div class="np-byline">${ntb('byline')}</div>
+      <hr class="np-rule">
+      <div class="np-body">${paras.join('')}</div>
+    </article>`;
+  const back = document.getElementById('backFromBracketNutshell');
+  if(back) back.onclick = ()=>{ setView('home'); };
+}
+
+/* =========================================================
+   WRAP-UP ARTICLE — "Le tournoi en bref & pourquoi ce site"
+   An editorial piece: tournament overview + why the site exists + the
+   reliable findings about the GAME, illustrated with self-contained inline
+   SVG charts (no external deps, styled with the site's own palette).
+========================================================= */
+// Small helpers to build crisp, palette-matched SVG charts inline.
+const CHART_C = { gold:'#FFCE54', cream:'#FBEFDA', dim:'#D9B996', red:'#E5484D', blue:'#59C7E8', green:'#3ECF6B', line:'rgba(255,235,210,0.14)' };
+function chartFrame(inner, w, h, caption){
+  return `<figure class="np-chart">
+    <svg viewBox="0 0 ${w} ${h}" width="100%" preserveAspectRatio="xMidYMid meet" role="img" font-family="'JetBrains Mono',monospace">${inner}</svg>
+    ${caption?`<figcaption>${caption}</figcaption>`:''}
+  </figure>`;
+}
+// 1) Luck vs skill split — a single 100%-wide stacked bar.
+function chartLuckSkill(luckLabel, skillLabel){
+  const w=680, h=132, x=20, y=42, bw=w-40, bh=44;
+  const luckW = bw*0.90, skillW = bw*0.10;
+  const inner = `
+    <rect x="${x}" y="${y}" width="${luckW}" height="${bh}" rx="6" fill="${CHART_C.red}" opacity="0.88"></rect>
+    <rect x="${x+luckW}" y="${y}" width="${skillW}" height="${bh}" rx="6" fill="${CHART_C.gold}"></rect>
+    <text x="${x+luckW/2}" y="${y+bh/2+6}" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">90%</text>
+    <text x="${x+luckW+skillW/2}" y="${y+bh/2+6}" text-anchor="middle" font-size="13" font-weight="700" fill="#3a2100">10%</text>
+    <text x="${x}" y="${y-12}" font-size="13" fill="${CHART_C.red}" font-weight="700">${luckLabel}</text>
+    <text x="${x+bw}" y="${y-12}" text-anchor="end" font-size="13" fill="${CHART_C.gold}" font-weight="700">${skillLabel}</text>
+    <text x="${x}" y="${y+bh+26}" font-size="12" fill="${CHART_C.dim}">◄ 1 course</text>`;
+  return chartFrame(inner, w, h);
+}
+// 2) Reliability vs number of races — two rising curves (team vs player).
+function chartReliability(labels){
+  const w=680, h=340, L=54, R=20, T=24, B=54;
+  const pw=w-L-R, ph=h-T-B;
+  const maxN=100;
+  const X = n => L + (Math.log(n)/Math.log(maxN))*pw; // log x so early races are readable
+  const Y = r => T + (1-r)*ph;
+  // Sampling-corrected luck/skill ratios on the full final dataset: team 8.5:1, player 14.7:1.
+  const relTeam = n => 1/(1+8.5/n), relPlayer = n => 1/(1+14.7/n);
+  const ns=[1,2,4,6,8,12,18,24,36,48,72,100];
+  const path = f => ns.map((n,i)=>`${i?'L':'M'}${X(n).toFixed(1)} ${Y(f(n)).toFixed(1)}`).join(' ');
+  // gridlines at 50/80/90%
+  const grid=[0.5,0.8,0.9,1.0].map(r=>`<line x1="${L}" y1="${Y(r)}" x2="${w-R}" y2="${Y(r)}" stroke="${CHART_C.line}"></line><text x="${L-8}" y="${Y(r)+4}" text-anchor="end" font-size="11" fill="${CHART_C.dim}">${Math.round(r*100)}%</text>`).join('');
+  const xt=[1,4,12,24,48,100].map(n=>`<text x="${X(n)}" y="${h-B+20}" text-anchor="middle" font-size="11" fill="${CHART_C.dim}">${n}</text>`).join('');
+  // markers: one 12-race match
+  const inner=`
+    ${grid}${xt}
+    <text x="${L+pw/2}" y="${h-10}" text-anchor="middle" font-size="12" fill="${CHART_C.cream}">${labels.x}</text>
+    <path d="${path(relTeam)}" fill="none" stroke="${CHART_C.gold}" stroke-width="3"></path>
+    <path d="${path(relPlayer)}" fill="none" stroke="${CHART_C.blue}" stroke-width="3" stroke-dasharray="2 4"></path>
+    <line x1="${X(12)}" y1="${T}" x2="${X(12)}" y2="${T+ph}" stroke="${CHART_C.cream}" stroke-width="1" opacity="0.35" stroke-dasharray="3 3"></line>
+    <text x="${X(12)+5}" y="${T+14}" font-size="11" fill="${CHART_C.cream}" opacity="0.8">${labels.match}</text>
+    <circle cx="${X(12)}" cy="${Y(relTeam(12))}" r="5" fill="${CHART_C.gold}"></circle>
+    <circle cx="${X(12)}" cy="${Y(relPlayer(12))}" r="5" fill="${CHART_C.blue}"></circle>
+    <text x="${w-R}" y="${Y(relTeam(100))-10}" text-anchor="end" font-size="13" fill="${CHART_C.gold}" font-weight="700">${labels.team}</text>
+    <text x="${w-R}" y="${Y(relPlayer(100))+18}" text-anchor="end" font-size="13" fill="${CHART_C.blue}" font-weight="700">${labels.player}</text>`;
+  return chartFrame(inner, w, h, labels.caption);
+}
+// 3) Races needed to reach a "reliable" (80%) ranking — team vs player bars.
+function chartRacesToRank(labels){
+  // Wider right margin reserves room for the value label so the longest bar's text never
+  // spills past the frame; the label is also clamped to stay inside the drawing area.
+  const w=680, h=180, L=130, R=96, T=20;
+  const pw=w-L-R;
+  const rows=[{lab:labels.team, v:34, c:CHART_C.gold},{lab:labels.player, v:59, c:CHART_C.blue}];
+  const maxV=64; const X=v=>(v/maxV)*pw;
+  const inner = rows.map((row,i)=>{
+    const y=T+i*70, bh=40;
+    const labelX = Math.min(L+X(row.v)+10, w-8); // never let the number run off the right edge
+    const anchor = labelX > w-56 ? 'end' : 'start'; // flip to right-anchored near the edge
+    const tx = anchor==='end' ? Math.min(L+X(row.v)-8, w-8) : labelX;
+    return `<text x="${L-12}" y="${y+bh/2+5}" text-anchor="end" font-size="14" fill="${CHART_C.cream}" font-weight="700">${row.lab}</text>
+      <rect x="${L}" y="${y}" width="${X(row.v)}" height="${bh}" rx="6" fill="${row.c}"></rect>
+      <text x="${tx}" y="${y+bh/2+6}" text-anchor="${anchor}" font-size="18" font-weight="700" fill="${anchor==='end'?'#3a2100':row.c}">${row.v} ${labels.races}</text>`;
+  }).join('');
+  return chartFrame(inner, w, h, labels.caption);
+}
+// 4) The best player's own race finishes — a 12-bucket histogram showing volatility.
+function chartBestPlayerSpread(labels){
+  // Borger (FR), 72 races: count of finishes at each position 1..12 (final tournament data).
+  const counts=[15,12,7,9,3,8,4,4,4,2,2,2];
+  const w=680, h=240, L=36, R=16, T=24, B=48;
+  const pw=w-L-R, ph=h-T-B; const n=counts.length;
+  const gap=6, bw=(pw-gap*(n-1))/n; const maxC=Math.max(...counts);
+  const bars=counts.map((c,i)=>{
+    const x=L+i*(bw+gap), bh=ph*(c/maxC), y=T+ph-bh;
+    const podium=i<3, tail=i>=9;
+    const col = podium?CHART_C.gold : tail?CHART_C.red : CHART_C.dim;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${col}"></rect>
+      <text x="${(x+bw/2).toFixed(1)}" y="${h-B+18}" text-anchor="middle" font-size="11" fill="${CHART_C.dim}">${i+1}${labels.posSuffix}</text>
+      ${c?`<text x="${(x+bw/2).toFixed(1)}" y="${(y-6).toFixed(1)}" text-anchor="middle" font-size="11" fill="${CHART_C.cream}">${c}</text>`:''}`;
+  }).join('');
+  const inner = `${bars}
+    <text x="${L}" y="${h-10}" font-size="12" fill="${CHART_C.gold}">${labels.podium}</text>
+    <text x="${w-R}" y="${h-10}" text-anchor="end" font-size="12" fill="${CHART_C.red}">${labels.tail}</text>`;
+  return chartFrame(inner, w, h, labels.caption);
+}
+// How often a half-time lead of a given size is held to the end (44 / 62 / 86 / 100%).
+function chartSafeLead(labels){
+  const data=[{lab:labels.b1, v:44},{lab:labels.b2, v:68},{lab:labels.b3, v:86},{lab:labels.b4, v:100}];
+  const w=680, h=210, L=90, R=48, T=16, B=40;
+  const pw=w-L-R; const rowH=(h-T-B)/data.length;
+  const X=v=>(v/100)*pw;
+  const inner = data.map((d,i)=>{
+    const y=T+i*rowH+6, bh=rowH-14;
+    // colour ramps from red (fragile lead) to green (safe lead)
+    const col = d.v>=100?CHART_C.green : d.v>=86?'#8Fc96b' : d.v>=62?CHART_C.gold : CHART_C.red;
+    return `<text x="${L-10}" y="${y+bh/2+4}" text-anchor="end" font-size="12" fill="${CHART_C.cream}">${d.lab}</text>
+      <rect x="${L}" y="${y}" width="${X(d.v).toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${col}"></rect>
+      <text x="${L+X(d.v)+8}" y="${y+bh/2+5}" font-size="14" font-weight="700" fill="${col}">${d.v}%</text>`;
+  }).join('');
+  return chartFrame(inner, w, h, labels.caption);
+}
+// The one reliable track finding: selection frequency is highly non-uniform (top vs bottom picks).
+// Built as an HTML bar list (not SVG) so it can collapse to the 5 most / 5 least picked tracks and
+// expand to all 30 via a button. `prefs` = [{id, n}] sorted most-played first (from getWrapRecords).
+function chartTrackPrefs(labels, prefs){
+  const list = (prefs||[]).filter(p=>p && p.id);
+  if(!list.length) return '';
+  const maxN = list[0].n || 1;
+  const N = list.length;
+  const HEAD = 5, TAIL = 5;
+  const row = (p, rank) => {
+    const hot = rank < HEAD;            // top picks in gold, the rest dim
+    const cold = rank >= N - TAIL;
+    const col = hot ? 'var(--gold)' : cold ? 'var(--red)' : 'var(--dim)';
+    const collapsed = (rank >= HEAD && rank < N - TAIL) ? ' tp-hidden' : '';
+    const pct = Math.max(4, Math.round((p.n/maxN)*100));
+    return `<div class="tp-row${collapsed}">
+      <span class="tp-name">${trackName(p.id)}</span>
+      <span class="tp-bar"><span class="tp-fill" style="width:${pct}%;background:${col};"></span></span>
+      <span class="tp-val" style="color:${col};">${p.n}</span>
+    </div>`;
+  };
+  const rows = list.map((p,i)=>row(p,i)).join('');
+  const hiddenCount = Math.max(0, N - HEAD - TAIL);
+  const btn = hiddenCount>0
+    ? `<button type="button" class="tp-toggle" data-more="${labels.showAll}" data-less="${labels.showLess}">${labels.showAll}</button>`
+    : '';
+  return `<figure class="np-chart np-trackprefs" data-collapsed="1">
+    <div class="tp-list">${rows}</div>
+    ${btn}
+    ${labels.caption?`<figcaption>${labels.caption}</figcaption>`:''}
+  </figure>`;
+}
+// Editorial wrap-up copy. Prose is hand-written (not placeholder-filled): these are
+// fixed research conclusions. {champion} is the only dynamic token, filled from the
+// bracket recap once the final is decided. Arrays render as consecutive <p> blocks.
+const WRAP_I18N = {
+  fr:{
+    eyebrow:'Le mot de la fin',
+    title:'Le tournoi en bref, et pourquoi ce site',
+    standfirst:'Trois semaines, trente et une équipes, plus de mille courses. Le MKWC 2026 est terminé — l’occasion d’un dernier tour de piste : ce qu’il faut retenir du tournoi, mais surtout ce que toutes ces données nous ont appris sur <b>Mario Kart World</b> lui-même. Car c’est là, au fond, la vraie raison d’être de ce site.',
+    byline:'Bilan · Analyse · Coulisses',
+    hOverview:'Le tournoi en un coup d’œil',
+    overviewChamp:'Au terme d’un parcours à élimination directe impitoyable, c’est {champion} qui décroche le titre de champion du MKWC 2026. Mais derrière le sacre, c’est tout un tournoi qui s’est joué en trois actes : un Play-In pour se qualifier, une phase de groupes pour se départager, un bracket pour trancher.',
+    overviewNoChamp:'Le tournoi s’est joué en trois actes : un Play-In pour se qualifier, une phase de groupes pour se départager, un bracket à élimination directe pour trancher. Le champion sera couronné à l’issue de la finale — ce récap se complétera automatiquement à ce moment-là.',
+    overview2:'Trente et une nations, réparties d’abord en petits groupes puis fondues dans un tableau final. Chaque match se joue sur douze courses, et chaque course rapporte des points selon la place de chacun·e des six pilotes d’une équipe. Simple sur le papier — beaucoup moins évident une fois qu’on regarde les chiffres de près, comme on va le voir.',
+    hWhy:'Pourquoi j’ai fait ce site',
+    why:[
+      'Au départ, je voulais simplement un endroit clair pour suivre les résultats. Puis une question est revenue sans cesse : <b>dans un jeu où une carapace bleue ou un éclair peut gâcher une course parfaite, est-ce que le résultat reflète vraiment le niveau des joueur·euse·s ?</b> Chacun·e a son avis — «&nbsp;c’est surtout de la chance&nbsp;» ou «&nbsp;les meilleur·e·s finissent toujours par gagner&nbsp;» — mais personne ne s’appuie sur des chiffres.',
+      'Le site est donc devenu un moyen de <b>répondre à cette question avec des données</b>. Chaque résultat saisi vient enrichir une base qui permet de vérifier ce qu’on croit savoir sur le jeu. Et comme le tournoi rassemble plus de mille courses, on a enfin assez de matière pour séparer les vraies tendances du simple hasard.',
+      'Ce qui suit s’appuie sur les données de tout le tournoi — plus de mille courses. À cette échelle, les <b>tendances qui ressortent sont solides et cohérentes</b>&nbsp;: ce ne sont pas de simples impressions, mais des constats qui reviennent match après match. C’est ce qu’un tournoi de ce niveau nous apprend sur le jeu — d’autres contextes pourraient nuancer certains détails, mais l’image d’ensemble, elle, est fiable. Certaines conclusions confirment ce qu’on pensait, d’autres le contredisent.'
+    ],
+    hLuck:'1. Sur une course, la chance pèse pour 90&nbsp;%',
+    luck:[
+      'C’est le résultat le plus surprenant. Pour le mesurer, on regarde à quel point les résultats d’un·e <b>même joueur·euse</b> changent d’une course à l’autre. Son niveau peut bien sûr fluctuer un peu — fatigue, concentration, forme du moment — mais bien trop peu pour expliquer des écarts aussi grands d’une course à l’autre. Le constat est net : sur une course prise seule, environ <fig>90&nbsp;%</fig> du résultat tient à ce qui échappe au niveau pur (objets, accrochages, erreurs ponctuelles) et seulement <fig>10&nbsp;%</fig> environ au niveau réel du·de la joueur·euse.'
+    ],
+    chartLuck:{ luck:'Hasard et aléas de la course', skill:'Niveau' },
+    luck2:[
+      'Autrement dit, <b>une seule course ne dit presque rien du niveau</b> des joueur·euse·s. C’est vrai pour tout le monde, y compris pour <b>Borger</b>, le·la meilleur·e joueur·euse du tournoi. Voici comment se répartissent ses résultats sur ses 72 courses&nbsp;:',
+      'Il/elle termine premier·e une fois sur cinq, mais finit aussi parfois en fond de classement, jusqu’à la dernière place. Même les meilleur·e·s ne gagnent pas toutes leurs courses&nbsp;: un objet mal placé, un accrochage ou une petite erreur suffit à tout changer. Le niveau ne se lit donc pas sur une course isolée, mais sur l’ensemble des courses.'
+    ],
+    chartSpread:{ caption:'Positions de <b>Borger</b>, le·la meilleur·e joueur·euse du tournoi, sur ses 72 courses. Podium en or, fond de classement en rouge.', podium:'◄ podium', tail:'fond de classement ►', posSuffix:'', posPrefix:'' },
+    hCollective:'2. Le niveau ressort à force de répétition',
+    collective:[
+      'Si une course dépend à 90&nbsp;% de la chance, comment le tournoi peut-il désigner un vainqueur juste&nbsp;? En <b>multipliant les courses</b>. Sur une course, la chance sourit à l’un puis à l’autre&nbsp;; mais plus on enchaîne les courses, plus ces coups de chance s’annulent entre eux. Le petit avantage de niveau, lui, joue toujours dans le même sens&nbsp;: à force de répéter, c’est lui qui finit par ressortir.',
+      'Une <b>équipe de six joueur·euse·s</b> accélère encore ce phénomène. Sur une même course, si l’un se fait piéger par un objet, un·e coéquipier·ère en profite souvent&nbsp;: la malchance de l’un est compensée par la chance de l’autre, dans la course elle-même. Résultat, le hasard se lisse bien plus vite pour une équipe que pour un individu — et on peut donc la juger avec bien moins de courses&nbsp;:'
+    ],
+    chartRel:{ x:'Nombre de courses jouées', team:'Équipe (6 joueur·euse·s)', player:'Individu seul', match:'un match', caption:'Fiabilité du classement selon le nombre de courses. Après un seul match de 12 courses, une équipe est déjà mieux cernée qu’un individu (58&nbsp;% contre 45&nbsp;%), mais la vraie certitude ne vient qu’avec beaucoup plus de courses.' },
+    chartRaces:{ team:'Équipe', player:'Individu seul', races:'courses', caption:'Nombre de courses nécessaires pour un classement fiable. Une équipe se juge environ deux fois plus vite qu’un individu seul.' },
+    collective2:[
+      'Concrètement, il faut environ <fig>60 courses</fig> pour juger correctement une personne seule, mais seulement <fig>34 courses</fig> pour une équipe&nbsp;: près de deux fois moins. Or, dans ce tournoi, chaque match oppose deux équipes sur <b>douze courses</b> — assez pour que le niveau prenne le pas sur le hasard. C’est pourquoi la meilleure équipe finit presque toujours par gagner son match, et pourquoi un tournoi par équipes reflète bien mieux le niveau réel qu’un classement individuel.'
+    ],
+    hMemory:'3. Une mauvaise course n’en entraîne jamais une autre',
+    memory:[
+      'Beaucoup de joueur·euse·s pensent qu’il existe un «&nbsp;momentum&nbsp;»&nbsp;: une bonne course en lancerait une autre, une mauvaise ferait boule de neige. Les données disent l’inverse&nbsp;: chaque course repart de zéro, sans lien avec les précédentes. Concrètement, même après avoir fini dernier·e, on garde <fig>23&nbsp;%</fig> de chances de monter sur le podium à la course suivante. Rien n’est jamais plombé d’avance.'
+    ],
+    hPlayers:'4. Ce qui fait un·e bon·ne joueur·euse',
+    players:[
+      'Le talent se lit surtout dans les <b>meilleures courses</b> d’un·e joueur·euse, pas dans sa capacité à éviter les mauvaises. Autrement dit, un·e bon·ne joueur·euse n’est pas quelqu’un qui limite les catastrophes&nbsp;: c’est quelqu’un qui vise plus haut quand tout s’aligne. Viser le sommet et accepter le risque rapporte plus que jouer prudemment.',
+      'On imagine aussi que la pression fait craquer dans les moments décisifs. Bien sûr, certain·e·s craquent et d’autres se subliment&nbsp;: ça existe, individuellement. Mais <b>en moyenne</b>, ça s’équilibre&nbsp;: dans la manche décisive d’une série, l’ensemble des joueur·euse·s marque autant qu’en temps normal. À l’échelle du plateau, l’enjeu ne fait donc pas monter ni baisser le niveau global.'
+    ],
+    hTracks:'5. Les circuits se valent tous',
+    tracks:[
+      'On imagine souvent que certains circuits sont plus «&nbsp;chanceux&nbsp;», plus «&nbsp;piégeux&nbsp;» ou plus «&nbsp;décisifs&nbsp;» que d’autres. Les données ne le confirment pas. Aucun circuit ne se distingue vraiment&nbsp;: ni par la part de chance, ni par sa tendance à creuser les écarts, ni par l’importance de la position de départ.',
+      'Une conséquence concrète&nbsp;: <b>choisir un circuit en fonction de sa position sur la grille ne change rien</b>. La position de départ n’a quasiment aucun effet sur le résultat final. Sur le plan de la compétition, les circuits sont donc équivalents&nbsp;: jouez celui que vous préférez, vos chances restent les mêmes.'
+    ],
+    tracksPref:[
+      'Et pourtant, les joueur·euse·s sont loin de choisir au hasard. Certains circuits reviennent bien plus souvent que d’autres, et ces préférences sont <b>stables tout au long du tournoi</b>&nbsp;: les favoris des poules restent les favoris du bracket. C’est donc une vraie tendance, pas un simple effet d’échantillon.',
+      'Le paradoxe est là&nbsp;: ces circuits adorés ne donnent pourtant pas des courses différentes — ni plus justes, ni plus décisives. Les joueur·euse·s choisissent par <b>goût, habitude ou esthétique</b>, pas parce qu’un circuit leur offrirait un avantage réel.'
+    ],
+    chartTracks:{ caption:'Circuits les plus et les moins choisis sur tout le tournoi. Les préférences sont fortes et stables, mais compétitivement neutres.', showAll:'Voir tous les circuits', showLess:'Réduire' },
+    hMatch:'6. Ce qui fait vraiment gagner un match',
+    match:[
+      '<b>Ce qui décide, c’est le podium.</b> Ce qui compte dans un match, c’est combien de vos pilotes montent sur le podium, et combien coulent en fond de classement. Le milieu ne change presque rien.',
+      '<b>Attaquer rapporte plus que se protéger.</b> Aller chercher les premières places pèse plus que d’éviter les dernières.',
+      '<b>C’est un jeu d’équipe.</b> Le·la joueur·euse le·la plus faible compte autant que la star&nbsp;: une seule vedette ne suffit jamais à gagner.',
+      'Enfin, un match se <b>décide petit à petit</b>. Dès la première course, l’équipe en tête finit par l’emporter dans <fig>65&nbsp;%</fig> des cas&nbsp;; après dix courses, c’est <fig>99&nbsp;%</fig>. Mais tant que l’écart de points entre les deux équipes reste petit, rien n’est joué — une avance à la mi-match ne tient que si elle est vraiment large&nbsp;:'
+    ],
+    chartLead:{ caption:'Chances de conserver son avance jusqu’au bout, selon la taille de l’avance à la mi-match.', b1:'≤ 15 pts', b2:'16–30 pts', b3:'31–50 pts', b4:'plus de 50 pts' },
+    match2:[
+      'Autrement dit&nbsp;: en dessous de 30&nbsp;points d’avance à la mi-match, tout reste possible&nbsp;; au-delà de 50, la victoire est quasiment acquise.',
+      'Et même à l’échelle d’une équipe, le hasard reste très présent&nbsp;: connaître le niveau des deux équipes ne suffit pas à prédire le score d’un match. Le déroulé du jour compte au moins autant que la valeur des équipes.'
+    ],
+    hRecords:'Les records du tournoi',
+    recordsIntro:'À présent, le tableau d’honneur du MKWC 2026 — les chiffres marquants d’un tournoi de trois semaines.',
+    rec:{
+      champion:'Équipe championne', bestPlayer:'Meilleur·e joueur·euse', mostWins:'Plus de courses gagnées',
+      bigMatch:'Plus gros match individuel', longStreak:'Plus longue série de victoires', surprise:'La surprise du tournoi',
+      mostPoints:'Équipe la plus prolifique', topScorer:'Plus grande quantité de points marqués sur le tournoi', comeback:'Plus grosse remontée',
+      pts:'pts', wins:'victoires', races:'courses', ptsMatch:'pts sur un match', streakUnit:'d’affilée',
+      top6Unit:'fois', places:'places gagnées', deficit:'pts de retard comblés',
+      avgOn:'de moyenne sur', top6Hint:'(les 6 pilotes en top 6 sur une course)'
+    },
+    statsLead:'Le MKWC 2026 en chiffres',
+    stat:{ teams:'équipes', players:'joueur·euse·s', matches:'matchs', races:'courses disputées', points:'points marqués' },
+    hClose:'Le mot de la fin',
+    close:[
+      'Voici l’idée qui résume tout&nbsp;: <b>sur une course, Mario Kart World est très imprévisible&nbsp;; sur la durée, il devient très cohérent.</b> La chance s’équilibre, le niveau ressort, et une fois l’écart installé il s’inverse rarement. La plupart des idées reçues — les bonnes séries, les votes des circuits en fonction des positions sur la grille, la part de chance, les remontées héroïques — ne résistent pas à l’analyse.',
+      'C’est ce que ce site m’a permis de comprendre&nbsp;: derrière le désordre apparent, le jeu est en réalité <b>plutôt juste</b>, à condition de lui laisser le temps de départager les joueur·euse·s. Merci d’avoir suivi le tournoi ici, et merci à toutes les équipes pour le spectacle&nbsp;!'
+    ]
+  },
+  en:{
+    eyebrow:'Final word',
+    title:'The tournament in a nutshell, and why this site',
+    standfirst:'Three weeks, thirty-one teams, over a thousand races. MKWC 2026 is over — time for one last lap: what to remember from the tournament, but above all what all this data taught us about <b>Mario Kart World</b> itself. Because that, deep down, is the real reason this site exists.',
+    byline:'Wrap-up · Analysis · Behind the scenes',
+    hOverview:'The tournament at a glance',
+    overviewChamp:'At the end of a merciless single-elimination run, {champion} claims the MKWC 2026 title. But behind the crowning, the whole tournament played out in three acts: a Play-In to qualify, a Group Stage to sort the field, a bracket to settle it.',
+    overviewNoChamp:'The tournament played out in three acts: a Play-In to qualify, a Group Stage to sort the field, a single-elimination bracket to settle it. The champion will be crowned once the final is done — this recap will complete itself automatically then.',
+    overview2:'Thirty-one nations, first split into small groups then folded into a final bracket. Each match is twelve races, and each race scores points by the finishing place of a team’s six racers. Simple on paper — a lot less obvious once you look closely at the numbers, as we’ll see.',
+    hWhy:'Why I built this site',
+    why:[
+      'At first I just wanted a clear place to track the results. Then one question kept coming back: <b>in a game where a blue shell or a lightning bolt can ruin a perfect race, does the result really reflect the players’ skill?</b> Everyone has a view — “it’s mostly luck” or “the best always win in the end” — but no one backs it with numbers.',
+      'So the site became a way to <b>answer that question with data</b>. Every result entered feeds a dataset that lets us check what we think we know about the game. And because the tournament gathers over a thousand races, we finally have enough to separate real trends from plain chance.',
+      'What follows is built on the data from the entire tournament — over a thousand races. At that scale, the <b>trends that emerge are solid and consistent</b>: not just impressions, but patterns that recur match after match. This is what a tournament of this level tells us about the game — other settings might nuance some of the details, but the overall picture is reliable. Some conclusions confirm what we expected, others contradict it.'
+    ],
+    hLuck:'1. On a single race, luck accounts for 90%',
+    luck:[
+      'This is the most surprising result. To measure it, we look at how much the <b>same player’s</b> results change from race to race. Their level can of course shift a little — tiredness, focus, form on the day — but far too little to explain swings this big from one race to the next. The finding is clear: on a single race, about <fig>90%</fig> of the result comes down to what’s beyond pure skill (items, collisions, one-off mistakes) and only about <fig>10%</fig> to the player’s actual level.'
+    ],
+    chartLuck:{ luck:'Luck and race randomness', skill:'Skill' },
+    luck2:[
+      'In other words, <b>a single race tells you almost nothing about a player’s skill</b>. That’s true for everyone, including <b>Borger</b>, the best player of the tournament. Here’s how their results break down across their 72 races:',
+      'They finish first one race in five, but they also land near the bottom, as low as last place. Even the very best don’t win every race: a badly-timed item, a collision or a small mistake is enough to change everything. So skill doesn’t show on one race — it shows across many.'
+    ],
+    chartSpread:{ caption:'Finishing positions of <b>Borger</b>, the tournament’s best player, across their 72 races. Podium in gold, bottom of the field in red.', podium:'◄ podium', tail:'bottom of field ►', posSuffix:'', posPrefix:'' },
+    hCollective:'2. Skill emerges through repetition',
+    collective:[
+      'If a race is 90% luck, how can the tournament crown a fair winner? By <b>stacking up races</b>. On one race, luck favours first one side then the other; but the more races you run, the more those strokes of luck cancel each other out. The small skill edge always works the same way, so over enough races it’s what surfaces.',
+      'A <b>team of six players</b> speeds this up even more. Within one race, if one player gets caught by an item, a teammate often benefits: one player’s bad luck is offset by another’s good luck, inside the race itself. So luck averages out far faster for a team than for an individual — and you can judge a team with far fewer races:'
+    ],
+    chartRel:{ x:'Number of races played', team:'Team (6 players)', player:'Lone player', match:'one match', caption:'Ranking reliability by number of races. After a single 12-race match, a team is already better pinned down than a player (58% vs 45%), but real certainty only comes with many more races.' },
+    chartRaces:{ team:'Team', player:'Lone player', races:'races', caption:'Races needed for a reliable ranking. A team can be judged about twice as fast as a lone player.' },
+    collective2:[
+      'Concretely, it takes about <fig>60 races</fig> to judge a lone player properly, but only <fig>34 races</fig> for a team — roughly half as many. Now, in this tournament, every match pits two teams against each other over <b>twelve races</b> — enough for skill to outweigh luck. That’s why the better team almost always wins its match, and why a team tournament reflects real skill far better than an individual ranking.'
+    ],
+    hMemory:'3. One bad race never drags another behind it',
+    memory:[
+      'Many players believe in “momentum”: a good race supposedly launches another, a bad one snowballs. The data says the opposite: every race starts fresh, with no link to the ones before. In practice, even after finishing last, you still have a <fig>23%</fig> chance of reaching the podium on the next race. Nothing is ever doomed in advance.'
+    ],
+    hPlayers:'4. What makes a good player',
+    players:[
+      'Skill shows mostly in a player’s <b>best races</b>, not in their ability to avoid bad ones. In other words, a good player isn’t someone who limits disasters: it’s someone who reaches higher when everything lines up. Aiming for the top and accepting the risk pays more than playing it safe.',
+      'It’s also tempting to think pressure makes players crack in the decisive moments. Sure, some crack and others rise to it — individually, that happens. But <b>on average</b> it balances out: in the deciding game of a series, players as a whole score just as much as usual. Across the field, the stakes don’t raise or lower the overall level.'
+    ],
+    hTracks:'5. The tracks are all equivalent',
+    tracks:[
+      'It’s tempting to think some tracks are “luckier,” “more treacherous” or “more decisive” than others. The data doesn’t support that. No track truly stands out: not in how much luck it involves, not in how much it opens gaps, not in how much starting position matters.',
+      'A practical consequence: <b>choosing a track based on your grid position changes nothing</b>. Starting position has almost no effect on the final result. Competitively, the tracks are equivalent — play the one you prefer, your odds stay the same.'
+    ],
+    tracksPref:[
+      'And yet, players are far from choosing at random. Some tracks come up much more often than others, and these preferences are <b>stable throughout the tournament</b>: the group-stage favourites stay the bracket favourites. So it’s a real pattern, not just a sampling quirk.',
+      'Here’s the paradox: those beloved tracks don’t actually produce different races — no fairer, no more decisive. Players choose by <b>taste, habit or looks</b>, not because a track gives them a real edge.'
+    ],
+    chartTracks:{ caption:'Most- and least-picked tracks across the whole tournament. Preferences are strong and stable, but competitively neutral.', showAll:'Show all tracks', showLess:'Show less' },
+    hMatch:'6. What actually wins a match',
+    match:[
+      '<b>What decides it is the podium.</b> What counts in a match is how many of your racers reach the podium, and how many sink to the back. The midfield barely matters.',
+      '<b>Attacking pays more than playing safe.</b> Going for first places matters more than avoiding last places.',
+      '<b>It’s a team game.</b> The weakest player matters as much as the star: one big name is never enough to win.',
+      'Finally, a match is <b>decided little by little</b>. From the very first race, the leading team goes on to win <fig>65%</fig> of the time; after ten races, it’s <fig>99%</fig>. But as long as the points gap between the two teams stays small, nothing is settled — a half-time lead only holds if it’s truly large:'
+    ],
+    chartLead:{ caption:'Chances of holding your lead to the end, by the size of the lead at half-time.', b1:'≤ 15 pts', b2:'16–30 pts', b3:'31–50 pts', b4:'over 50 pts' },
+    match2:[
+      'In short: below a 30-point lead at half-time, anything can still happen; beyond 50, the win is all but secured.',
+      'And even at team level, luck stays very present: knowing both teams’ level isn’t enough to predict a match’s score. How the day unfolds matters at least as much as how good the teams are.'
+    ],
+    hRecords:'The tournament records',
+    recordsIntro:'Now, the MKWC 2026 roll of honour — the standout numbers from three weeks of racing.',
+    rec:{
+      champion:'Champion team', bestPlayer:'Best player', mostWins:'Most race wins',
+      bigMatch:'Biggest individual match', longStreak:'Longest win streak', surprise:'Surprise of the tournament',
+      mostPoints:'Highest-scoring team', topScorer:'Most points scored in the tournament', comeback:'Biggest comeback',
+      pts:'pts', wins:'wins', races:'races', ptsMatch:'pts in one match', streakUnit:'in a row',
+      top6Unit:'times', places:'places gained', deficit:'pts deficit overturned',
+      avgOn:'average over', top6Hint:'(all 6 racers finishing in the top 6 of one race)'
+    },
+    statsLead:'MKWC 2026 in numbers',
+    stat:{ teams:'teams', players:'players', matches:'matches', races:'races played', points:'points scored' },
+    hClose:'Final word',
+    close:[
+      'Here’s the idea that ties it together: <b>over one race, Mario Kart World is very unpredictable; over the long run, it becomes very consistent.</b> Luck evens out, skill emerges, and once a gap is set it rarely reverses. Most common beliefs — hot streaks, picking tracks based on your grid position, the role of luck, heroic comebacks — don’t survive the analysis.',
+      'That’s what this site helped me understand: behind the apparent disorder, the game is actually <b>quite fair</b>, as long as you give it time to separate the players. Thanks for following the tournament here, and thanks to every team for the show. See you next time.'
+    ]
+  },
+  es:{
+    eyebrow:'La última palabra',
+    title:'El torneo en resumen, y por qué este sitio',
+    standfirst:'Tres semanas, treinta y un equipos, más de mil carreras. El MKWC 2026 ha terminado — momento para una última vuelta: qué recordar del torneo, pero sobre todo qué nos han enseñado todos estos datos sobre <b>Mario Kart World</b> en sí. Porque esa es, en el fondo, la verdadera razón de ser de este sitio.',
+    byline:'Balance · Análisis · Entre bastidores',
+    hOverview:'El torneo de un vistazo',
+    overviewChamp:'Al final de un recorrido a eliminación directa despiadado, {champion} se lleva el título del MKWC 2026. Pero tras la coronación, todo un torneo se jugó en tres actos: un Play-In para clasificar, una fase de grupos para ordenar, un bracket para decidir.',
+    overviewNoChamp:'El torneo se jugó en tres actos: un Play-In para clasificar, una fase de grupos para ordenar, un bracket a eliminación directa para decidir. El campeón se coronará al terminar la final — este resumen se completará automáticamente entonces.',
+    overview2:'Treinta y una naciones, primero repartidas en grupos pequeños y luego fundidas en un cuadro final: el formato premia tanto la regularidad en el tiempo como las grandes actuaciones del día. Cada partido son doce carreras, cada carrera reparte puntos según el puesto de los seis pilotos de un equipo. Simple sobre el papel — mucho más retorcido en la práctica, como veremos.',
+    hWhy:'Por qué hice este sitio',
+    why:[
+      'Al principio solo quería un lugar claro para seguir los resultados. Luego una pregunta volvía una y otra vez: <b>en un juego donde un caparazón azul o un rayo puede arruinar una carrera perfecta, ¿refleja el resultado de verdad el nivel de los jugadores?</b> Cada uno tiene su opinión — “es sobre todo suerte” o “al final ganan los mejores” — pero nadie se apoya en cifras.',
+      'Así que el sitio se convirtió en una forma de <b>responder a esa pregunta con datos</b>. Cada resultado introducido alimenta una base que permite comprobar lo que creemos saber del juego. Y como el torneo reúne más de mil carreras, por fin hay material suficiente para separar las tendencias reales del simple azar.',
+      'Lo que sigue se apoya en los datos de todo el torneo — más de mil carreras. A esa escala, las <b>tendencias que surgen son sólidas y coherentes</b>: no son simples impresiones, sino patrones que se repiten partido tras partido. Es lo que un torneo de este nivel nos enseña sobre el juego — otros contextos podrían matizar algunos detalles, pero la imagen de conjunto sí es fiable. Algunas conclusiones confirman lo que pensábamos, otras lo contradicen.'
+    ],
+    hLuck:'1. En una carrera, el azar pesa un 90%',
+    luck:[
+      'Es el resultado más sorprendente. Para medirlo, miramos cuánto cambian los resultados de un <b>mismo jugador</b> de una carrera a otra. Su nivel puede variar un poco, claro — cansancio, concentración, estado del día — pero demasiado poco para explicar diferencias tan grandes de una carrera a otra. El dato es claro: en una carrera aislada, alrededor del <fig>90%</fig> del resultado se debe a lo que escapa al nivel puro (objetos, choques, errores puntuales) y solo un <fig>10%</fig> aproximado al nivel real del jugador.'
+    ],
+    chartLuck:{ luck:'Azar y aleatoriedad de la carrera', skill:'Nivel' },
+    luck2:[
+      'Dicho de otro modo, <b>una sola carrera no dice casi nada del nivel</b> de los jugadores. Vale para todos, incluido <b>Borger</b>, el mejor jugador del torneo. Así se reparten sus resultados en sus 72 carreras:',
+      'Termina primero una carrera de cada cinco, pero también acaba en el fondo, hasta el último puesto. Ni los mejores ganan todas sus carreras: un objeto mal colocado, un choque o un pequeño error basta para cambiarlo todo. Por eso el nivel no se ve en una carrera aislada, sino a lo largo de muchas.'
+    ],
+    chartSpread:{ caption:'Posiciones de <b>Borger</b>, el mejor jugador del torneo, en sus 72 carreras. Podio en oro, fondo de la clasificación en rojo.', podium:'◄ podio', tail:'fondo de la clasificación ►', posSuffix:'', posPrefix:'' },
+    hCollective:'2. El nivel aflora con la repetición',
+    collective:[
+      'Si una carrera depende un 90% del azar, ¿cómo puede el torneo coronar a un ganador justo? <b>Acumulando carreras</b>. En una carrera, el azar favorece tan pronto a uno como a otro; pero cuantas más carreras se encadenan, más se anulan entre sí esos golpes de suerte. La pequeña ventaja de nivel siempre juega en el mismo sentido: a fuerza de repetir, es la que acaba aflorando.',
+      'Un <b>equipo de seis jugadores</b> acelera aún más esto. En una misma carrera, si a uno lo atrapa un objeto, un compañero suele aprovecharlo: la mala suerte de uno se compensa con la buena del otro, dentro de la propia carrera. Así, el azar se promedia mucho más rápido para un equipo que para un individuo, y por eso se puede juzgar con muchas menos carreras:'
+    ],
+    chartRel:{ x:'Número de carreras jugadas', team:'Equipo (6 jugadores)', player:'Jugador solo', match:'un partido', caption:'Fiabilidad de la clasificación según el número de carreras. Tras un solo partido de 12 carreras, un equipo ya está mejor definido que un jugador (58% frente a 45%), pero la verdadera certeza solo llega con muchas más carreras.' },
+    chartRaces:{ team:'Equipo', player:'Jugador solo', races:'carreras', caption:'Carreras necesarias para una clasificación fiable. Un equipo se juzga unas dos veces más rápido que un jugador solo.' },
+    collective2:[
+      'En concreto, hacen falta unas <fig>60 carreras</fig> para juzgar bien a un jugador solo, pero solo <fig>34 carreras</fig> para un equipo: casi la mitad. Ahora bien, en este torneo cada partido enfrenta a dos equipos a lo largo de <b>doce carreras</b>, suficiente para que el nivel pese más que el azar. Por eso el mejor equipo casi siempre gana su partido, y por eso un torneo por equipos refleja el nivel real mucho mejor que una clasificación individual.'
+    ],
+    hMemory:'3. Una mala carrera nunca arrastra a otra',
+    memory:[
+      'Muchos jugadores creen en el “momentum”: una buena carrera lanzaría otra, una mala haría bola de nieve. Los datos dicen lo contrario: cada carrera empieza de cero, sin relación con las anteriores. En la práctica, incluso tras acabar último, aún tienes un <fig>23%</fig> de probabilidades de subir al podio en la carrera siguiente. Nada está condenado de antemano.'
+    ],
+    hPlayers:'4. Qué hace a un buen jugador',
+    players:[
+      'El nivel se ve sobre todo en las <b>mejores carreras</b> de un jugador, no en su capacidad de evitar las malas. Dicho de otro modo, un buen jugador no es quien limita los desastres: es quien apunta más alto cuando todo encaja. Buscar la cima y aceptar el riesgo rinde más que jugar con prudencia.',
+      'También se suele pensar que la presión hace fallar en los momentos decisivos. Claro, algunos fallan y otros se crecen: individualmente, ocurre. Pero <b>en promedio</b> se equilibra: en la manga decisiva de una serie, el conjunto de los jugadores puntúa igual que de costumbre. A escala global, lo que está en juego no sube ni baja el nivel general.'
+    ],
+    hTracks:'5. Todos los circuitos son equivalentes',
+    tracks:[
+      'Es tentador pensar que algunos circuitos son más “afortunados”, más “traicioneros” o más “decisivos” que otros. Los datos no lo respaldan. Ningún circuito destaca de verdad: ni en la parte de azar, ni en su tendencia a abrir hueco, ni en la importancia de la posición de salida.',
+      'Una consecuencia práctica: <b>elegir un circuito según tu posición de salida no cambia nada</b>. La posición de partida casi no influye en el resultado final. En lo competitivo, los circuitos son equivalentes: juega el que prefieras, tus probabilidades son las mismas.'
+    ],
+    tracksPref:[
+      'Y sin embargo, los jugadores están lejos de elegir al azar. Algunos circuitos aparecen mucho más que otros, y esas preferencias son <b>estables durante todo el torneo</b>: los favoritos de la fase de grupos siguen siendo los favoritos del bracket. Es, por tanto, una tendencia real, no un simple efecto del azar.',
+      'Ahí está la paradoja: esos circuitos tan queridos no producen carreras diferentes — ni más justas, ni más decisivas. Los jugadores eligen por <b>gusto, costumbre o estética</b>, no porque un circuito les dé una ventaja real.'
+    ],
+    chartTracks:{ caption:'Circuitos más y menos elegidos en todo el torneo. Las preferencias son fuertes y estables, pero competitivamente neutras.', showAll:'Ver todos los circuitos', showLess:'Ver menos' },
+    hMatch:'6. Lo que de verdad gana un partido',
+    match:[
+      '<b>Lo que decide es el podio.</b> Lo que cuenta en un partido es cuántos de tus pilotos llegan al podio, y cuántos se hunden al fondo. La zona media apenas cuenta.',
+      '<b>Atacar rinde más que jugar seguro.</b> Ir a por los primeros puestos importa más que evitar los últimos.',
+      '<b>Es un juego de equipo.</b> El jugador más débil cuenta tanto como la estrella: un solo nombre nunca basta para ganar.',
+      'Por último, un partido se <b>decide poco a poco</b>. Desde la primera carrera, el equipo líder acaba ganando el <fig>65%</fig> de las veces; tras diez carreras, es el <fig>99%</fig>. Pero mientras la diferencia de puntos entre los dos equipos sea pequeña, nada está resuelto: una ventaja a mitad de partido solo aguanta si es realmente amplia:'
+    ],
+    chartLead:{ caption:'Probabilidad de conservar la ventaja hasta el final, según su tamaño a mitad de partido.', b1:'≤ 15 pts', b2:'16–30 pts', b3:'31–50 pts', b4:'más de 50 pts' },
+    match2:[
+      'En resumen: por debajo de 30 puntos de ventaja a mitad de partido, todo sigue siendo posible; por encima de 50, la victoria está casi asegurada.',
+      'E incluso a nivel de equipo, el azar sigue muy presente: conocer el nivel de los dos equipos no basta para predecir el marcador de un partido. Cómo se desarrolle el día cuenta al menos tanto como lo buenos que sean los equipos.'
+    ],
+    hRecords:'Los récords del torneo',
+    recordsIntro:'Ahora, el cuadro de honor del MKWC 2026: las cifras destacadas de tres semanas de competición.',
+    rec:{
+      champion:'Equipo campeón', bestPlayer:'Mejor jugador', mostWins:'Más carreras ganadas',
+      bigMatch:'Mejor partido individual', longStreak:'Mayor racha de victorias', surprise:'La sorpresa del torneo',
+      mostPoints:'Equipo más anotador', topScorer:'Mayor cantidad de puntos anotados en el torneo', comeback:'Mayor remontada',
+      pts:'pts', wins:'victorias', races:'carreras', ptsMatch:'pts en un partido', streakUnit:'seguidas',
+      top6Unit:'veces', places:'puestos ganados', deficit:'pts de desventaja remontados',
+      avgOn:'de media en', top6Hint:'(los 6 pilotos en el top 6 de una carrera)'
+    },
+    statsLead:'El MKWC 2026 en cifras',
+    stat:{ teams:'equipos', players:'jugadores', matches:'partidos', races:'carreras disputadas', points:'puntos anotados' },
+    hClose:'La última palabra',
+    close:[
+      'Esta es la idea que lo resume todo: <b>en una carrera, Mario Kart World es muy impredecible; a la larga, se vuelve muy coherente.</b> El azar se equilibra, el nivel aflora, y una vez fijada la diferencia rara vez se invierte. La mayoría de las ideas habituales — las rachas, elegir circuitos según tu posición de salida, el peso del azar, las remontadas heroicas — no sobreviven al análisis.',
+      'Eso es lo que este sitio me permitió entender: tras el desorden aparente, el juego es en realidad <b>bastante justo</b>, siempre que le des tiempo para separar a los jugadores. Gracias por seguir el torneo aquí, y gracias a todos los equipos por el espectáculo. Hasta la próxima.'
+    ]
+  },
+  ja:{
+    eyebrow:'最後に',
+    title:'大会を振り返る、そしてこのサイトを作った理由',
+    standfirst:'3週間、31チーム、1000を超えるレース。MKWC 2026が終わりました——最後にもう一周。大会の総括、そして何より、これだけのデータが<b>マリオカート ワールド</b>そのものについて何を教えてくれたのか。それこそが、このサイトの本当の存在理由だからです。',
+    byline:'総括 · 分析 · 舞台裏',
+    hOverview:'ひと目で見る大会',
+    overviewChamp:'容赦のないシングルエリミネーションを勝ち抜き、{champion}がMKWC 2026の王座に就きました。しかしその戴冠の裏で、大会は3幕に分かれて進行しました——予選のプレイイン、順位を決めるグループステージ、決着をつけるブラケットです。',
+    overviewNoChamp:'大会は3幕に分かれて進行しました——予選のプレイイン、順位を決めるグループステージ、決着をつけるシングルエリミネーションのブラケットです。王者は決勝終了後に決まり、この総括はその時点で自動的に完成します。',
+    overview2:'31か国が、まず小グループに分かれ、やがて最終ブラケットへと集約されていく——この形式は、長期的な安定感と当日の爆発力の両方を評価します。1試合は12レース、各レースはチーム6人の順位に応じて得点が入ります。紙の上では単純——実際にはずっと奥深いのは、これから見るとおりです。',
+    hWhy:'このサイトを作った理由',
+    why:[
+      '最初は、ただ結果をきれいに追える場所が欲しかっただけでした。でもすぐに、ある問いが何度も浮かんできました。<b>青こうらやサンダーが完璧なレースを台無しにしうるゲームで、結果は本当に選手の実力を映しているのか？</b> 誰もが自分の考えを持っています——「ほとんど運だ」「いや、最後は強い者が勝つ」——でも、数字で語れる人はいません。',
+      'そこでこのサイトは、<b>その問いにデータで答える</b>手段になりました。入力された一つ一つの結果が、ゲームについて「知っているつもり」を確かめられるデータベースを育てます。大会は1000を超えるレースを積み重ねるので、ようやく本当の傾向と単なる偶然を見分けられるだけの材料が揃います。',
+      'ここから紹介するのは、大会全体のデータ——1000を超えるレース——に基づいています。この規模になると、<b>見えてくる傾向は確かで一貫しています</b>。単なる印象ではなく、試合を重ねるたびに繰り返し現れるパターンです。これはこのレベルの大会がゲームについて教えてくれることであり、別の状況では細部が多少変わるかもしれませんが、全体像そのものは信頼できます。予想どおりのものもあれば、それを覆すものもあります。'
+    ],
+    hLuck:'1. 1レースでは、運が90%を占める',
+    luck:[
+      '最も意外な結果です。これを測るために、<b>同じ選手</b>の結果がレースごとにどれだけ変わるかを見ます。実力は多少ぶれることもあります——疲れ、集中、その日の調子——が、レースごとにこれほど大きな差を生むには小さすぎます。結論は明快で、1レース単位では結果の約<fig>90%</fig>が実力以外の要素（アイテム、接触、ふとしたミス）で決まり、実際の実力は約<fig>10%</fig>にすぎません。'
+    ],
+    chartLuck:{ luck:'運とレースのばらつき', skill:'実力' },
+    luck2:[
+      '言い換えれば、<b>1レースだけでは選手の実力はほとんど分かりません</b>。これは全員に当てはまり、大会最優秀選手の<b>Borger</b>も例外ではありません。以下は、Borgerの72レースの成績の散らばりです。',
+      '5レースに1回は1位を取りますが、下位に沈み、最下位まで落ちることもあります。最強の選手でも全レースを勝てるわけではありません——タイミングの悪いアイテム、接触、ちょっとしたミスで一変します。だから実力は1レースでは見えず、多くのレースを通して初めて見えてきます。'
+    ],
+    chartSpread:{ caption:'大会最優秀選手<b>Borger</b>の72レースの順位分布。表彰台は金、下位は赤。', podium:'◄ 表彰台', tail:'下位 ►', posSuffix:'位', posPrefix:'' },
+    hCollective:'2. 実力は繰り返しで表れる',
+    collective:[
+      '1レースが90%運なら、大会はどうやって公平に勝者を決められるのか？ それは<b>レースを積み重ねる</b>からです。1レースでは運が一方に、次はもう一方にと味方しますが、レースを重ねるほどその幸運・不運は互いに打ち消し合っていきます。わずかな実力差は常に同じ方向に働くので、繰り返すうちにそれが表面化するのです。',
+      '<b>6人のチーム</b>はこれをさらに加速させます。同じレースの中で、誰かがアイテムに阻まれても、別の仲間がその隙に前へ出ることが多い——一人の不運が、レースの中で別の一人の幸運に相殺されるのです。だからチームは個人よりずっと速く運がならされ、はるかに少ないレース数で評価できます。'
+    ],
+    chartRel:{ x:'プレーしたレース数', team:'チーム（6人）', player:'個人', match:'1試合', caption:'レース数ごとの順位の信頼度。12レースの1試合を終えた時点で、チームは個人より的確に把握できる（58%対45%）が、本当の確実さはさらに多くのレースを重ねて初めて得られる。' },
+    chartRaces:{ team:'チーム', player:'個人', races:'レース', caption:'信頼できる順位付けに必要なレース数。チームは個人の約2倍速く判定できる。' },
+    collective2:[
+      '具体的には、個人を正しく評価するには約<fig>60レース</fig>が必要ですが、チームなら<fig>34レース</fig>——ほぼ半分で足ります。そしてこの大会では、各試合は2チームが<b>12レース</b>を戦うので、運より実力が上回るのに十分です。だから強いチームがほぼ必ず自分の試合に勝ち、チーム戦の大会は個人ランキングよりずっと正確に実力を映すのです。'
+    ],
+    hMemory:'3. 悪いレースが次の悪いレースを呼ぶことはない',
+    memory:[
+      '多くの選手は「モメンタム」を信じています——良いレースが次を呼び、悪いレースは雪だるま式に悪化する、と。データはその逆を示します。どのレースもゼロから始まり、前のレースとは無関係です。実際、最下位でゴールした後でも、次のレースで表彰台に入る確率は<fig>23%</fig>あります。あらかじめ決まっている運命など、何もありません。'
+    ],
+    hPlayers:'4. 良い選手を決めるもの',
+    players:[
+      '実力は、悪いレースを避ける力よりも、選手の<b>最良のレース</b>に表れます。言い換えれば、良い選手とは大崩れを抑える人ではなく、すべてが噛み合ったときにより上を狙える人です。上を狙ってリスクを取る方が、堅実に走るより報われます。',
+      'プレッシャーで決定的な場面に崩れる、とも思われがちです。確かに、崩れる人もいれば逆に力を出す人もいます——個人単位では起こります。しかし<b>平均すれば</b>釣り合います。シリーズの最終マッチでも、選手全体の得点は普段と変わりません。全体として見れば、かかっているものの大きさが全体の実力を上げ下げすることはないのです。'
+    ],
+    hTracks:'5. コースはどれも同じ',
+    tracks:[
+      '一部のコースは他より「運が絡む」「危険」「決定的」だと思いがちです。しかしデータはそれを裏づけません。どのコースも本当に際立ってはいません——運の大きさでも、差の開きやすさでも、スタート位置の重要度でも。',
+      '実用的な帰結として、<b>自分のスタート順位に応じてコースを選んでも何も変わりません</b>。スタート位置は最終結果にほとんど影響しません。競技の観点では、コースはどれも同等です——好きなコースを選んでください、勝率は変わりません。'
+    ],
+    tracksPref:[
+      'それでも、選手たちは決してランダムに選んでいるわけではありません。一部のコースは他よりずっと多く選ばれ、その好みは<b>大会を通じて安定</b>しています——グループステージで人気のコースは、ブラケットでも人気です。つまり、単なる偶然ではなく本物の傾向です。',
+      'ここに逆説があります。よく選ばれるコースだからといって、レースの内容が変わるわけではありません——より公平でも、より決定的でもないのです。選手たちは<b>好み・習慣・見た目</b>で選んでいるのであって、そのコースが本当の有利をもたらすからではありません。'
+    ],
+    chartTracks:{ caption:'大会全体で最も選ばれた／最も選ばれなかったコース。好みは強く安定しているが、競技的には中立。', showAll:'すべてのコースを表示', showLess:'表示を減らす' },
+    hMatch:'6. 試合を本当に決めるもの',
+    match:[
+      '<b>勝敗を決めるのは表彰台です。</b> 試合で大事なのは、あなたの何人が表彰台に上がり、何人が後方に沈むか。中位はほとんど関係ありません。',
+      '<b>攻めは守りより報われます。</b> 1位を取りにいくことは、最下位を避けることより効きます。',
+      '<b>これはチームの競技です。</b> 最も弱い選手も、エースと同じくらい重要——一人の名選手だけでは決して勝てません。',
+      '試合は<b>少しずつ決まって</b>いきます。最初のレースの時点で、リードするチームが最終的に勝つのは<fig>65%</fig>。10レース後には<fig>99%</fig>です。ただし2チーム間の得点差が小さいうちは、まだ何も決まっていません——中間地点でのリードは、よほど大きくなければ守り切れないのです：'
+    ],
+    chartLead:{ caption:'中間地点でのリードの大きさ別に、最後まで逃げ切れる確率。', b1:'15点以下', b2:'16〜30点', b3:'31〜50点', b4:'50点超' },
+    match2:[
+      'つまり、中間地点でのリードが30点未満ならまだ何が起きるか分からず、50点を超えれば勝利はほぼ確実です。',
+      'そしてチーム単位でも、運は依然として大きく作用します。両チームの実力を知っていても、試合のスコアは予測しきれません。その日の展開は、チームの強さと少なくとも同じくらい結果を左右するのです。'
+    ],
+    hRecords:'大会の記録',
+    recordsIntro:'ここで、MKWC 2026の栄誉——3週間の戦いを彩った数字たちです。',
+    rec:{
+      champion:'優勝チーム', bestPlayer:'最優秀選手', mostWins:'最多レース勝利',
+      bigMatch:'個人最高マッチ', longStreak:'最長連勝', surprise:'今大会の番狂わせ',
+      mostPoints:'最多得点チーム', topScorer:'大会での最多獲得ポイント', comeback:'最大の逆転',
+      pts:'点', wins:'勝', races:'レース', ptsMatch:'点（1マッチ）', streakUnit:'連続',
+      top6Unit:'回', places:'順位アップ', deficit:'点差を逆転',
+      avgOn:'平均・', top6Hint:'（1レースで6人全員がトップ6）'
+    },
+    statsLead:'数字で見るMKWC 2026',
+    stat:{ teams:'チーム', players:'選手', matches:'試合', races:'レース', points:'総得点' },
+    hClose:'最後に',
+    close:[
+      'すべてを要約する考えはこうです：<b>1レースではマリオカート ワールドは非常に予測しづらいが、長い目で見れば非常に安定している。</b> 運はならされ、実力が表れ、一度差がつけばめったに覆りません。よくある思い込み——好調の波、スタート順位に応じたコース選び、運の大きさ、劇的な逆転——の多くは、分析に耐えません。',
+      'それこそ、このサイトが私に気づかせてくれたことです：見かけの乱雑さの裏で、ゲームは実は<b>かなり公平</b>です——選手を見分けるだけの時間さえ与えれば。ここで大会を追ってくれてありがとう、そして素晴らしい戦いを見せてくれた全チームに感謝します。また次回。'
+    ]
+  }
+};
+// One record card: a small label, the winning team/player (with flag + determiner), and a detail line.
+function recordCardHTML(label, nameHTML, detail){
+  return `<div class="np-rec">
+    <span class="r-label">${label}</span>
+    <span class="r-name">${nameHTML}</span>
+    ${detail?`<span class="r-detail">${detail}</span>`:''}
+  </div>`;
+}
+function recordsGridHTML(r, S){
+  const L = S.rec;
+  // Record cards show the plain team name (flag + name), with NO article/determiner.
+  const teamHTML = tag => tag ? `${flagEl(tag)}<span>${teamName(tag)}</span>` : '—';
+  const playerHTML = (name, tag) => tag ? `${flagEl(tag)}<span>${name}</span>` : `<span>${name||'—'}</span>`;
+  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
+  const cards = [];
+  if(r.champion) cards.push(recordCardHTML(L.champion, teamHTML(r.champion), ''));
+  if(r.bestPlayer) cards.push(recordCardHTML(L.bestPlayer, playerHTML(r.bestPlayer.name, r.bestPlayer.team),
+    `${r.bestPlayer.raceAvg.toFixed(1).replace('.',decimalSep())}/15 ${L.avgOn} ${r.bestPlayer.races} ${L.races}`));
+  if(r.mostWins) cards.push(recordCardHTML(L.mostWins, playerHTML(r.mostWins.name, r.mostWins.team),
+    `${nf(r.mostWins.wins)} ${L.wins}`));
+  if(r.bigMatch) cards.push(recordCardHTML(L.bigMatch, playerHTML(r.bigMatch.name, r.bigMatch.team),
+    `${nf(r.bigMatch.total)} ${L.ptsMatch}`));
+  if(r.longStreak) cards.push(recordCardHTML(L.longStreak, playerHTML(r.longStreak.name, r.longStreak.team),
+    `${r.longStreak.streak} ${L.wins} ${L.streakUnit}`));
+  if(r.surprise) cards.push(recordCardHTML(L.surprise, teamHTML(r.surprise.tag),
+    r.surprise.delta>0 ? `+${r.surprise.delta} ${L.places}` : ''));
+  if(r.mostPoints) cards.push(recordCardHTML(L.mostPoints, teamHTML(r.mostPoints.tag),
+    `${nf(r.mostPoints.pts)} ${L.pts}`));
+  if(r.topScorer) cards.push(recordCardHTML(L.topScorer, playerHTML(r.topScorer.name, r.topScorer.team),
+    `${nf(r.topScorer.pts)} ${L.pts}`));
+  if(r.comeback) cards.push(recordCardHTML(L.comeback, teamHTML(r.comeback.winner),
+    `${Math.abs(r.comeback.deficit)} ${L.deficit}`));
+  return `<div class="np-records">${cards.join('')}</div>`;
+}
+function statsBarHTML(r, S){
+  const nf = n => (n==null?'—':n.toLocaleString(localeForLang()));
+  const cells = [
+    [nf(r.teamsCount), S.stat.teams],
+    [nf(r.playersCount), S.stat.players],
+    [nf(r.matchesCount), S.stat.matches],
+    [nf(r.racesCount), S.stat.races],
+    [nf(r.pointsTotal), S.stat.points],
+  ];
+  return `<div class="np-stats">${cells.map(([n,l])=>`<div class="np-stat"><div class="s-num">${n}</div><div class="s-lab">${l}</div></div>`).join('')}</div>`;
+}
+function renderWrapView(){
+  const el = document.getElementById('view-wrap');
+  if(!el) return;
+  const r = bracketDone() ? getBracketRecap() : null;
+  const champ = r && r.champion ? teamProseHTML(r.champion) : null;
+  const S = WRAP_I18N[LANG] || WRAP_I18N.en;
+  const md = s => s
+    .replace(/<b>/g,'<strong>').replace(/<\/b>/g,'</strong>')
+    .replace(/<fig>/g,'<span class="np-fig">').replace(/<\/fig>/g,'</span>');
+  const body = [];
+  // Records/stats + the track-preference chart both read the same tournament tally.
+  const rec = bracketDone() ? getWrapRecords() : null;
+  // Intro / overview (champion line only when known). {champion} already carries its own
+  // (lowercase, unbold) FR determiner via teamProseHTML — the text must not add one.
+  body.push(`<h2 class="np-h2">${S.hOverview}</h2>`);
+  body.push(`<p>${md(champ ? S.overviewChamp.split('{champion}').join(champ) : S.overviewNoChamp)}</p>`);
+  body.push(`<p>${md(S.overview2)}</p>`);
+  // Records + headline stats sit right under the overview (final data only).
+  if(S.rec && rec){
+    body.push(`<h2 class="np-h2">${S.hRecords}</h2>`);
+    body.push(`<p>${md(S.recordsIntro)}</p>`);
+    body.push(recordsGridHTML(rec, S));
+    body.push(`<p class="np-stats-lead" style="text-align:center;font-family:'Rajdhani',sans-serif;text-transform:uppercase;letter-spacing:0.04em;color:var(--gold);margin:26px 0 0;">${S.statsLead}</p>`);
+    body.push(statsBarHTML(rec, S));
+  }
+  // Why this site
+  body.push(`<h2 class="np-h2">${S.hWhy}</h2>`);
+  S.why.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  // Findings, each with a chart
+  body.push(`<h2 class="np-h2">${S.hLuck}</h2>`);
+  S.luck.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  body.push(chartLuckSkill(S.chartLuck.luck, S.chartLuck.skill));
+  S.luck2.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  body.push(chartBestPlayerSpread(S.chartSpread));
+
+  body.push(`<h2 class="np-h2">${S.hCollective}</h2>`);
+  S.collective.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  body.push(chartReliability(S.chartRel));
+  body.push(chartRacesToRank(S.chartRaces));
+  S.collective2.forEach(p=>body.push(`<p>${md(p)}</p>`));
+
+  body.push(`<h2 class="np-h2">${S.hMemory}</h2>`);
+  S.memory.forEach(p=>body.push(`<p>${md(p)}</p>`));
+
+  // Players: talent = ceiling not floor, no pressure effect
+  body.push(`<h2 class="np-h2">${S.hPlayers}</h2>`);
+  S.players.forEach(p=>body.push(`<p>${md(p)}</p>`));
+
+  body.push(`<h2 class="np-h2">${S.hTracks}</h2>`);
+  S.tracks.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  // The one reliable track finding: strong, stable selection preferences (taste, not strategy).
+  if(S.tracksPref) S.tracksPref.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  if(rec) body.push(chartTrackPrefs(S.chartTracks, rec.trackPrefs));
+
+  body.push(`<h2 class="np-h2">${S.hMatch}</h2>`);
+  S.match.forEach(p=>body.push(`<p>${md(p)}</p>`));
+  // Safe-lead threshold chart + extra match findings
+  body.push(chartSafeLead(S.chartLead));
+  if(S.match2) S.match2.forEach(p=>body.push(`<p>${md(p)}</p>`));
+
+  body.push(`<h2 class="np-h2">${S.hClose}</h2>`);
+  S.close.forEach(p=>body.push(`<p>${md(p)}</p>`));
+
+  el.innerHTML = `
+    <button class="back-btn" id="backFromWrap">← ${t('navHome')}</button>
+    <article class="np-article">
+      <div class="np-eyebrow">${S.eyebrow}</div>
+      <h1 class="np-title outline">${S.title}</h1>
+      <p class="np-standfirst">${md(S.standfirst)}</p>
+      <div class="np-byline">${S.byline}</div>
+      <hr class="np-rule">
+      <div class="np-body">${body.join('')}</div>
+    </article>`;
+  const back = document.getElementById('backFromWrap');
+  if(back) back.onclick = ()=>{ setView('home'); };
+  // Expand / collapse the full track-preference list.
+  const toggle = el.querySelector('.tp-toggle');
+  if(toggle){
+    toggle.onclick = ()=>{
+      const fig = toggle.closest('.np-trackprefs');
+      const collapsed = fig.getAttribute('data-collapsed')==='1';
+      fig.setAttribute('data-collapsed', collapsed ? '0' : '1');
+      toggle.textContent = collapsed ? toggle.dataset.less : toggle.dataset.more;
+    };
+  }
+}
 function decimalSep(){ return LANG==='en' ? '.' : ','; }
 
 /* =========================================================
@@ -3536,6 +4717,8 @@ function HERO_INFO_F(){ return {
   players: {title:t('heroTitlePlayers'), sub:t('heroSubPlayers')},
   nutshell: {title:t('heroTitleNutshell'), sub:t('heroSubNutshell')},
   groupnutshell: {title:t('heroTitleGroupNutshell'), sub:t('heroSubGroupNutshell')},
+  bracketnutshell: {title:t('heroTitleBracketNutshell'), sub:t('heroSubBracketNutshell')},
+  wrap: {title:t('heroTitleWrap'), sub:t('heroSubWrap')},
 };}
 let selectedMatch = null;
 let selectedPlayer = null; // {tag, name}
@@ -3564,6 +4747,8 @@ const VIEW_RENDERERS = {
   players: renderPlayersView,
   nutshell: renderNutshellView,
   groupnutshell: renderGroupNutshellView,
+  bracketnutshell: renderBracketNutshellView,
+  wrap: renderWrapView,
 };
 let dirtyViews = new Set(Object.keys(VIEW_RENDERERS));
 function markAllDirty(){ dirtyViews = new Set(Object.keys(VIEW_RENDERERS)); }
@@ -3605,7 +4790,7 @@ function setView(view){
   currentView = view;
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', groupnutshell:'view-groupnutshell'};
+  const map = {home:'view-home', standings:'view-standings', calendar:'view-calendar', teams:'view-teams', match:'view-match', player:'view-player', players:'view-players', nutshell:'view-nutshell', groupnutshell:'view-groupnutshell', bracketnutshell:'view-bracketnutshell', wrap:'view-wrap'};
   document.getElementById(map[view]).classList.add('active');
   updateHero(view);
   ensureViewRendered(view);
