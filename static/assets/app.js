@@ -4401,7 +4401,7 @@ const WRAP_I18N = {
     hClose:'Final word',
     close:[
       'Here’s the idea that ties it together: <b>over one race, Mario Kart World is very unpredictable; over the long run, it becomes very consistent.</b> Luck evens out, skill emerges, and once a gap is set it rarely reverses. Most common beliefs — hot streaks, picking tracks based on your grid position, the role of luck, heroic comebacks — don’t survive the analysis.',
-      'That’s what this site helped me understand: behind the apparent disorder, the game is actually <b>quite fair</b>, as long as you give it time to separate the players. Thanks for following the tournament here, and thanks to every team for the show. See you next time.'
+      'That’s what this site helped me understand: behind the apparent disorder, the game is actually <b>quite fair</b>, as long as you give it time to separate the players. Thanks for following the tournament here, and thanks to every team for the show!'
     ]
   },
   es:{
@@ -4485,7 +4485,7 @@ const WRAP_I18N = {
     hClose:'La última palabra',
     close:[
       'Esta es la idea que lo resume todo: <b>en una carrera, Mario Kart World es muy impredecible; a la larga, se vuelve muy coherente.</b> El azar se equilibra, el nivel aflora, y una vez fijada la diferencia rara vez se invierte. La mayoría de las ideas habituales — las rachas, elegir circuitos según tu posición de salida, el peso del azar, las remontadas heroicas — no sobreviven al análisis.',
-      'Eso es lo que este sitio me permitió entender: tras el desorden aparente, el juego es en realidad <b>bastante justo</b>, siempre que le des tiempo para separar a los jugadores. Gracias por seguir el torneo aquí, y gracias a todos los equipos por el espectáculo. Hasta la próxima.'
+      'Eso es lo que este sitio me permitió entender: tras el desorden aparente, el juego es en realidad <b>bastante justo</b>, siempre que le des tiempo para separar a los jugadores. ¡Gracias por seguir el torneo aquí, y gracias a todos los equipos por el espectáculo!'
     ]
   },
   ja:{
@@ -4569,7 +4569,7 @@ const WRAP_I18N = {
     hClose:'最後に',
     close:[
       'すべてを要約する考えはこうです：<b>1レースではマリオカート ワールドは非常に予測しづらいが、長い目で見れば非常に安定している。</b> 運はならされ、実力が表れ、一度差がつけばめったに覆りません。よくある思い込み——好調の波、スタート順位に応じたコース選び、運の大きさ、劇的な逆転——の多くは、分析に耐えません。',
-      'それこそ、このサイトが私に気づかせてくれたことです：見かけの乱雑さの裏で、ゲームは実は<b>かなり公平</b>です——選手を見分けるだけの時間さえ与えれば。ここで大会を追ってくれてありがとう、そして素晴らしい戦いを見せてくれた全チームに感謝します。また次回。'
+      'それこそ、このサイトが私に気づかせてくれたことです：見かけの乱雑さの裏で、ゲームは実は<b>かなり公平</b>です——選手を見分けるだけの時間さえ与えれば。ここで大会を追ってくれてありがとう、そして素晴らしい戦いを見せてくれた全チームに感謝します。'
     ]
   }
 };
